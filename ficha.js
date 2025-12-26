@@ -1,5 +1,6 @@
 const inputs = document.querySelectorAll("input");
 
+/* Salvar tudo */
 inputs.forEach((input, i) => {
   input.value = localStorage.getItem("campo_" + i) || "";
   input.addEventListener("input", () => {
@@ -7,18 +8,33 @@ inputs.forEach((input, i) => {
   });
 });
 
-document.querySelectorAll(".bar-input").forEach(input => {
-  const barId = input.dataset.bar;
-  const bar = document.getElementById(barId);
+/* Barras com atual / máximo */
+function atualizarBarra(tipo) {
+  const atual = document.querySelector(`.current[data-bar="${tipo}"]`);
+  const max = document.querySelector(`.max[data-bar="${tipo}"]`);
+  const barra = document.getElementById(tipo);
 
-  function atualizar() {
-    let valor = parseInt(input.value) || 0;
-    if (valor < 0) valor = 0;
-    if (valor > 100) valor = 100;
-    bar.style.width = valor + "%";
+  let a = parseInt(atual.value) || 0;
+  let m = parseInt(max.value) || 0;
+
+  if (m <= 0) {
+    barra.style.width = "0%";
+    return;
   }
 
-  atualizar();
-  input.addEventListener("input", atualizar);
+  if (a > m) a = m;
+  if (a < 0) a = 0;
+
+  const porcentagem = (a / m) * 100;
+  barra.style.width = porcentagem + "%";
+}
+
+["vida", "sanidade", "energia"].forEach(tipo => {
+  document.querySelectorAll(`[data-bar="${tipo}"]`).forEach(input => {
+    input.addEventListener("input", () => atualizarBarra(tipo));
+  });
+
+  atualizarBarra(tipo);
 });
+
 
