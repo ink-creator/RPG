@@ -98,18 +98,18 @@ h2 {
 .field {
   display: flex;
   flex-direction: column;
-  margin-bottom: 2px; /* era grande demais */
+  margin-bottom: 1px; /* era grande demais */
 }
 
 .field label {
-  font-size: 11px;      /* menor */
+  font-size: 6px;      /* menor */
   color: #aaa;
-  margin-bottom: 1px;  /* quase colado */
+  margin-bottom: 0px;  /* quase colado */
   line-height: 1;
 }
 
 .field input {
-  padding: 4px 6px;    /* menos altura */
+  padding: 1px 2px;    /* menos altura */
   font-size: 14px;
 }
 .cabecinha { 
@@ -117,4 +117,5 @@ text-align: center;
 margin-bottom: 15px; 
 color: var(--accent);
 }
+
 
