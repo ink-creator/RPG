@@ -13,8 +13,7 @@ body {
   margin: 0;
 }
 
-/* FICHA */
-.ficha {
+.sheet {
   max-width: 1200px;
   margin: auto;
   padding: 15px;
@@ -22,7 +21,6 @@ body {
   border: 3px solid var(--border);
 }
 
-/* INPUTS */
 input {
   width: 100%;
   background: #000;
@@ -32,120 +30,69 @@ input {
   margin-bottom: 5px;
 }
 
-/* TÍTULOS */
 h2 {
   text-align: center;
   border-bottom: 1px solid var(--border);
   color: var(--accent);
-  margin-top: 20px;
 }
 
-/* TOPO */
-.topo {
+.top {
   display: grid;
-  grid-template-columns: 1fr 2fr;
+  grid-template-columns: 1fr 2fr 1fr;
   gap: 15px;
 }
 
-.info-esquerda {
-  border: 2px solid var(--border);
-  padding: 10px;
-}
-
-.info-direita {
+.middle {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 10px;
+  gap: 15px;
+  margin-top: 15px;
 }
 
-/* STATUS */
-.status {
+.block, .inventory {
   border: 2px solid var(--border);
   padding: 10px;
 }
 
-.status label {
-  display: block;
-  text-align: center;
-  color: var(--accent);
-  margin-bottom: 5px;
+.bar-group {
+  margin-bottom: 15px;
 }
 
-/* BARRAS */
-.barra {
+.bar-inputs {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.bar-inputs input {
+  width: 45%;
+}
+
+.bar {
   background: #333;
   height: 16px;
   border: 1px solid #000;
   margin-bottom: 5px;
 }
 
-.barra-interna {
+.bar div {
   height: 100%;
   width: 0%;
 }
 
-/* CORES DAS BARRAS */
-#vida {
-  background: #b00000;
-}
+#vida { background: #b00000; }
+#sanidade { background: #7a00b0; }
+#energia { background: #007a3d; }
 
-#sanidade {
-  background: #7a00b0;
-}
-
-#energia {
-  background: #007a3d;
-}
-
-/* GERAL */
-.geral {
+.inventory .grid {
   display: grid;
   grid-template-columns: repeat(5, 1fr);
   gap: 5px;
-  border: 2px solid var(--border);
-  padding: 10px;
-}
-
-/* BLOCOS (INTERPESSOAL, TÉCNICO, ACADÊMICAS) */
-.bloco {
-  border: 2px solid var(--border);
-  padding: 10px;
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 5px;
-}
-
-/* INVENTÁRIO */
-.inventario {
-  border: 2px solid var(--border);
-  padding: 10px;
-  display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  gap: 5px;
-}
-
-/* CABEÇALHO OPCIONAL */
-.cabecinha {
-  text-align: center;
-  margin-bottom: 15px;
-  color: var(--accent);
 }
 
 /* RESPONSIVO */
 @media (max-width: 900px) {
-  .topo {
+  .top, .middle {
     grid-template-columns: 1fr;
-  }
-
-  .info-direita {
-    grid-template-columns: 1fr;
-  }
-
-  .geral {
-    grid-template-columns: repeat(2, 1fr);
-  }
-
-  .inventario {
-    grid-template-columns: repeat(2, 1fr);
   }
 }
