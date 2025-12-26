@@ -1,26 +1,43 @@
 import { db, ref, set, onValue } from "./firebase.js";
 
-/* SALVAR + OUVIR CAMPOS */
+/* ================================
+   INPUTS + FIREBASE
+================================ */
+
 document.querySelectorAll("input").forEach(input => {
   if (!input.id) return;
 
   const caminho = `jogadores/${PLAYER_ID}/${input.id}`;
   const referencia = ref(db, caminho);
 
-  // OUVIR mudanças em tempo real
+  // ouvir mudanças em tempo real
   onValue(referencia, snapshot => {
-    if (snapshot.exists()) {
-      input.value = snapshot.val();
+    if (!snapshot.exists()) return;
+
+    const valor = snapshot.val();
+
+    // evita reatribuição desnecessária
+    if (input.value !== String(valor)) {
+      input.value = valor;
+    }
+
+    // se o input pertence a uma barra, atualiza
+    const partes = input.id.split("-");
+    if (partes.length === 2) {
+      atualizarBarra(partes[0]);
     }
   });
 
-  // SALVAR ao digitar
+  // salvar ao digitar
   input.addEventListener("input", () => {
     set(referencia, input.value);
   });
 });
 
-/* BARRAS */
+/* ================================
+   BARRAS RPG
+================================ */
+
 function atualizarBarra(tipo) {
   const atual = document.getElementById(`${tipo}-atual`);
   const max = document.getElementById(`${tipo}-max`);
@@ -36,5 +53,16 @@ function atualizarBarra(tipo) {
     return;
   }
 
-  barra.style.width = (a / m) * 100 + "%";
+  if (a > m) a = m;
+  if (a < 0) a = 0;
+
+  barra.style.width = ((a / m) * 100) + "%";
 }
+
+/* ================================
+   INICIALIZAR BARRAS
+================================ */
+
+["vida", "sanidade", "energia"].forEach(tipo => {
+  atualizarBarra(tipo);
+});
