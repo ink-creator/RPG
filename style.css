@@ -90,7 +90,6 @@ h2 {
   gap: 5px;
 }
 
-/* RESPONSIVO */
 @media (max-width: 900px) {
   .top, .middle {
     grid-template-columns: 1fr;
