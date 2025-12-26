@@ -104,7 +104,7 @@ h2 {
 .field label {
   font-size: 10px;      /* menor */
   color: #aaa;
-  margin-bottom: 0px;  /* quase colado */
+  margin-bottom: 1px;  /* quase colado */
   line-height: 1;
 }
 
@@ -117,6 +117,7 @@ text-align: center;
 margin-bottom: 15px; 
 color: var(--accent);
 }
+
 
 
 
