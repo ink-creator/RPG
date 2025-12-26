@@ -1,28 +1,21 @@
-const inputs = document.querySelectorAll("input");
+/* SALVAR CAMPOS PELO ID */
+document.querySelectorAll("input").forEach(input => {
+  if (!input.id) return;
 
-inputs.forEach((input, index) => {
-  input.value = localStorage.getItem("campo_" + index) || "";
+  input.value = localStorage.getItem(input.id) || "";
 
   input.addEventListener("input", () => {
-    localStorage.setItem("campo_" + index, input.value);
+    localStorage.setItem(input.id, input.value);
   });
 });
 
-const inputs = document.querySelectorAll("input");
-
-/* Salvar tudo */
-inputs.forEach((input, i) => {
-  input.value = localStorage.getItem("campo_" + i) || "";
-  input.addEventListener("input", () => {
-    localStorage.setItem("campo_" + i, input.value);
-  });
-});
-
-/* Barras com atual / máximo */
+/* ATUALIZAR BARRAS */
 function atualizarBarra(tipo) {
-  const atual = document.querySelector(`.current[data-bar="${tipo}"]`);
-  const max = document.querySelector(`.max[data-bar="${tipo}"]`);
+  const atual = document.getElementById(`${tipo}-atual`);
+  const max = document.getElementById(`${tipo}-max`);
   const barra = document.getElementById(tipo);
+
+  if (!atual || !max || !barra) return;
 
   let a = parseInt(atual.value) || 0;
   let m = parseInt(max.value) || 0;
@@ -35,16 +28,17 @@ function atualizarBarra(tipo) {
   if (a > m) a = m;
   if (a < 0) a = 0;
 
-  const porcentagem = (a / m) * 100;
-  barra.style.width = porcentagem + "%";
+  barra.style.width = (a / m) * 100 + "%";
 }
 
+/* EVENTOS DAS BARRAS */
 ["vida", "sanidade", "energia"].forEach(tipo => {
-  document.querySelectorAll(`[data-bar="${tipo}"]`).forEach(input => {
-    input.addEventListener("input", () => atualizarBarra(tipo));
+  ["atual", "max"].forEach(sufixo => {
+    const campo = document.getElementById(`${tipo}-${sufixo}`);
+    if (campo) {
+      campo.addEventListener("input", () => atualizarBarra(tipo));
+    }
   });
 
   atualizarBarra(tipo);
 });
-
-
