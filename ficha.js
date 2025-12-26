@@ -1,41 +1,24 @@
-/* SALVAR CAMPOS PELO ID */
-document.querySelectorAll("input").forEach(input => {
-  if (!input.id) return;
+const inputs = document.querySelectorAll("input");
 
-  input.value = localStorage.getItem(input.id) || "";
-
+inputs.forEach((input, i) => {
+  input.value = localStorage.getItem("campo_" + i) || "";
   input.addEventListener("input", () => {
-    localStorage.setItem(input.id, input.value);
+    localStorage.setItem("campo_" + i, input.value);
   });
 });
 
-/* ATUALIZAR BARRAS */
-function atualizarBarra(tipo) {
-  const atual = document.getElementById(`${tipo}-atual`);
-  const max = document.getElementById(`${tipo}-max`);
-  const barra = document.getElementById(tipo);
+document.querySelectorAll(".bar-input").forEach(input => {
+  const barId = input.dataset.bar;
+  const bar = document.getElementById(barId);
 
-  let a = parseInt(atual.value) || 0;
-  let m = parseInt(max.value) || 0;
-
-  if (m <= 0) {
-    barra.style.width = "0%";
-    return;
+  function atualizar() {
+    let valor = parseInt(input.value) || 0;
+    if (valor < 0) valor = 0;
+    if (valor > 100) valor = 100;
+    bar.style.width = valor + "%";
   }
 
-  if (a > m) a = m;
-  if (a < 0) a = 0;
-
-  barra.style.width = (a / m) * 100 + "%";
-}
-
-["vida", "sanidade", "energia"].forEach(tipo => {
-  ["atual", "max"].forEach(sufixo => {
-    const campo = document.getElementById(`${tipo}-${sufixo}`);
-    if (campo) {
-      campo.addEventListener("input", () => atualizarBarra(tipo));
-    }
-  });
-
-  atualizarBarra(tipo);
+  atualizar();
+  input.addEventListener("input", atualizar);
 });
+
