@@ -1,19 +1,26 @@
-/* SALVAR CAMPOS PELO ID + PLAYER */
+import { db, ref, set, onValue } from "./firebase.js";
+
+/* SALVAR + OUVIR CAMPOS */
 document.querySelectorAll("input").forEach(input => {
   if (!input.id) return;
 
-  const chave = PLAYER_ID + "_" + input.id;
+  const caminho = `jogadores/${PLAYER_ID}/${input.id}`;
+  const referencia = ref(db, caminho);
 
-  // carregar valor salvo
-  input.value = localStorage.getItem(chave) || "";
+  // OUVIR mudanças em tempo real
+  onValue(referencia, snapshot => {
+    if (snapshot.exists()) {
+      input.value = snapshot.val();
+    }
+  });
 
-  // salvar ao digitar
+  // SALVAR ao digitar
   input.addEventListener("input", () => {
-    localStorage.setItem(chave, input.value);
+    set(referencia, input.value);
   });
 });
 
-/* ATUALIZAR BARRAS */
+/* BARRAS */
 function atualizarBarra(tipo) {
   const atual = document.getElementById(`${tipo}-atual`);
   const max = document.getElementById(`${tipo}-max`);
@@ -29,20 +36,5 @@ function atualizarBarra(tipo) {
     return;
   }
 
-  if (a > m) a = m;
-  if (a < 0) a = 0;
-
   barra.style.width = (a / m) * 100 + "%";
 }
-
-/* EVENTOS DAS BARRAS */
-["vida", "sanidade", "energia"].forEach(tipo => {
-  ["atual", "max"].forEach(sufixo => {
-    const campo = document.getElementById(`${tipo}-${sufixo}`);
-    if (campo) {
-      campo.addEventListener("input", () => atualizarBarra(tipo));
-    }
-  });
-
-  atualizarBarra(tipo);
-});
