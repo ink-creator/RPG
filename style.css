@@ -96,14 +96,13 @@ h2 {
   }
 }
 .field span {
-  opacity: 0.8;
-}
-.field {
-  gap: 1px;
+  opacity: 0.5;
+  color: #e0e0e0;
 }
 .field span {
   text-align: left;
 }
+
 
 
 
