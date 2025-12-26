@@ -13,7 +13,8 @@ body {
   margin: 0;
 }
 
-.sheet {
+/* FICHA */
+.ficha {
   max-width: 1200px;
   margin: auto;
   padding: 15px;
@@ -21,6 +22,7 @@ body {
   border: 3px solid var(--border);
 }
 
+/* INPUTS */
 input {
   width: 100%;
   background: #000;
@@ -30,74 +32,120 @@ input {
   margin-bottom: 5px;
 }
 
+/* TÍTULOS */
 h2 {
   text-align: center;
   border-bottom: 1px solid var(--border);
   color: var(--accent);
+  margin-top: 20px;
 }
 
-.top {
+/* TOPO */
+.topo {
   display: grid;
-  grid-template-columns: 1fr 2fr 1fr;
+  grid-template-columns: 1fr 2fr;
   gap: 15px;
 }
 
-.middle {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 15px;
-  margin-top: 15px;
-}
-
-.block, .inventory {
+.info-esquerda {
   border: 2px solid var(--border);
   padding: 10px;
 }
 
-.bar-group {
-  margin-bottom: 15px;
+.info-direita {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
 }
 
-.bar-inputs {
-  display: flex;
-  align-items: center;
-  gap: 5px;
+/* STATUS */
+.status {
+  border: 2px solid var(--border);
+  padding: 10px;
 }
 
-.bar-inputs input {
-  width: 45%;
+.status label {
+  display: block;
+  text-align: center;
+  color: var(--accent);
+  margin-bottom: 5px;
 }
 
-.bar {
+/* BARRAS */
+.barra {
   background: #333;
   height: 16px;
   border: 1px solid #000;
   margin-bottom: 5px;
 }
 
-.bar div {
+.barra-interna {
   height: 100%;
   width: 0%;
 }
 
-#vida { background: #b00000; }
-#sanidade { background: #7a00b0; }
-#energia { background: #007a3d; }
+/* CORES DAS BARRAS */
+#vida {
+  background: #b00000;
+}
 
-.inventory .grid {
+#sanidade {
+  background: #7a00b0;
+}
+
+#energia {
+  background: #007a3d;
+}
+
+/* GERAL */
+.geral {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 5px;
+  border: 2px solid var(--border);
+  padding: 10px;
+}
+
+/* BLOCOS (INTERPESSOAL, TÉCNICO, ACADÊMICAS) */
+.bloco {
+  border: 2px solid var(--border);
+  padding: 10px;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 5px;
+}
+
+/* INVENTÁRIO */
+.inventario {
+  border: 2px solid var(--border);
+  padding: 10px;
   display: grid;
   grid-template-columns: repeat(5, 1fr);
   gap: 5px;
 }
 
-/* RESPONSIVO */
-@media (max-width: 900px) {
-  .top, .middle {
-    grid-template-columns: 1fr;
-  }
-}
+/* CABEÇALHO OPCIONAL */
 .cabecinha {
   text-align: center;
   margin-bottom: 15px;
   color: var(--accent);
+}
+
+/* RESPONSIVO */
+@media (max-width: 900px) {
+  .topo {
+    grid-template-columns: 1fr;
+  }
+
+  .info-direita {
+    grid-template-columns: 1fr;
+  }
+
+  .geral {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .inventario {
+    grid-template-columns: repeat(2, 1fr);
+  }
 }
