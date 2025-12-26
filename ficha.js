@@ -1,42 +1,38 @@
 import { db, ref, set, onValue } from "./firebase.js";
 
-/* ================================
-   INPUTS + FIREBASE
-================================ */
-
 document.querySelectorAll("input").forEach(input => {
   if (!input.id) return;
 
   const caminho = `jogadores/${PLAYER_ID}/${input.id}`;
   const referencia = ref(db, caminho);
 
-  // ouvir mudanças em tempo real
   onValue(referencia, snapshot => {
     if (!snapshot.exists()) return;
 
-    const valor = snapshot.val();
-
-    // evita reatribuição desnecessária
-    if (input.value !== String(valor)) {
+    const valor = String(snapshot.val());
+    if (input.value !== valor) {
       input.value = valor;
     }
 
-    // se o input pertence a uma barra, atualiza
     const partes = input.id.split("-");
     if (partes.length === 2) {
       atualizarBarra(partes[0]);
     }
   });
 
-  // salvar ao digitar
-  input.addEventListener("input", () => {
+  const salvar = () => {
     set(referencia, input.value);
-  });
-});
 
-/* ================================
-   BARRAS RPG
-================================ */
+    const partes = input.id.split("-");
+    if (partes.length === 2) {
+      atualizarBarra(partes[0]);
+    }
+  };
+
+  input.addEventListener("input", salvar);
+  input.addEventListener("change", salvar);
+  input.addEventListener("keyup", salvar);
+});
 
 function atualizarBarra(tipo) {
   const atual = document.getElementById(`${tipo}-atual`);
@@ -56,13 +52,7 @@ function atualizarBarra(tipo) {
   if (a > m) a = m;
   if (a < 0) a = 0;
 
-  barra.style.width = ((a / m) * 100) + "%";
+  barra.style.width = (a / m) * 100 + "%";
 }
 
-/* ================================
-   INICIALIZAR BARRAS
-================================ */
-
-["vida", "sanidade", "energia"].forEach(tipo => {
-  atualizarBarra(tipo);
-});
+["vida", "sanidade", "energia"].forEach(atualizarBarra);
