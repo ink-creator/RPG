@@ -4,7 +4,7 @@ const contas = {
   Luma: { senha: "monitora", pagina: "players/p3.html" },
   Cayo: { senha: "cabeludo", pagina: "players/p4.html" },
   Juliana: { senha: "ruiva", pagina: "players/p5.html" },
-  mestre:  { senha: "mestre123", pagina: "mestre/mestre.html" }
+  mestre:  { senha: "cabecinha", pagina: "mestre/mestre.html" }
 };
 
 function login() {
@@ -18,3 +18,4 @@ function login() {
     document.getElementById("erro").innerText = "Usuário ou senha incorretos";
   }
 }
+
