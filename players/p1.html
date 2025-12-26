@@ -1,141 +1,133 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-br">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Ficha</title>
-  <link rel="stylesheet" href="../style.css">
+  <title>Ficha RPG</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-<div class="sheet">
+<div class="ficha">
 
   <!-- TOPO -->
-  <div class="top">
-
-    <!-- INFO ESQUERDA -->
-    <div class="info left">
-      <input placeholder="Nome">
-      <input placeholder="Raça">
-      <input placeholder="Altura">
-      <input placeholder="Idade">
+  <div class="topo">
+    <div class="info-esquerda">
+      <input id="nome" placeholder="Nome">
+      <input id="raca" placeholder="Raça">
+      <input id="altura" placeholder="Altura">
+      <input id="idade" placeholder="Idade">
     </div>
 
-    <!-- GERAL -->
-    <div class="info center">
-      <h2>GERAL</h2>
-      <input placeholder="Preparação">
-      <input placeholder="Luta Física">
-      <input placeholder="Luta à Distância">
-      <input placeholder="Vigilância">
-      <input placeholder="Mecânica">
-      <input placeholder="Infiltração">
-      <input placeholder="Terapia">
-      <input placeholder="Curar">
-      <input placeholder="Furtar">
-      <input placeholder="Fugir">
-    </div>
-
-    <!-- STATUS -->
-    <div class="info right">
-
-      <!-- VIDA -->
-      <div class="bar-group">
-        <label>VIDA</label>
-        <div class="bar-inputs">
-          <input type="number" placeholder="Atual" class="current" data-bar="vida">
-          <span>/</span>
-          <input type="number" placeholder="Máx" class="max" data-bar="vida">
+    <div class="info-direita">
+      <div class="status">
+        <label>Vida</label>
+        <input id="vida-atual" placeholder="Atual">
+        <input id="vida-max" placeholder="Máx">
+        <div class="barra">
+          <div class="barra-interna" id="vida"></div>
         </div>
-        <div class="bar"><div id="vida"></div></div>
-        <input placeholder="Resistência física">
+        <input id="vida-resistencia" placeholder="Resistência">
       </div>
 
-      <!-- SANIDADE -->
-      <div class="bar-group">
-        <label>SANIDADE</label>
-        <div class="bar-inputs">
-          <input type="number" placeholder="Atual" class="current" data-bar="sanidade">
-          <span>/</span>
-          <input type="number" placeholder="Máx" class="max" data-bar="sanidade">
+      <div class="status">
+        <label>Sanidade</label>
+        <input id="sanidade-atual" placeholder="Atual">
+        <input id="sanidade-max" placeholder="Máx">
+        <div class="barra">
+          <div class="barra-interna" id="sanidade"></div>
         </div>
-        <div class="bar"><div id="sanidade"></div></div>
-        <input placeholder="Resistência mental">
+        <input id="sanidade-resistencia" placeholder="Resistência">
       </div>
 
-      <!-- ENERGIA -->
-      <div class="bar-group">
-        <label>ENERGIA</label>
-        <div class="bar-inputs">
-          <input type="number" placeholder="Atual" class="current" data-bar="energia">
-          <span>/</span>
-          <input type="number" placeholder="Máx" class="max" data-bar="energia">
+      <div class="status">
+        <label>Energia</label>
+        <input id="energia-atual" placeholder="Atual">
+        <input id="energia-max" placeholder="Máx">
+        <div class="barra">
+          <div class="barra-interna" id="energia"></div>
         </div>
-        <div class="bar"><div id="energia"></div></div>
-        <input placeholder="Resistência a desgaste">
+        <input id="energia-resistencia" placeholder="Resistência">
       </div>
-
     </div>
   </div>
 
-  <!-- MEIO -->
-  <div class="middle">
+  <!-- GERAL -->
+  <h2>GERAL</h2>
+  <div class="geral">
+    <input id="preparacao" placeholder="Preparação">
+    <input id="luta-fisica" placeholder="Luta Física">
+    <input id="luta-distancia" placeholder="Luta à Distância">
+    <input id="vigilancia" placeholder="Vigilância">
+    <input id="mecanica" placeholder="Mecânica">
+    <input id="infiltracao" placeholder="Infiltração">
+    <input id="terapia" placeholder="Terapia">
+    <input id="curar" placeholder="Curar">
+    <input id="furtar" placeholder="Furtar">
+    <input id="fugir" placeholder="Fugir">
+  </div>
 
-    <div class="block">
-      <h2>INTERPESSOAL</h2>
-      <input placeholder="Acalmar">
-      <input placeholder="Detectar Mentira">
-      <input placeholder="Disfarce">
-      <input placeholder="Elogiar">
-      <input placeholder="Flertar">
-      <input placeholder="Interrogar">
-      <input placeholder="Intimidar">
-      <input placeholder="Malandragem">
-      <input placeholder="Negociar">
-      <input placeholder="Incomodar">
-    </div>
+  <!-- INTERPESSOAL -->
+  <h2>INTERPESSOAL</h2>
+  <div class="bloco">
+    <input id="acalmar" placeholder="Acalmar">
+    <input id="detectar-mentira" placeholder="Detectar Mentira">
+    <input id="disfarce" placeholder="Disfarce">
+    <input id="elogiar" placeholder="Elogiar">
+    <input id="fletar" placeholder="Fletar">
+    <input id="interrogar" placeholder="Interrogar">
+    <input id="intimidar" placeholder="Intimidar">
+    <input id="malandragem" placeholder="Malandragem">
+    <input id="negociar" placeholder="Negociar">
+    <input id="incomodar" placeholder="Incomodar">
+  </div>
 
-    <div class="block">
-      <h2>TÉCNICO</h2>
-      <input placeholder="Análise de Documentos">
-      <input placeholder="Astronomia">
-      <input placeholder="Balística">
-      <input placeholder="Coletar Evidências">
-      <input placeholder="Criptografia">
-      <input placeholder="Dispositivos Explosivos">
-      <input placeholder="Fotografia">
-      <input placeholder="Impressão Digital">
-      <input placeholder="Química">
-      <input placeholder="Vigilância Eletrônica">
-    </div>
+  <!-- TÉCNICO -->
+  <h2>TÉCNICO</h2>
+  <div class="bloco">
+    <input id="analise-documentos" placeholder="Análise de Documentos">
+    <input id="astronomia" placeholder="Astronomia">
+    <input id="balistica" placeholder="Balística">
+    <input id="coletar-evidencias" placeholder="Coletar Evidências">
+    <input id="criptografia" placeholder="Criptografia">
+    <input id="explosivos" placeholder="Dispositivos Explosivos">
+    <input id="fotografia" placeholder="Fotografia">
+    <input id="impressao-digital" placeholder="Impressão Digital">
+    <input id="quimica" placeholder="Química">
+    <input id="vigilancia-eletronica" placeholder="Vigilância Eletrônica">
+  </div>
 
-    <div class="block">
-      <h2>ACADÊMICAS</h2>
-      <input placeholder="Antropologia">
-      <input placeholder="Arquitetura">
-      <input placeholder="Curiosidades">
-      <input placeholder="Estudos">
-      <input placeholder="História">
-      <input placeholder="História Artística">
-      <input placeholder="História Natural">
-      <input placeholder="Lei">
-      <input placeholder="Linguagem">
-      <input placeholder="Pesquisa">
-    </div>
-
+  <!-- ACADÊMICAS -->
+  <h2>ACADÊMICAS</h2>
+  <div class="bloco">
+    <input id="antropologia" placeholder="Antropologia">
+    <input id="arquitetura" placeholder="Arquitetura">
+    <input id="curiosidades" placeholder="Curiosidades">
+    <input id="estudos" placeholder="Estudos">
+    <input id="historia" placeholder="História">
+    <input id="historia-artistica" placeholder="História Artística">
+    <input id="historia-natural" placeholder="História Natural">
+    <input id="lei" placeholder="Lei">
+    <input id="linguagem" placeholder="Linguagem">
+    <input id="pesquisa" placeholder="Pesquisa">
   </div>
 
   <!-- INVENTÁRIO -->
-  <div class="inventory">
-    <h2>INVENTÁRIO</h2>
-    <div class="grid">
-      <input><input><input><input><input>
-      <input><input><input><input><input>
-    </div>
+  <h2>INVENTÁRIO</h2>
+  <div class="inventario">
+    <input id="item1">
+    <input id="item2">
+    <input id="item3">
+    <input id="item4">
+    <input id="item5">
+    <input id="item6">
+    <input id="item7">
+    <input id="item8">
+    <input id="item9">
+    <input id="item10">
   </div>
 
 </div>
 
-<script src="login.js"></script>
+<script src="ficha.js"></script>
 </body>
 </html>
