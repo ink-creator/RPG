@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+    <script>
+        const user = localStorage.getItem("logado");
+
+        if (user !== "mestre") {
+            window.location.href = "../index.html";
+        }
+
+    </script>
+    <div class="cabecinha">
+        <h1>Bem-vindo, Mestre!</h1>
+        <p>Aqui estão os links para as fichas dos jogadores:</p>
+    <a href="../players/p1.html">Ficha Player 1</a>
+<a href="../players/p2.html">Ficha Player 2</a>
+<a href="../players/p3.html">Ficha Player 3</a>
+<a href="../players/p4.html">Ficha Player 4</a>
+<a href="../players/p5.html">Ficha Player 5</a>
+    </div>
+</body>
+</html>
