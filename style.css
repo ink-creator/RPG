@@ -123,21 +123,3 @@ h2 {
   z-index: 0;
   user-select: none;
 }
-input {
-  position: relative;
-  padding-top: 18px; /* espaço para o texto acima */
-}
-
-input::placeholder {
-  color: transparent; /* esconde o placeholder original */
-}
-
-input::before {
-  content: attr(placeholder);
-  position: absolute;
-  top: 2px;
-  left: 6px;
-  font-size: 12px;
-  color: #aaa;
-  pointer-events: none;
-}
