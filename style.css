@@ -112,3 +112,8 @@ h2 {
   padding: 4px 6px;    /* menos altura */
   font-size: 14px;
 }
+.cabecinha { 
+text-align: center;
+margin-bottom: 15px; 
+color: var(--accent);
+}
