@@ -95,31 +95,3 @@ h2 {
     grid-template-columns: 1fr;
   }
 }
-.field {
-  position: relative;
-  width: 100%;
-}
-
-.field input {
-  width: 100%;
-  padding: 12px 6px 6px 6px;
-  background: #000;
-  color: var(--text);
-  border: 1px solid #444;
-  box-sizing: border-box;
-  font-size: 16px;
-  position: relative;
-  z-index: 1;
-}
-
-.field label {
-  position: absolute;
-  left: 8px;
-  top: 50%;
-  transform: translateY(-50%);
-  color: #aaa;
-  pointer-events: none;
-  font-size: 14px;
-  z-index: 0;
-  user-select: none;
-}
