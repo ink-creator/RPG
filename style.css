@@ -109,7 +109,7 @@ h2 {
 }
 
 .field input {
-  padding: 1px 2px;    /* menos altura */
+  padding: 3px 6px;    /* menos altura */
   font-size: 14px;
 }
 .cabecinha { 
@@ -117,5 +117,6 @@ text-align: center;
 margin-bottom: 15px; 
 color: var(--accent);
 }
+
 
 
