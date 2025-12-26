@@ -1,11 +1,15 @@
-/* SALVAR CAMPOS PELO ID */
+/* SALVAR CAMPOS PELO ID + PLAYER */
 document.querySelectorAll("input").forEach(input => {
   if (!input.id) return;
 
-  input.value = localStorage.getItem(input.id) || "";
+  const chave = PLAYER_ID + "_" + input.id;
 
+  // carregar valor salvo
+  input.value = localStorage.getItem(chave) || "";
+
+  // salvar ao digitar
   input.addEventListener("input", () => {
-    localStorage.setItem(input.id, input.value);
+    localStorage.setItem(chave, input.value);
   });
 });
 
@@ -31,7 +35,7 @@ function atualizarBarra(tipo) {
   barra.style.width = (a / m) * 100 + "%";
 }
 
-/* EVENTOS */
+/* EVENTOS DAS BARRAS */
 ["vida", "sanidade", "energia"].forEach(tipo => {
   ["atual", "max"].forEach(sufixo => {
     const campo = document.getElementById(`${tipo}-${sufixo}`);
