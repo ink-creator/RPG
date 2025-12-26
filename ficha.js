@@ -1,5 +1,15 @@
 const inputs = document.querySelectorAll("input");
 
+inputs.forEach((input, index) => {
+  input.value = localStorage.getItem("campo_" + index) || "";
+
+  input.addEventListener("input", () => {
+    localStorage.setItem("campo_" + index, input.value);
+  });
+});
+
+const inputs = document.querySelectorAll("input");
+
 /* Salvar tudo */
 inputs.forEach((input, i) => {
   input.value = localStorage.getItem("campo_" + i) || "";
