@@ -99,13 +99,12 @@ h2 {
   display: flex;
   flex-direction: column;
   gap: 2px;
-  width: 100%;
 }
 
 .field span {
+  order: -1;
   font-size: 11px;
   color: #aaa;
-  line-height: 1;
 }
 
 .field input {
@@ -116,6 +115,7 @@ h2 {
   padding: 6px;
   box-sizing: border-box;
 }
+
 
 
 
