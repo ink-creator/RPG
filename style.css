@@ -95,20 +95,7 @@ h2 {
     grid-template-columns: 1fr;
   }
 }
-.field {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
 
-.field span {
-  font-size: 11px;
-  color: #aaa;
-}
-
-.field input {
-  margin-bottom: 5px;
-}
 
 
 
