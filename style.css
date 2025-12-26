@@ -95,15 +95,19 @@ h2 {
     grid-template-columns: 1fr;
   }
 }
-.field span {
-  opacity: 0.5;
-  color: #e0e0e0;
-}
-.field span {
-  text-align: left;
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
 }
 
+.field span {
+  font-size: 11px;
+  color: #aaa;
+}
 
-
+.field input {
+  margin-bottom: 5px;
+}
 
 
