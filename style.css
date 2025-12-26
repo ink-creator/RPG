@@ -95,6 +95,15 @@ h2 {
     grid-template-columns: 1fr;
   }
 }
+.field span {
+  opacity: 0.8;
+}
+.field {
+  gap: 1px;
+}
+.field span {
+  text-align: left;
+}
 
 
 
