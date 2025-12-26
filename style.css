@@ -98,20 +98,17 @@ h2 {
 .field {
   display: flex;
   flex-direction: column;
-  margin-bottom: 6px;
+  margin-bottom: 2px; /* era grande demais */
 }
 
 .field label {
-  font-size: 13px;
+  font-size: 11px;      /* menor */
   color: #aaa;
-  margin-bottom: 2px;
+  margin-bottom: 1px;  /* quase colado */
+  line-height: 1;
 }
 
 .field input {
-  background: #000;
-  color: var(--text);
-  border: 1px solid #444;
-  padding: 6px;
-  font-size: 15px;
+  padding: 4px 6px;    /* menos altura */
+  font-size: 14px;
 }
-
