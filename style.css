@@ -177,7 +177,7 @@ h2 {
 #dice-sprite {
   width: 64px;
   height: 64px;
-  background: url("../players/D20.png") left center; /* Coloque aqui seu sprite sheet */
+  background: url("../players/bah.png") left center; /* Coloque aqui seu sprite sheet */
   background-size: 1280px 64px; /* 20 frames de 64px cada */
   image-rendering: pixelated;
 }
@@ -205,6 +205,7 @@ h2 {
 .BOM     { color: #4caf50; }
 .NORMAL  { color: #2196f3; }
 .FALHA   { color: #f44336; }
+
 
 
 
