@@ -48,7 +48,7 @@ function avaliarResultado(valor, dado) {
 }
 
 // ============================
-// SALVAR HISTÓRICO NO FIREBASE
+// SALVAR HISTÓRICO
 // ============================
 
 function salvarHistorico({ jogador, playerId, pericia, valorSkill, dado, resultado }) {
@@ -66,7 +66,7 @@ function salvarHistorico({ jogador, playerId, pericia, valorSkill, dado, resulta
 }
 
 // ============================
-// FUNÇÃO PARA ROLAR DADO 2D
+// FUNÇÃO DADO
 // ============================
 
 function rolarDado2D(valorSkill) {
@@ -91,10 +91,6 @@ function rolarDado2D(valorSkill) {
     texto.textContent = `${resultado} (${dado})`;
     texto.className = `dice-text ${resultado}`;
 
-    // ============================
-    // HISTÓRICO
-    // ============================
-
     const nomeJogador =
       document.getElementById("nome")?.value || "Desconhecido";
 
@@ -112,73 +108,60 @@ function rolarDado2D(valorSkill) {
 }
 
 // ============================
-// VERIFICA INPUT
+// DOM READY
 // ============================
-
-function verificarInput(inputId) {
-  const input = document.getElementById(inputId);
-  if (!input) return false;
-
-  if (input.value.trim() === "") {
-    alert(`O campo "${inputId}" está vazio!`);
-    return false;
-  }
-
-  return true;
-}
-
-// ============================
-// CLIQUE NOS LABELS
-// ============================
-
-document.querySelectorAll("label[for]").forEach(label => {
-  label.style.cursor = "pointer";
-
-  label.addEventListener("click", event => {
-    event.preventDefault();
-
-    const inputId = label.getAttribute("for");
-    window.periciaAtual = label.textContent.trim();
-
-    if (!verificarInput(inputId)) return;
-
-    const input = document.getElementById(inputId);
-    const valor = parseInt(input.value, 10);
-
-    if (isNaN(valor) || valor < 1 || valor > 20) {
-      alert(`O valor do campo "${inputId}" precisa ser de 1 a 20.`);
-      return;
-    }
-
-    rolarDado2D(valor);
-  });
-});
-
-// =========================
-// CONTROLE MANUAL DO D20
-// =========================
 
 document.addEventListener("DOMContentLoaded", () => {
+
+  // CLIQUE NOS LABELS
+  document.querySelectorAll("label[for]").forEach(label => {
+    label.style.cursor = "pointer";
+
+    label.addEventListener("click", event => {
+      event.preventDefault();
+
+      const inputId = label.getAttribute("for");
+      window.periciaAtual = label.textContent.trim();
+
+      const input = document.getElementById(inputId);
+      if (!input) return;
+
+      if (input.value.trim() === "") {
+        alert(`O campo "${inputId}" está vazio!`);
+        return;
+      }
+
+      const valor = parseInt(input.value, 10);
+      if (isNaN(valor) || valor < 1 || valor > 20) {
+        alert(`O valor do campo "${inputId}" precisa ser de 1 a 20.`);
+        return;
+      }
+
+      rolarDado2D(valor);
+    });
+  });
+
+  // CONTROLE MANUAL (mantido)
   const overlay = document.getElementById("dice-overlay");
   const dice = document.getElementById("dice-sprite");
   const text = document.getElementById("dice-text");
 
-  if (!overlay || !dice) return;
+  if (overlay && dice) {
+    window.rolarD20 = function (resultadoTexto = "") {
+      overlay.classList.remove("hidden");
+      dice.classList.add("rolling");
 
-  window.rolarD20 = function (resultadoTexto = "") {
-    overlay.classList.remove("hidden");
-    dice.classList.add("rolling");
+      if (text) text.textContent = "";
 
-    if (text) text.textContent = "";
+      setTimeout(() => {
+        dice.classList.remove("rolling");
 
-    setTimeout(() => {
-      dice.classList.remove("rolling");
+        if (text && resultadoTexto) {
+          text.textContent = resultadoTexto;
+        }
 
-      if (text && resultadoTexto) {
-        text.textContent = resultadoTexto;
-      }
-
-      setTimeout(() => overlay.classList.add("hidden"), 1200);
-    }, 1000);
-  };
+        setTimeout(() => overlay.classList.add("hidden"), 1200);
+      }, 1000);
+    };
+  }
 });
