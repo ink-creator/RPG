@@ -42,6 +42,7 @@ function avaliarResultado(valor, dado) {
 // ============================
 function rolarDado2D(valorSkill) {
   const overlay = document.getElementById("dice-overlay");
+  overlay.classList.remove("hidden");
   const sprite = document.getElementById("dice-sprite");
   const texto = document.getElementById("dice-text");
 
@@ -124,3 +125,4 @@ document.querySelectorAll("label[for]").forEach(label => {
     rolarDado2D(valor);
   });
 });
+
