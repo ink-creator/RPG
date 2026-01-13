@@ -115,9 +115,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
   document.querySelectorAll("label[for]").forEach(label => {
 
-    label.addEventListener("click", (event) => {
-      // NÃO focar o input
+    // IMPEDE O FOCO NO INPUT (isso é o segredo)
+    label.addEventListener("mousedown", (event) => {
       event.preventDefault();
+    });
+
+    // Clique = rolar dado
+    label.addEventListener("click", () => {
 
       const inputId = label.getAttribute("for");
       const input = document.getElementById(inputId);
