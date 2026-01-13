@@ -24,5 +24,46 @@
 <a href="../players/p4.html">Ficha  Claymant(Cayo)</a>
 <a href="../players/p5.html">Ficha Stella(Juliana)</a>
     </div>
+    <h2>Histórico de Rolagens</h2>
+<div id="historico"></div>
+
+    <script type="module">
+import { db } from "../firebase.js";
+import { ref, onValue } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+
+const historicoDiv = document.getElementById("historico");
+
+const historicoRef = ref(db, "historicoDados");
+
+onValue(historicoRef, snapshot => {
+  historicoDiv.innerHTML = "";
+
+  const dados = snapshot.val();
+  if (!dados) return;
+
+  const lista = Object.values(dados)
+    .sort((a, b) => b.timestamp - a.timestamp)
+    .slice(0, 50); // últimos 50
+
+  lista.forEach(item => {
+    const div = document.createElement("div");
+    div.className = "log";
+
+    const data = new Date(item.timestamp).toLocaleString("pt-BR");
+
+    div.innerHTML = `
+      <strong>${item.jogador}</strong>
+      rolou <em>${item.pericia}</em>
+      (${item.valorSkill})
+      → <strong>${item.resultado}</strong>
+      [d20: ${item.dado}]
+      <span style="opacity:.6">(${data})</span>
+    `;
+
+    historicoDiv.appendChild(div);
+  });
+});
+</script>
+
 </body>
 </html>
