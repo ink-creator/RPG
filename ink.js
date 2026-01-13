@@ -66,7 +66,7 @@ function salvarHistorico({ jogador, playerId, pericia, valorSkill, dado, resulta
 }
 
 // ============================
-// ROLAGEM DE DADO (ANIMAÇÃO)
+// ROLAGEM DE DADO
 // ============================
 
 function rolarDado2D(valorSkill) {
@@ -113,37 +113,32 @@ function rolarDado2D(valorSkill) {
 
 document.addEventListener("DOMContentLoaded", () => {
 
-  // Clique nos labels COM for
   document.querySelectorAll("label[for]").forEach(label => {
 
-  document.querySelectorAll("label[for]").forEach(label => {
+    label.addEventListener("click", (event) => {
+      // NÃO focar o input
+      event.preventDefault();
 
-  label.addEventListener("click", (event) => {
-    // impede o foco no input
-    event.preventDefault();
+      const inputId = label.getAttribute("for");
+      const input = document.getElementById(inputId);
+      if (!input) return;
 
-    const inputId = label.getAttribute("for");
-    const input = document.getElementById(inputId);
-    if (!input) return;
+      window.periciaAtual = label.textContent.trim();
 
-    // nome da perícia
-    window.periciaAtual = label.textContent.trim();
+      if (input.value.trim() === "") {
+        alert(`O campo "${window.periciaAtual}" está vazio!`);
+        return;
+      }
 
-    if (input.value.trim() === "") {
-      alert(`O campo "${window.periciaAtual}" está vazio!`);
-      return;
-    }
+      const valor = parseInt(input.value, 10);
+      if (isNaN(valor) || valor < 1 || valor > 20) {
+        alert(`O valor de "${window.periciaAtual}" precisa ser de 1 a 20.`);
+        return;
+      }
 
-    const valor = parseInt(input.value, 10);
-    if (isNaN(valor) || valor < 1 || valor > 20) {
-      alert(`O valor de "${window.periciaAtual}" precisa ser de 1 a 20.`);
-      return;
-    }
+      rolarDado2D(valor);
+    });
 
-    rolarDado2D(valor);
   });
 
 });
-
-});
-
