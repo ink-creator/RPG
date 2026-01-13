@@ -125,4 +125,46 @@ document.querySelectorAll("label[for]").forEach(label => {
     rolarDado2D(valor);
   });
 });
+// =========================
+// CONTROLE DO DADO D20
+// (não altera nada existente)
+// =========================
+
+document.addEventListener("DOMContentLoaded", () => {
+  const overlay = document.getElementById("dice-overlay");
+  const dice = document.getElementById("dice-sprite");
+  const text = document.getElementById("dice-text");
+
+  // Segurança: se não existir, não quebra o site
+  if (!overlay || !dice) return;
+
+  // Função global para rolar o dado
+  window.rolarD20 = function (resultadoTexto = "") {
+    // Mostra overlay
+    overlay.classList.remove("hidden");
+
+    // Inicia animação
+    dice.classList.add("rolling");
+
+    // Limpa texto anterior
+    if (text) text.textContent = "";
+
+    // Para a animação após 1s
+    setTimeout(() => {
+      dice.classList.remove("rolling");
+
+      // Mostra resultado, se existir
+      if (text && resultadoTexto) {
+        text.textContent = resultadoTexto;
+      }
+
+      // Fecha overlay depois de um tempo
+      setTimeout(() => {
+        overlay.classList.add("hidden");
+      }, 1200);
+
+    }, 1000);
+  };
+});
+
 
