@@ -116,32 +116,34 @@ document.addEventListener("DOMContentLoaded", () => {
   // Clique nos labels COM for
   document.querySelectorAll("label[for]").forEach(label => {
 
-    label.addEventListener("click", () => {
+  document.querySelectorAll("label[for]").forEach(label => {
 
-      const inputId = label.getAttribute("for");
-      const input = document.getElementById(inputId);
-      if (!input) return;
+  label.addEventListener("click", (event) => {
+    // impede o foco no input
+    event.preventDefault();
 
-      // Guarda a perícia atual
-      window.periciaAtual = label.textContent.trim();
+    const inputId = label.getAttribute("for");
+    const input = document.getElementById(inputId);
+    if (!input) return;
 
-      // Foca o input (reforço, sem quebrar o padrão)
-      input.focus();
+    // nome da perícia
+    window.periciaAtual = label.textContent.trim();
 
-      if (input.value.trim() === "") {
-        alert(`O campo "${window.periciaAtual}" está vazio!`);
-        return;
-      }
+    if (input.value.trim() === "") {
+      alert(`O campo "${window.periciaAtual}" está vazio!`);
+      return;
+    }
 
-      const valor = parseInt(input.value, 10);
-      if (isNaN(valor) || valor < 1 || valor > 20) {
-        alert(`O valor de "${window.periciaAtual}" precisa ser de 1 a 20.`);
-        return;
-      }
+    const valor = parseInt(input.value, 10);
+    if (isNaN(valor) || valor < 1 || valor > 20) {
+      alert(`O valor de "${window.periciaAtual}" precisa ser de 1 a 20.`);
+      return;
+    }
 
-      rolarDado2D(valor);
-    });
-
+    rolarDado2D(valor);
   });
 
 });
+
+});
+
