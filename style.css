@@ -1,3 +1,6 @@
+/* =========================
+   VARIÁVEIS GLOBAIS
+========================= */
 :root {
   --bg: #0d0d0d;
   --panel: #1a1a1a;
@@ -6,6 +9,9 @@
   --accent: #a00000;
 }
 
+/* =========================
+   BASE
+========================= */
 body {
   background: var(--bg);
   color: var(--text);
@@ -27,7 +33,7 @@ input {
   color: var(--text);
   border: 1px solid #444;
   padding: 6px;
-  margin-bottom: 0px;
+  margin-bottom: 0;
 }
 
 h2 {
@@ -36,6 +42,9 @@ h2 {
   color: var(--accent);
 }
 
+/* =========================
+   LAYOUT
+========================= */
 .top {
   display: grid;
   grid-template-columns: 1fr 2fr 1fr;
@@ -49,11 +58,42 @@ h2 {
   margin-top: 15px;
 }
 
-.block, .inventory {
+.block,
+.inventory {
   border: 2px solid var(--border);
   padding: 10px;
 }
 
+/* =========================
+   CAMPOS
+========================= */
+.field {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 1px;
+}
+
+.field label {
+  font-size: 15px;
+  color: #aaa;
+  margin-bottom: 1px;
+  line-height: 1;
+}
+
+.field input {
+  padding: 3px 6px;
+  font-size: 14px;
+}
+
+.cabecinha {
+  text-align: center;
+  margin-bottom: 15px;
+  color: var(--accent);
+}
+
+/* =========================
+   BARRAS (VIDA / SANIDADE / ENERGIA)
+========================= */
 .bar-group {
   margin-bottom: 15px;
 }
@@ -80,47 +120,88 @@ h2 {
   width: 0%;
 }
 
-#vida { background: #b00000; }
-#sanidade { background: #7a00b0; }
-#energia { background: #007a3d; }
+#vida {
+  background: #b00000;
+}
 
+#sanidade {
+  background: #7a00b0;
+}
+
+#energia {
+  background: #007a3d;
+}
+
+/* =========================
+   INVENTÁRIO
+========================= */
 .inventory .grid {
   display: grid;
   grid-template-columns: repeat(5, 1fr);
   gap: 5px;
 }
 
+/* =========================
+   RESPONSIVO
+========================= */
 @media (max-width: 900px) {
-  .top, .middle {
+  .top,
+  .middle {
     grid-template-columns: 1fr;
   }
 }
-.field {
+/* =========================
+   DADO OVERLAY
+========================= */
+/* =========================
+   OVERLAY DO DADO
+========================= */
+#dice-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.7);
   display: flex;
-  flex-direction: column;
-  margin-bottom: 1px; /* era grande demais */
+  align-items: flex-end;
+  justify-content: flex-end;
+  padding: 20px;
+  z-index: 9999;
 }
 
-.field label {
-  font-size: 15px;      /* menor */
-  color: #aaa;
-  margin-bottom: 1px;  /* quase colado */
-  line-height: 1;
+#dice-overlay.hidden {
+  display: none;
 }
 
-.field input {
-  padding: 3px 6px;    /* menos altura */
-  font-size: 14px;
+/* =========================
+   SPRITE DO D20
+========================= */
+#dice-sprite {
+  width: 64px;
+  height: 64px;
+  background: url("../img/D20.png") left center; /* Coloque aqui seu sprite sheet */
+  background-size: 1280px 64px; /* 20 frames de 64px cada */
+  image-rendering: pixelated;
 }
-.cabecinha { 
-text-align: center;
-margin-bottom: 15px; 
-color: var(--accent);
+
+#dice-sprite.rolling {
+  animation: rollD20 1s steps(20) infinite;
 }
 
+@keyframes rollD20 {
+  from { background-position-x: 0; }
+  to   { background-position-x: -1280px; }
+}
 
+/* =========================
+   TEXTO DO RESULTADO
+========================= */
+.dice-text {
+  color: #eee;
+  font-family: Georgia, serif;
+  margin-left: 12px;
+  font-size: 18px;
+}
 
-
-
-
-
+.EXTREMO { color: gold; }
+.BOM     { color: #4caf50; }
+.NORMAL  { color: #2196f3; }
+.FALHA   { color: #f44336; }
