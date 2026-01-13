@@ -33,7 +33,7 @@ const TABELA_ORDEM = {
 };
 
 // ============================
-// AVALIA RESULTADO
+// AVALIAR RESULTADO
 // ============================
 
 function avaliarResultado(valor, dado) {
@@ -66,13 +66,13 @@ function salvarHistorico({ jogador, playerId, pericia, valorSkill, dado, resulta
 }
 
 // ============================
-// FUNÇÃO DADO
+// ROLAGEM DE DADO (ANIMAÇÃO)
 // ============================
 
 function rolarDado2D(valorSkill) {
   const overlay = document.getElementById("dice-overlay");
-  const sprite = document.getElementById("dice-sprite");
-  const texto = document.getElementById("dice-text");
+  const sprite  = document.getElementById("dice-sprite");
+  const texto   = document.getElementById("dice-text");
 
   overlay.classList.remove("hidden");
   sprite.classList.add("rolling");
@@ -113,56 +113,35 @@ function rolarDado2D(valorSkill) {
 
 document.addEventListener("DOMContentLoaded", () => {
 
-  // CLIQUE NOS LABELS
+  // Clique nos labels COM for
   document.querySelectorAll("label[for]").forEach(label => {
-    label.style.cursor = "pointer";
 
-    label.addEventListener("click", event => {
-      event.preventDefault();
+    label.addEventListener("click", () => {
 
       const inputId = label.getAttribute("for");
-      window.periciaAtual = label.textContent.trim();
-
       const input = document.getElementById(inputId);
       if (!input) return;
 
+      // Guarda a perícia atual
+      window.periciaAtual = label.textContent.trim();
+
+      // Foca o input (reforço, sem quebrar o padrão)
+      input.focus();
+
       if (input.value.trim() === "") {
-        alert(`O campo "${inputId}" está vazio!`);
+        alert(`O campo "${window.periciaAtual}" está vazio!`);
         return;
       }
 
       const valor = parseInt(input.value, 10);
       if (isNaN(valor) || valor < 1 || valor > 20) {
-        alert(`O valor do campo "${inputId}" precisa ser de 1 a 20.`);
+        alert(`O valor de "${window.periciaAtual}" precisa ser de 1 a 20.`);
         return;
       }
 
       rolarDado2D(valor);
     });
+
   });
 
-  // CONTROLE MANUAL (mantido)
-  const overlay = document.getElementById("dice-overlay");
-  const dice = document.getElementById("dice-sprite");
-  const text = document.getElementById("dice-text");
-
-  if (overlay && dice) {
-    window.rolarD20 = function (resultadoTexto = "") {
-      overlay.classList.remove("hidden");
-      dice.classList.add("rolling");
-
-      if (text) text.textContent = "";
-
-      setTimeout(() => {
-        dice.classList.remove("rolling");
-
-        if (text && resultadoTexto) {
-          text.textContent = resultadoTexto;
-        }
-
-        setTimeout(() => overlay.classList.add("hidden"), 1200);
-      }, 1000);
-    };
-  }
 });
-
