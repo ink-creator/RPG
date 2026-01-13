@@ -1,3 +1,7 @@
+// ============================
+// FIREBASE
+// ============================
+
 import { db } from "./firebase.js";
 import { ref, push } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
@@ -44,7 +48,25 @@ function avaliarResultado(valor, dado) {
 }
 
 // ============================
-// FUNÇÃO PARA ROLAR DADO 2D COM SPRITE
+// SALVAR HISTÓRICO NO FIREBASE
+// ============================
+
+function salvarHistorico({ jogador, playerId, pericia, valorSkill, dado, resultado }) {
+  const historicoRef = ref(db, "historicoDados");
+
+  push(historicoRef, {
+    jogador,
+    playerId,
+    pericia,
+    valorSkill,
+    dado,
+    resultado,
+    timestamp: Date.now()
+  });
+}
+
+// ============================
+// FUNÇÃO PARA ROLAR DADO 2D
 // ============================
 
 function rolarDado2D(valorSkill) {
@@ -58,45 +80,36 @@ function rolarDado2D(valorSkill) {
   texto.textContent = "";
   texto.className = "dice-text";
 
-  // rolagem animada por 1s
   setTimeout(() => {
     sprite.classList.remove("rolling");
 
-    // valor do dado
     const dado = Math.floor(Math.random() * 20) + 1;
     const resultado = avaliarResultado(valorSkill, dado);
 
-    // ajusta frame do dado
     sprite.style.backgroundPositionX = `${-64 * (dado - 1)}px`;
 
-    // mostra resultado
     texto.textContent = `${resultado} (${dado})`;
     texto.className = `dice-text ${resultado}`;
 
-    // fecha overlay depois de 1.5s
+    // ============================
+    // HISTÓRICO
+    // ============================
+
+    const nomeJogador =
+      document.getElementById("nome")?.value || "Desconhecido";
+
+    salvarHistorico({
+      jogador: nomeJogador,
+      playerId: window.PLAYER_ID || "desconhecido",
+      pericia: window.periciaAtual || "Perícia",
+      valorSkill,
+      dado,
+      resultado
+    });
+
     setTimeout(() => overlay.classList.add("hidden"), 1500);
   }, 1000);
 }
-
-// ============================
-// CLIQUE NOS LABELS PARA ROLAR
-// ============================
-
-document.querySelectorAll("label[for]").forEach(label => {
-  label.style.cursor = "pointer";
-
-  label.addEventListener("click", event => {
-    event.preventDefault();
-
-    const input = document.getElementById(label.getAttribute("for"));
-    if (!input) return;
-
-    const valor = parseInt(input.value, 10);
-    if (isNaN(valor) || valor < 1 || valor > 20) return;
-
-    rolarDado2D(valor);
-  });
-});
 
 // ============================
 // VERIFICA INPUT
@@ -106,8 +119,7 @@ function verificarInput(inputId) {
   const input = document.getElementById(inputId);
   if (!input) return false;
 
-  const valor = input.value.trim();
-  if (valor === "") {
+  if (input.value.trim() === "") {
     alert(`O campo "${inputId}" está vazio!`);
     return false;
   }
@@ -116,7 +128,7 @@ function verificarInput(inputId) {
 }
 
 // ============================
-// EXEMPLO DE USO NO CLIQUE DO LABEL
+// CLIQUE NOS LABELS
 // ============================
 
 document.querySelectorAll("label[for]").forEach(label => {
@@ -126,6 +138,7 @@ document.querySelectorAll("label[for]").forEach(label => {
     event.preventDefault();
 
     const inputId = label.getAttribute("for");
+    window.periciaAtual = label.textContent.trim();
 
     if (!verificarInput(inputId)) return;
 
@@ -142,8 +155,7 @@ document.querySelectorAll("label[for]").forEach(label => {
 });
 
 // =========================
-// CONTROLE DO DADO D20
-// (não altera nada existente)
+// CONTROLE MANUAL DO D20
 // =========================
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -166,10 +178,7 @@ document.addEventListener("DOMContentLoaded", () => {
         text.textContent = resultadoTexto;
       }
 
-      setTimeout(() => {
-        overlay.classList.add("hidden");
-      }, 1200);
+      setTimeout(() => overlay.classList.add("hidden"), 1200);
     }, 1000);
   };
 });
-
