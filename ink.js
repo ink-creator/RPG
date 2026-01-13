@@ -34,93 +34,77 @@ function avaliarResultado(valor, dado) {
   if (regra.extremo !== null && dado >= regra.extremo) return "EXTREMO";
   if (regra.bom !== null && dado >= regra.bom) return "BOM";
   if (regra.normal !== null && dado >= regra.normal) return "NORMAL";
+
   return "FALHA";
 }
 
 // ============================
-// FUNÇÃO PARA ROLAR DADO 2D COM SPRITE
+// ROLAR DADO (SPRITE 2D)
 // ============================
 function rolarDado2D(valorSkill) {
   const overlay = document.getElementById("dice-overlay");
-  const sprite = document.getElementById("dice-sprite");
-  const texto = document.getElementById("dice-text");
+  const sprite  = document.getElementById("dice-sprite");
+  const texto   = document.getElementById("dice-text");
+
+  if (!overlay || !sprite || !texto) return;
 
   overlay.classList.remove("hidden");
   sprite.classList.add("rolling");
   texto.textContent = "";
   texto.className = "dice-text";
 
-  // rolagem animada por 1s
   setTimeout(() => {
     sprite.classList.remove("rolling");
 
-    // valor do dado
     const dado = Math.floor(Math.random() * 20) + 1;
     const resultado = avaliarResultado(valorSkill, dado);
 
-    // ajusta frame do dado
     sprite.style.backgroundPositionX = `${-64 * (dado - 1)}px`;
 
-    // mostra resultado
     texto.textContent = `${resultado} (${dado})`;
     texto.className = `dice-text ${resultado}`;
 
-    // fecha overlay depois de 1.5s
-    setTimeout(() => overlay.classList.add("hidden"), 1500);
+    setTimeout(() => {
+      overlay.classList.add("hidden");
+    }, 1500);
   }, 1000);
 }
 
 // ============================
-// CLIQUE NOS LABELS PARA ROLAR
+// LABEL → ROLAR DADO (SEM FOCO)
 // ============================
-document.querySelectorAll("label[for]").forEach(label => {
-  label.style.cursor = "pointer";
+document.addEventListener("DOMContentLoaded", () => {
 
-  label.addEventListener("click", (event) => {
-    event.preventDefault(); // evita foco no input
-    const input = document.getElementById(label.getAttribute("for"));
-    if (!input) return;
+  document.querySelectorAll("label[for]").forEach(label => {
+    label.style.cursor = "pointer";
 
-    const valor = parseInt(input.value, 10);
-    if (isNaN(valor) || valor < 1 || valor > 20) return;
+    // BLOQUEIA O FOCO NATIVO DO INPUT
+    label.addEventListener(
+      "mousedown",
+      (e) => {
+        e.preventDefault();
+        e.stopImmediatePropagation();
+      },
+      true // capture (ESSENCIAL)
+    );
 
-    rolarDado2D(valor);
+    // CLIQUE PARA ROLAR
+    label.addEventListener("click", (e) => {
+      e.preventDefault();
+      e.stopImmediatePropagation();
+
+      const inputId = label.getAttribute("for");
+      const input = document.getElementById(inputId);
+      if (!input) return;
+
+      const valor = parseInt(input.value, 10);
+      if (isNaN(valor) || valor < 1 || valor > 20) {
+        alert(`O valor de "${label.textContent.trim()}" precisa ser de 1 a 20.`);
+        return;
+      }
+
+      rolarDado2D(valor);
+    });
   });
-});
-function verificarInput(inputId) {
-  const input = document.getElementById(inputId);
-  if (!input) return false;
 
-  const valor = input.value.trim(); // remove espaços
-  if (valor === "") {
-    alert(`O campo "${inputId}" está vazio!`);
-    return false;
-  }
-
-  return true;
-}
-
-// Exemplo de uso no clique do label
-document.querySelectorAll("label[for]").forEach(label => {
-  label.style.cursor = "pointer";
-
-  label.addEventListener("click", (event) => {
-    event.preventDefault(); // previne foco automático
-
-    const inputId = label.getAttribute("for");
-
-    // Verifica se está vazio
-    if (!verificarInput(inputId)) return;
-
-    const input = document.getElementById(inputId);
-    const valor = parseInt(input.value, 10);
-
-    // Valor inválido
-    if (isNaN(valor) || valor < 1 || valor > 20) {
-      alert(`O valor do campo "${inputId}" precisa ser de 1 a 20.`);
-      return;
-    }
-
-    rolarDado2D(valor);
-  });
 });
