@@ -110,18 +110,20 @@ function rolarDado2D(valorSkill) {
 // ============================
 // DOM READY
 // ============================
-
 document.addEventListener("DOMContentLoaded", () => {
 
   document.querySelectorAll("label[for]").forEach(label => {
 
-    // IMPEDE O FOCO NO INPUT (isso é o segredo)
-    label.addEventListener("mousedown", (event) => {
-      event.preventDefault();
-    });
+    // BLOQUEIA O FOCO NATIVO
+    label.addEventListener("mousedown", (e) => {
+      e.preventDefault();
+      e.stopImmediatePropagation();
+    }, true); // <- capture = true (ESSENCIAL)
 
-    // Clique = rolar dado
-    label.addEventListener("click", () => {
+    // AÇÃO DE ROLAGEM
+    label.addEventListener("click", (e) => {
+      e.preventDefault();
+      e.stopImmediatePropagation();
 
       const inputId = label.getAttribute("for");
       const input = document.getElementById(inputId);
