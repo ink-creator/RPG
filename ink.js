@@ -1,3 +1,6 @@
+import { db } from "./firebase.js";
+import { ref, push } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+
 // ============================
 // TABELA DE RESULTADOS
 // ============================
@@ -169,3 +172,4 @@ document.addEventListener("DOMContentLoaded", () => {
     }, 1000);
   };
 });
+
