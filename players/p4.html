@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Ficha</title>
-  <link rel="stylesheet" href="../style.css">
+  <link rel="stylesheet" href="../ink/ink.css">
 </head>
 <body>
 
@@ -15,12 +15,13 @@
 
     <!-- INFO ESQUERDA -->
     <div class="info left">
-      <div class="field"><label for="nome">Nome</label><input id="nome"></div>
-      <div class="field"><label for="raca">Raça</label><input id="raca"></div>
-      <div class="field"><label for="sraca">Semi Raça</label><input id="sraca"></div>
-      <div class="field"><label for="altura">Altura</label><input id="altura"></div>
-      <div class="field"><label for="idade">Idade</label><input id="idade"></div>
-       <div class="field"><label for="peso">Peso</label><input id="peso"></div>
+      <div class="field"><label>Nome</label><input id="nome"></div>
+      <div class="field"><label>Raça</label><input id="raca"></div>
+      <div class="field"><label>Semi Raça</label><input id="sraca"></div>
+      <div class="field"><label>Altura</label><input id="altura"></div>
+      <div class="field"><label>Idade</label><input id="idade"></div>
+      <div class="field"><label>Peso</label><input id="peso"></div>
+      <div class="field"><label>Dinheiro</label><input id="dinheiro"></div>
     </div>
 
     <!-- GERAL -->
@@ -30,13 +31,12 @@
     <div class="field"><label for="briga">Briga</label><input id="briga" type="number"></div>
     <div class="field"><label for="constituicao">Constituição</label><input id="constituicao" type="number"></div>
     <div class="field"><label for="destreza">Destreza</label><input id="destreza" type="number"></div>
-    <div class="field"><label for="força">Força</label><input id="forca" type="number"></div>
+    <div class="field"><label for="forca">Força</label><input id="forca" type="number"></div>
     <div class="field"><label for="furtar">Furtar</label><input id="furtar" type="number"></div>
     <div class="field"><label for="infiltracao">Infiltração</label><input id="infiltracao" type="number"></div>
     <div class="field"><label for="intelecto">Intelecto</label><input id="intelecto" type="number"></div>
     <div class="field"><label for="sorte">Sorte</label><input id="sorte" type="number"></div>
-    <div class="field"><label for="terapia">Terapia</label><input id="terapia" type="number"></div>
-    <div class="field"><label for="vigilância">Vigilância</label><input id="vigilancia" type="number"></div>
+    <div class="field"><label for="vigilancia">Vigilância</label><input id="vigilancia" type="number"></div>
     <div class="field"><label for="vontade">Vontade</label><input id="vontade" type="number"></div>
   </div>
 
@@ -47,36 +47,36 @@
       <div class="bar-group">
         <label>VIDA</label>
         <div class="bar-inputs">
-          <div class="field"><label for="vida-atual">Atual</label><input id="vida-atual" type="number"></div>
+          <div class="field"><label>Atual</label><input id="vida-atual" type="number"></div>
           <span>/</span>
-          <div class="field"><label for="vida-max">Máx</label><input id="vida-max" type="number"></div>
+          <div class="field"><label>Máx</label><input id="vida-max" type="number"></div>
         </div>
         <div class="bar"><div id="vida"></div></div>
-        <div class="field"><label for="vida-resistencia">Resistência</label><input id="vida-resistencia"></div>
+        <div class="field"><label>Resistência</label><input id="vida-resistencia"></div>
       </div>
 
       <!-- SANIDADE -->
       <div class="bar-group">
         <label>SANIDADE</label>
         <div class="bar-inputs">
-          <div class="field"><label for="sanidade-atual">Atual</label><input id="sanidade-atual" type="number"></div>
+          <div class="field"><label>Atual</label><input id="sanidade-atual" type="number"></div>
           <span>/</span>
-          <div class="field"><label for="sanidade-max">Máx</label><input id="sanidade-max" type="number"></div>
+          <div class="field"><label>Máx</label><input id="sanidade-max" type="number"></div>
         </div>
         <div class="bar"><div id="sanidade"></div></div>
-        <div class="field"><label for="sanidade-resistencia">Resistência</label><input id="sanidade-resistencia"></div>
+        <div class="field"><label>Resistência</label><input id="sanidade-resistencia"></div>
       </div>
 
       <!-- ENERGIA -->
       <div class="bar-group">
         <label>ENERGIA</label>
         <div class="bar-inputs">
-          <div class="field"><label for="energia-atual">Atual</label><input id="energia-atual" type="number"></div>
+          <div class="field"><label>Atual</label><input id="energia-atual" type="number"></div>
           <span>/</span>
-          <div class="field"><label for="energia-max">Máx</label><input id="energia-max" type="number"></div>
+          <div class="field"><label>Máx</label><input id="energia-max" type="number"></div>
         </div>
         <div class="bar"><div id="energia"></div></div>
-        <div class="field"><label for="energia-resistencia">Resistência</label><input id="energia-resistencia"></div>
+        <div class="field"><label>Resistência</label><input id="energia-resistencia"></div>
       </div>
 
     </div>
@@ -97,37 +97,39 @@
       <div class="field"><label for="negociar">Negociar</label><input id="negociar" type="number"></div>
       <div class="field"><label for="provocar">Provocar</label><input id="provocar" type="number"></div>
       <div class="field"><label for="psicologia">Psicologia</label><input id="psicologia" type="number"></div>
+      <div class="field"><label for="terapia">Terapia</label><input id="terapia" type="number"></div>
     </div>
 
     <div class="block">
       <h2>TÉCNICO</h2>
       <div class="field"><label for="analise-documentos">Análise de Documentos</label><input id="analise-documentos" type="number"></div>
-      <div class="field"><label for="tecnologia">Tecnologia</label><input id="tecnologia" type="number"></div>
-      <div class="field"><label for="balistica">Balística</label><input id="balistica" type="number"></div>
-      <div class="field"><label for="mecanica">Mecânica</label><input id="mecanica" type="number"></div>
-      <div class="field"><label for="falsificacao">Falsificação</label><input id="falsificacao" type="number"></div>
-      <div class="field"><label for="explosivos">Explosivos</label><input id="explosivos" type="number"></div>
-      <div class="field"><label for="forense">Perícia Forense</label><input id="forense" type="number"></div>
-      <div class="field"><label for="pesquisa">Pesquisa</label><input id="pesquisa" type="number"></div>
-      <div class="field"><label for="cartografia">Cartografia</label><input id="cartografia" type="number"></div>
-      <div class="field"><label for="pilotagem">Pilotagem</label><input id="pilotagem" type="number"></div>
       <div class="field"><label for="aviacao">Aviação</label><input id="aviacao" type="number"></div>
+      <div class="field"><label for="balistica">Balística</label><input id="balistica" type="number"></div>
+      <div class="field"><label for="cartografia">Cartografia</label><input id="cartografia" type="number"></div>
+      <div class="field"><label for="explosivos">Explosivos</label><input id="explosivos" type="number"></div>
+      <div class="field"><label for="falsificacao">Falsificação</label><input id="falsificacao" type="number"></div>
+      <div class="field"><label for="forense">Perícia Forense</label><input id="forense" type="number"></div>
+      <div class="field"><label for="mecanica">Mecânica</label><input id="mecanica" type="number"></div>
+      <div class="field"><label for="pesquisa">Pesquisa</label><input id="pesquisa" type="number"></div>
+      <div class="field"><label for="pilotagem">Pilotagem</label><input id="pilotagem" type="number"></div>
+      <div class="field"><label for="tecnologia">Tecnologia</label><input id="tecnologia" type="number"></div>
     </div>
 
     <div class="block">
       <h2>ACADÊMICAS</h2>
-     <h2>ACADÊMICAS</h2>
-      <div class="field"><label for="geografia">Geografia</label><input id="geografia" type="number"></div>
-      <div class="field"><label for="matematica">Matemática</label><input id="matematica" type="number"></div>
-      <div class="field"><label for="curiosidades">Conhecimento Geral</label><input id="curiosidades" type="number"></div>
-      <div class="field"><label for="poderes">Poderes</label><input id="poderes" type="number"></div>
-      <div class="field"><label for="historia">História</label><input id="historia" type="number"></div>
-      <div class="field"><label for="historia-artistica">História Artística</label><input id="historia-artistica" type="number"></div>
-      <div class="field"><label for="historia-natural">História Natural</label><input id="historia-natural" type="number"></div>
-      <div class="field"><label for="fisica">Física</label><input id="fisica" type="number"></div>
-      <div class="field"><label for="linguagem">Linguagem</label><input id="linguagem" type="number"></div>
-      <div class="field"><label for="quimica">Química</label><input id="quimica" type="number"></div>
-      <div class="field"><label for="religiao">Religião</label><input id="religiao" type="number"></div>
+    <div class="field"><label for="curiosidades">Conhecimento Geral</label><input id="curiosidades" type="number"></div>
+    <div class="field"><label for="fisica">Física</label><input id="fisica" type="number"></div>
+    <div class="field"><label for="geografia">Geografia</label><input id="geografia" type="number"></div>
+    <div class="field"><label for="historia">História</label><input id="historia" type="number"></div>
+    <div class="field"><label for="historia-artistica">História Artística</label><input id="historia-artistica" type="number"></div>
+    <div class="field"><label for="historia-natural">História Natural</label><input id="historia-natural" type="number"></div>
+    <div class="field"><label for="linguagem">Linguagem</label><input id="linguagem" type="number"></div>
+    <div class="field"><label for="matematica">Matemática</label><input id="matematica" type="number"></div>
+    <div class="field"><label for="poderes">Poderes</label><input id="poderes" type="number"></div>
+    <div class="field"><label for="quimica">Química</label><input id="quimica" type="number"></div>
+    <div class="field"><label for="religiao">Religião</label><input id="religiao" type="number"></div>
+
+
     </div>
 
   </div>
@@ -136,16 +138,26 @@
   <div class="inventory">
     <h2>INVENTÁRIO</h2>
     <div class="grid">
-      <div class="field"><label for="item1">Item</label><input id="item1"></div>
-      <div class="field"><label for="item2">Item</label><input id="item2"></div>
-      <div class="field"><label for="item3">Item</label><input id="item3"></div>
-      <div class="field"><label for="item4">Item</label><input id="item4"></div>
-      <div class="field"><label for="item5">Item</label><input id="item5"></div>
-      <div class="field"><label for="item6">Item</label><input id="item6"></div>
-      <div class="field"><label for="item7">Item</label><input id="item7"></div>
-      <div class="field"><label for="item8">Item</label><input id="item8"></div>
-      <div class="field"><label for="item9">Item</label><input id="item9"></div>
-      <div class="field"><label for="item10">Item</label><input id="item10"></div>
+      <div class="field"><label>Item</label><input id="item1"></div>
+      <div class="field"><label>Item</label><input id="item2"></div>
+      <div class="field"><label>Item</label><input id="item3"></div>
+      <div class="field"><label>Item</label><input id="item4"></div>
+      <div class="field"><label>Item</label><input id="item5"></div>
+      <div class="field"><label>Item</label><input id="item6"></div>
+      <div class="field"><label>Item</label><input id="item7"></div>
+      <div class="field"><label>Item</label><input id="item8"></div>
+      <div class="field"><label>Item</label><input id="item9"></div>
+      <div class="field"><label>Item</label><input id="item10"></div>
+      <div class="field"><label>Item</label><input id="item11"></div>
+      <div class="field"><label>Item</label><input id="item12"></div>
+      <div class="field"><label>Item</label><input id="item13"></div>
+      <div class="field"><label>Item</label><input id="item14"></div>
+      <div class="field"><label>Item</label><input id="item15"></div>
+      <div class="field"><label>Item</label><input id="item16"></div>
+      <div class="field"><label>Item</label><input id="item17"></div>
+      <div class="field"><label>Item</label><input id="item18"></div>
+      <div class="field"><label>Item</label><input id="item19"></div>
+      <div class="field"><label>Item</label><input id="item20"></div>
     </div>
   </div>
 
@@ -157,22 +169,11 @@
 </script>
 <script type="module" src="../firebase.js"></script>
 <script type="module" src="../ficha.js"></script>
-
+<script src="../players/ink.js"></script>
+<!-- DADO OVERLAY -->
+<div id="dice-overlay" class="hidden">
+  <div id="dice-sprite"></div>
+  <div id="dice-text" class="dice-text"></div>
+</div>
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
