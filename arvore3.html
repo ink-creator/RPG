@@ -7,18 +7,11 @@
 <style>
 body{
   margin:0;
-  background:radial-gradient(circle at center,#0e0e14,#050509);
+  background:#0b0b12;
   font-family:Arial,sans-serif;
   overflow:hidden;
 }
-
-#toolbar{
-  position:fixed;
-  top:10px;
-  left:10px;
-  z-index:10;
-}
-
+#toolbar{position:fixed;top:10px;left:10px;z-index:10;}
 #toolbar button{
   padding:10px 14px;
   background:#6a5acd;
@@ -28,112 +21,39 @@ body{
   border-radius:8px;
   cursor:pointer;
 }
+#canvas{width:100vw;height:100vh;position:relative;}
+svg{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;}
 
-#playerTitle{
-  position:fixed;
-  top:10px;
-  right:20px;
-  color:white;
-  font-weight:bold;
-  opacity:.85;
-}
-
-#canvas{
-  width:100vw;
-  height:100vh;
-  position:relative;
-}
-
-svg{
-  position:absolute;
-  inset:0;
-  width:100%;
-  height:100%;
-  pointer-events:none;
-}
-
-.node{
-  position:absolute;
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  cursor:grab;
-  user-select:none;
-}
-
+.node{position:absolute;display:flex;flex-direction:column;align-items:center;cursor:grab;}
 .bubble{
-  width:90px;
-  height:90px;
-  border-radius:50%;
-  background:#222;
-  border:2px solid #aaa;
+  width:90px;height:90px;border-radius:50%;
+  background:#222;border:2px solid #aaa;
+  display:flex;align-items:center;justify-content:center;
   overflow:hidden;
-  display:flex;
-  align-items:center;
-  justify-content:center;
 }
-
-.bubble img{
-  width:100%;
-  height:100%;
-  object-fit:cover;
-}
-
-.node-title{
-  margin-top:6px;
-  font-size:12px;
-  color:white;
-  text-align:center;
-  max-width:120px;
-}
+.bubble img{width:100%;height:100%;object-fit:cover;}
+.node-title{margin-top:6px;font-size:12px;color:white;text-align:center;}
 
 #panel{
-  position:fixed;
-  right:20px;
-  top:50px;
-  width:260px;
-  background:#151520;
-  border-radius:12px;
-  padding:14px;
-  color:white;
-  box-shadow:0 0 25px rgba(0,0,0,.6);
-  z-index:20;
+  position:fixed;right:20px;top:20px;width:260px;
+  background:#151520;border-radius:12px;padding:14px;color:white;
 }
-
-#panel input,
-#panel textarea{
-  width:100%;
-  background:#0f0f18;
-  color:white;
-  border:1px solid #444;
-  border-radius:6px;
-  padding:6px;
-  margin-bottom:8px;
+#panel input,#panel textarea{
+  width:100%;background:#0f0f18;color:white;
+  border:1px solid #444;border-radius:6px;padding:6px;margin-bottom:8px;
 }
-
-.panel-btn{
-  width:100%;
-  padding:8px;
-  margin-top:6px;
-  background:#6a5acd;
-  border:none;
-  color:white;
-  border-radius:6px;
-  cursor:pointer;
-}
-
-.panel-btn.warn{ background:#e67e22; }
-.panel-btn.danger{ background:#c0392b; }
+.panel-btn{width:100%;padding:8px;margin-top:6px;
+  background:#6a5acd;border:none;color:white;border-radius:6px;cursor:pointer;}
+.warn{background:#e67e22;}
+.danger{background:#c0392b;}
 </style>
 </head>
 
-<body>
+<body data-tree="p3">
 
 <div id="toolbar">
-  <button onclick="addBubble()">➕ Adicionar Bolha</button>
+  <button id="btnAdd">➕ Adicionar Bolha</button>
 </div>
-
-<div id="playerTitle"></div>
 
 <div id="canvas">
   <svg id="lines"></svg>
@@ -143,106 +63,57 @@ svg{
   <input id="titleInput" placeholder="Nome">
   <textarea id="descInput" placeholder="Descrição"></textarea>
   <input id="fileInput" type="file" accept="image/*">
-  <input id="sizeInput" type="range" min="60" max="160">
-
-  <button class="panel-btn" onclick="connectNearest()">🔗 Conectar próxima</button>
-  <button class="panel-btn warn" onclick="cancelConnections()">❌ Cancelar ligações</button>
-  <button class="panel-btn danger" onclick="deleteBubble()">🗑️ Excluir</button>
+  <button class="panel-btn" id="btnConnect">🔗 Conectar próxima</button>
+  <button class="panel-btn warn" id="btnClear">❌ Remover ligações</button>
+  <button class="panel-btn danger" id="btnDelete">🗑️ Excluir bolha</button>
 </div>
 
+<!-- FIREBASE -->
 <script type="module">
-/* ===============================
-   FIREBASE
-================================ */
-import { db, ref, set, onValue } from "./firebase.js";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
-/* ===============================
-   PLAYER
-================================ */
-const params = new URLSearchParams(window.location.search);
-const PLAYER_ID = params.get("player") ?? "p1";
+/* 🔥 CONFIG FIREBASE */
+const firebaseConfig = {
+  apiKey: "AIzaSyBCCbxXH6UZEqpItsdVaaG354Nqu28HA44",
+  authDomain: "rpg-ficha-online.firebaseapp.com",
+  databaseURL: "https://rpg-ficha-online-default-rtdb.firebaseio.com",
+  projectId: "rpg-ficha-online",
+};
 
-document.getElementById("playerTitle").textContent =
-  `Árvore de Habilidades — ${PLAYER_ID}`;
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
+const treeRef = ref(db, "skillTree");
 
-/* ===============================
-   VARIÁVEIS
-================================ */
-let nodes=[];
-let connections=[];
-let selected=null;
-let loading=true;
+/* =======================
+   ESTADO
+======================= */
+const canvas = document.getElementById("canvas");
+const svg = document.getElementById("lines");
+const panel = document.getElementById("panel");
 
-const canvas=document.getElementById("canvas");
-const svg=document.getElementById("lines");
-const panel=document.getElementById("panel");
+const btnAdd = document.getElementById("btnAdd");
+const btnConnect = document.getElementById("btnConnect");
+const btnClear = document.getElementById("btnClear");
+const btnDelete = document.getElementById("btnDelete");
 
-const titleInput=document.getElementById("titleInput");
-const descInput=document.getElementById("descInput");
-const fileInput=document.getElementById("fileInput");
-const sizeInput=document.getElementById("sizeInput");
+const titleInput = document.getElementById("titleInput");
+const descInput = document.getElementById("descInput");
+const fileInput = document.getElementById("fileInput");
 
-const treeRef = ref(db, `skillTrees/${PLAYER_ID}`);
+let nodes=[], connections=[], selected=null, loading=false;
 
-/* ===============================
-   FIREBASE LOAD
-================================ */
-onValue(treeRef, snap => {
-  if (!snap.exists()) {
-    loading = false;
-    return;
-  }
-
-  loading = true;
-  const data = snap.val();
-
-  nodes=[];
-  connections=[];
-  canvas.querySelectorAll(".node").forEach(n=>n.remove());
-
-  data.nodes?.forEach(n => addBubble(n, false));
-  data.connections?.forEach(([i,j]) => {
-    if(nodes[i] && nodes[j]) connections.push([nodes[i],nodes[j]]);
-  });
-
-  drawLines();
-  loading = false;
-});
-
-/* ===============================
-   SAVE
-================================ */
-function saveAll(){
-  if(loading) return;
-
-  set(treeRef, {
-    nodes: nodes.map(n=>({
-      left:n.style.left,
-      top:n.style.top,
-      title:n.dataset.title,
-      desc:n.dataset.desc,
-      size:n.dataset.size,
-      img:n.dataset.img
-    })),
-    connections: connections.map(c=>[
-      nodes.indexOf(c[0]),
-      nodes.indexOf(c[1])
-    ])
-  });
-}
-
-/* ===============================
+/* =======================
    CREATE
-================================ */
-function addBubble(data={}, save=true){
+======================= */
+function addBubble(data={}){
   const node=document.createElement("div");
   node.className="node";
-  node.style.left=data.left ?? "200px";
-  node.style.top=data.top ?? "200px";
+  node.style.left=data.left||"200px";
+  node.style.top=data.top||"200px";
 
   const bubble=document.createElement("div");
   bubble.className="bubble";
-  bubble.style.width=bubble.style.height=(data.size ?? 90)+"px";
 
   if(data.img){
     const img=document.createElement("img");
@@ -252,43 +123,40 @@ function addBubble(data={}, save=true){
 
   const title=document.createElement("div");
   title.className="node-title";
-  title.textContent=data.title ?? "";
+  title.textContent=data.title||"";
 
-  node.dataset.title=data.title ?? "";
-  node.dataset.desc=data.desc ?? "";
-  node.dataset.size=data.size ?? 90;
-  node.dataset.img=data.img ?? "";
+  node.dataset.title=data.title||"";
+  node.dataset.desc=data.desc||"";
+  node.dataset.img=data.img||"";
 
-  node.appendChild(bubble);
-  node.appendChild(title);
-
-  node.onclick=e=>{
-    e.stopPropagation();
-    selectNode(node);
-  };
-
+  node.append(bubble,title);
+  node.onclick=e=>{e.stopPropagation();selectNode(node);}
   drag(node);
   canvas.appendChild(node);
   nodes.push(node);
 
-  if(save) saveAll();
+  if(!loading) saveAll();
 }
 
-/* ===============================
-   INTERAÇÕES
-================================ */
+/* =======================
+   SELECT
+======================= */
 function selectNode(node){
   selected=node;
   panel.hidden=false;
   titleInput.value=node.dataset.title;
   descInput.value=node.dataset.desc;
-  sizeInput.value=node.dataset.size;
 }
 
+document.addEventListener("click",()=>{selected=null;panel.hidden=true;});
+
+/* =======================
+   DRAG
+======================= */
 function drag(el){
   let ox,oy;
   el.onmousedown=e=>{
-    ox=e.offsetX; oy=e.offsetY;
+    ox=e.offsetX;oy=e.offsetY;
     document.onmousemove=ev=>{
       el.style.left=(ev.pageX-ox)+"px";
       el.style.top=(ev.pageY-oy)+"px";
@@ -301,29 +169,23 @@ function drag(el){
   };
 }
 
+/* =======================
+   LINES
+======================= */
 function connectNearest(){
-  if(!selected) return;
-  let min=Infinity, target=null;
+  if(!selected||nodes.length<2)return;
+  let min=Infinity,target=null;
   nodes.forEach(n=>{
-    if(n===selected) return;
-    const d=Math.hypot(
-      parseInt(n.style.left)-parseInt(selected.style.left),
-      parseInt(n.style.top)-parseInt(selected.style.top)
-    );
-    if(d<min){ min=d; target=n; }
+    if(n===selected)return;
+    const dx=parseInt(n.style.left)-parseInt(selected.style.left);
+    const dy=parseInt(n.style.top)-parseInt(selected.style.top);
+    const d=Math.hypot(dx,dy);
+    if(d<min){min=d;target=n;}
   });
   if(target){
     connections.push([selected,target]);
-    drawLines();
-    saveAll();
+    drawLines();saveAll();
   }
-}
-
-function cancelConnections(){
-  if(!selected) return;
-  connections=connections.filter(c=>!c.includes(selected));
-  drawLines();
-  saveAll();
 }
 
 function drawLines(){
@@ -340,37 +202,77 @@ function drawLines(){
   });
 }
 
-function deleteBubble(){
-  if(!selected) return;
-  connections=connections.filter(c=>!c.includes(selected));
-  nodes=nodes.filter(n=>n!==selected);
-  selected.remove();
-  selected=null;
-  panel.hidden=true;
-  drawLines();
-  saveAll();
-}
-
-titleInput.oninput=()=>{ if(selected){ selected.dataset.title=titleInput.value; selected.querySelector(".node-title").textContent=titleInput.value; saveAll(); }};
-descInput.oninput=()=>{ if(selected){ selected.dataset.desc=descInput.value; saveAll(); }};
-sizeInput.oninput=()=>{ if(selected){ selected.dataset.size=sizeInput.value; selected.querySelector(".bubble").style.width=selected.querySelector(".bubble").style.height=sizeInput.value+"px"; drawLines(); saveAll(); }};
+/* =======================
+   PANEL
+======================= */
+titleInput.oninput=()=>{if(selected){selected.dataset.title=titleInput.value;selected.querySelector(".node-title").textContent=titleInput.value;saveAll();}};
+descInput.oninput=()=>{if(selected){selected.dataset.desc=descInput.value;saveAll();}};
 
 fileInput.onchange=()=>{
-  if(!selected || !fileInput.files[0]) return;
+  if(!selected||!fileInput.files[0])return;
   const r=new FileReader();
   r.onload=e=>{
     selected.dataset.img=e.target.result;
     const b=selected.querySelector(".bubble");
     b.innerHTML="";
-    const i=document.createElement("img");
-    i.src=e.target.result;
-    b.appendChild(i);
+    const img=document.createElement("img");
+    img.src=e.target.result;
+    b.appendChild(img);
     saveAll();
   };
   r.readAsDataURL(fileInput.files[0]);
 };
 
-document.addEventListener("click",()=>{ panel.hidden=true; selected=null; });
+btnDelete.onclick=()=>{
+  if(!selected)return;
+  connections=connections.filter(c=>c[0]!==selected&&c[1]!==selected);
+  nodes=nodes.filter(n=>n!==selected);
+  selected.remove();selected=null;panel.hidden=true;
+  drawLines();saveAll();
+};
+
+btnClear.onclick=()=>{
+  if(!selected)return;
+  connections=connections.filter(c=>c[0]!==selected&&c[1]!==selected);
+  drawLines();saveAll();
+};
+
+btnConnect.onclick=connectNearest;
+btnAdd.onclick=()=>addBubble();
+
+/* =======================
+   FIREBASE SAVE / LOAD
+======================= */
+function saveAll(){
+  if(loading)return;
+  set(treeRef,{
+    nodes:nodes.map(n=>({
+      left:n.style.left,
+      top:n.style.top,
+      title:n.dataset.title,
+      desc:n.dataset.desc,
+      img:n.dataset.img
+    })),
+    connections:connections.map(c=>[
+      nodes.indexOf(c[0]),
+      nodes.indexOf(c[1])
+    ])
+  });
+}
+
+onValue(treeRef,snap=>{
+  if(!snap.exists())return;
+  loading=true;
+  const data=snap.val();
+  nodes.forEach(n=>n.remove());
+  nodes=[];connections=[];
+  data.nodes.forEach(n=>addBubble(n));
+  data.connections.forEach(([i,j])=>{
+    if(nodes[i]&&nodes[j])connections.push([nodes[i],nodes[j]]);
+  });
+  drawLines();
+  loading=false;
+});
 </script>
 
 </body>
