@@ -1,19 +1,6 @@
-import { getPlayerId } from "./player.js";
-
-const PLAYER_ID = getPlayerId();
 // ink.js
 import { db, ref, push } from "./firebase.js";
-
-// ============================
-// PLAYER_ID seguro (mock automático)
-// ============================
-let PLAYER_ID = localStorage.getItem("playerId");
-
-if (!PLAYER_ID) {
-  PLAYER_ID = "debug-player";
-  localStorage.setItem("playerId", PLAYER_ID);
-  console.warn("PLAYER_ID não encontrado. Usando mock:", PLAYER_ID);
-}
+import { PLAYER_ID } from "./player.js";
 
 // ============================
 // TABELA DE RESULTADOS
@@ -42,10 +29,10 @@ const TABELA_ORDEM = {
 };
 
 // ============================
-// FUNÇÃO PARA AVALIAR RESULTADO
+// AVALIA RESULTADO
 // ============================
-function avaliarResultado(valorSkill, dado) {
-  const regra = TABELA_ORDEM[valorSkill];
+function avaliarResultado(valor, dado) {
+  const regra = TABELA_ORDEM[valor];
   if (!regra) return "FALHA";
 
   if (regra.extremo !== null && dado >= regra.extremo) return "EXTREMO";
@@ -56,7 +43,7 @@ function avaliarResultado(valorSkill, dado) {
 }
 
 // ============================
-// FUNÇÃO PRINCIPAL DE ROLAR DADO
+// ROLAR DADO
 // ============================
 function rolarDado2D(nome, valorSkill) {
   const overlay = document.getElementById("dice-overlay");
@@ -70,68 +57,37 @@ function rolarDado2D(nome, valorSkill) {
   texto.textContent = "";
   texto.className = "dice-text";
 
-  const fecharOverlay = () => {
-    sprite.classList.remove("rolling");
-    overlay.classList.remove("show");
-  };
-
   setTimeout(() => {
-    try {
-      const dado = Math.floor(Math.random() * 20) + 1;
-      const resultado = avaliarResultado(valorSkill, dado);
+    const dado = Math.floor(Math.random() * 20) + 1;
+    const resultado = avaliarResultado(valorSkill, dado);
 
-      let cor = "#2196f3";
-      if (resultado === "EXTREMO") cor = "gold";
-      else if (resultado === "BOM") cor = "#4caf50";
-      else if (resultado === "FALHA") cor = "#f44336";
+    texto.textContent = `${nome}: ${resultado} (${dado})`;
 
-      texto.innerHTML = `${nome}: <span style="color:${cor}">${resultado}</span> (${dado})`;
+    push(ref(db, `historico/${PLAYER_ID}`), {
+      nome,
+      resultado,
+      dado,
+      data: Date.now()
+    });
 
-      const histRef = ref(db, `historico/${PLAYER_ID}`);
-      push(histRef, {
-        nome,
-        resultado,
-        dado,
-        data: Date.now()
-      });
-
-    } catch (err) {
-      console.error("Erro ao rolar dado:", err);
-      texto.textContent = "Erro ao rolar dado";
-    } finally {
-      setTimeout(fecharOverlay, 2000);
-    }
+    setTimeout(() => overlay.classList.remove("show"), 2000);
   }, 1000);
 }
 
 // ============================
-// ATIVA OS LABELS PARA ROLAR DADO
+// ATIVA LABELS
 // ============================
 document.addEventListener("DOMContentLoaded", () => {
   document.querySelectorAll(".roll-label").forEach(label => {
-    label.style.cursor = "pointer";
-
-    // Evita foco automático no input
-    label.addEventListener(
-      "mousedown",
-      e => {
-        e.preventDefault();
-        e.stopImmediatePropagation();
-      },
-      true
-    );
-
     label.addEventListener("click", e => {
       e.preventDefault();
-      e.stopImmediatePropagation();
 
-      const inputId = label.dataset.input;
-      const input = document.getElementById(inputId);
+      const input = document.getElementById(label.dataset.input);
       if (!input) return;
 
       const valor = parseInt(input.value, 10);
       if (isNaN(valor) || valor < 1 || valor > 20) {
-        alert(`O valor de "${label.textContent.trim()}" precisa ser de 1 a 20.`);
+        alert("Valor deve ser entre 1 e 20");
         return;
       }
 
@@ -140,9 +96,4 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 });
 
-// ============================
-// EXPORT (caso queira usar em outro módulo)
-// ============================
 export { rolarDado2D };
-
-
