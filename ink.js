@@ -1,3 +1,6 @@
+import { getPlayerId } from "./player.js";
+
+const PLAYER_ID = getPlayerId();
 // ink.js
 import { db, ref, push } from "./firebase.js";
 
@@ -141,4 +144,5 @@ document.addEventListener("DOMContentLoaded", () => {
 // EXPORT (caso queira usar em outro módulo)
 // ============================
 export { rolarDado2D };
+
 
