@@ -2,16 +2,23 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<title>Editor de Árvore de Habilidades</title>
+<title>Árvore de Habilidades</title>
 
 <style>
 body{
   margin:0;
-  background:radial-gradient(circle at center,#0e0e14,#050509);
-  font-family:Arial,sans-serif;
+  background:#0b0b12;
+  font-family:Arial, sans-serif;
   overflow:hidden;
 }
-#toolbar{position:fixed;top:10px;left:10px;z-index:10;}
+
+#toolbar{
+  position:fixed;
+  top:10px;
+  left:10px;
+  z-index:10;
+}
+
 #toolbar button{
   padding:10px 14px;
   background:#6a5acd;
@@ -21,278 +28,151 @@ body{
   border-radius:8px;
   cursor:pointer;
 }
-#canvas{width:100vw;height:100vh;position:relative;}
-svg{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;}
+
+#canvas{
+  width:100vw;
+  height:100vh;
+  position:relative;
+}
+
 .node{
   position:absolute;
   display:flex;
   flex-direction:column;
   align-items:center;
-  cursor:grab;
   user-select:none;
+  cursor:grab;
 }
+
 .bubble{
   width:90px;
   height:90px;
   border-radius:50%;
   background:#222;
   border:2px solid #aaa;
-  overflow:hidden;
   display:flex;
   align-items:center;
   justify-content:center;
 }
-.bubble img{width:100%;height:100%;object-fit:cover;}
+
 .node-title{
   margin-top:6px;
   font-size:12px;
   color:white;
-  text-align:center;
-  max-width:120px;
 }
-#panel{
-  position:fixed;
-  right:20px;
-  top:20px;
-  width:260px;
-  background:#151520;
-  border-radius:12px;
-  padding:14px;
-  color:white;
-  box-shadow:0 0 25px rgba(0,0,0,.6);
-  z-index:20;
-}
-#panel input,#panel textarea{
-  width:100%;
-  background:#0f0f18;
-  color:white;
-  border:1px solid #444;
-  border-radius:6px;
-  padding:6px;
-  margin-bottom:8px;
-}
-#panel textarea{resize:vertical;min-height:80px;}
-.panel-btn{
-  width:100%;
-  padding:8px;
-  margin-top:6px;
-  background:#6a5acd;
-  border:none;
-  color:white;
-  border-radius:6px;
-  cursor:pointer;
-}
-.panel-btn.warn{background:#e67e22;}
-.panel-btn.danger{background:#c0392b;}
 </style>
 </head>
 
 <body>
 
 <div id="toolbar">
-  <button onclick="addBubble()">➕ Adicionar Bolha</button>
+  <button id="btnAdd">➕ Adicionar Bolha</button>
 </div>
 
-<div id="canvas">
-  <svg id="lines"></svg>
-</div>
+<div id="canvas"></div>
 
-<div id="panel" hidden>
-  <input id="titleInput" placeholder="Nome">
-  <textarea id="descInput" placeholder="Descrição"></textarea>
-  <input id="fileInput" type="file" accept="image/*">
-  <input id="sizeInput" type="range" min="60" max="160">
-  <button class="panel-btn" onclick="connectNearest()">🔗 Conectar próxima</button>
-  <button class="panel-btn warn" onclick="cancelConnections()">❌ Cancelar ligações</button>
-  <button class="panel-btn danger" onclick="deleteBubble()">🗑️ Excluir</button>
-</div>
+<script>
+/* =========================
+   ESTADO GLOBAL
+========================= */
+const canvas = document.getElementById("canvas");
+const btnAdd = document.getElementById("btnAdd");
 
-<!-- FIREBASE -->
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+let nodes = [];
+let loading = false;
 
-const firebaseConfig = {
-  apiKey: "AIzaSyBCCbxXH6UZEqpItsdVaaG354Nqu28HA44",
-  authDomain: "rpg-ficha-online.firebaseapp.com",
-  databaseURL: "https://rpg-ficha-online-default-rtdb.firebaseio.com",
-  projectId: "rpg-ficha-online",
-  storageBucket: "rpg-ficha-online.firebasestorage.app",
-  messagingSenderId: "213971701978",
-  appId: "1:213971701978:web:b030274505603fd49255e3"
-};
+/* =========================
+   CRIAR BOLHA
+========================= */
+function addBubble(data = {}) {
+  const node = document.createElement("div");
+  node.className = "node";
 
-const app = initializeApp(firebaseConfig);
-const db = getDatabase(app);
-const DB_REF = ref(db, "skillTree");
+  node.style.left = data.left || "200px";
+  node.style.top  = data.top  || "200px";
 
-/* ============================ */
+  const bubble = document.createElement("div");
+  bubble.className = "bubble";
 
-let nodes=[];
-let connections=[];
-let selected=null;
-let loading=false;
-
-const canvas=document.getElementById("canvas");
-const svg=document.getElementById("lines");
-const panel=document.getElementById("panel");
-
-const titleInput=document.getElementById("titleInput");
-const descInput=document.getElementById("descInput");
-const fileInput=document.getElementById("fileInput");
-const sizeInput=document.getElementById("sizeInput");
-
-/* ===== CREATE ===== */
-function addBubble(data={}){
-  const node=document.createElement("div");
-  node.className="node";
-  node.style.left=data.left ?? "200px";
-  node.style.top=data.top ?? "200px";
-
-  const bubble=document.createElement("div");
-  bubble.className="bubble";
-  bubble.style.width=bubble.style.height=(data.size ?? 90)+"px";
-
-  if(data.img){
-    const img=document.createElement("img");
-    img.src=data.img;
-    bubble.appendChild(img);
-  }
-
-  const title=document.createElement("div");
-  title.className="node-title";
-  title.textContent=data.title ?? "";
-
-  node.dataset.title=data.title ?? "";
-  node.dataset.desc=data.desc ?? "";
-  node.dataset.size=data.size ?? 90;
-  node.dataset.img=data.img ?? "";
+  const title = document.createElement("div");
+  title.className = "node-title";
+  title.textContent = data.title || "Nova Skill";
 
   node.appendChild(bubble);
   node.appendChild(title);
 
-  node.onclick=e=>{e.stopPropagation();selectNode(node);};
   drag(node);
   canvas.appendChild(node);
   nodes.push(node);
 
-  if(!loading) saveAll();
+  if (!loading) saveAll();
 }
 
-/* ===== SELECT ===== */
-function selectNode(node){
-  selected=node;
-  panel.hidden=false;
-  titleInput.value=node.dataset.title;
-  descInput.value=node.dataset.desc;
-  sizeInput.value=node.dataset.size;
-}
+/* =========================
+   DRAG
+========================= */
+function drag(el) {
+  let ox, oy;
 
-/* ===== DRAG ===== */
-function drag(el){
-  let ox,oy;
-  el.onmousedown=e=>{
-    ox=e.offsetX;oy=e.offsetY;
-    document.onmousemove=ev=>{
-      el.style.left=(ev.pageX-ox)+"px";
-      el.style.top=(ev.pageY-oy)+"px";
-      drawLines();
-    };
-    document.onmouseup=()=>{
-      document.onmousemove=null;
+  el.addEventListener("mousedown", e => {
+    ox = e.offsetX;
+    oy = e.offsetY;
+
+    function move(ev){
+      el.style.left = (ev.pageX - ox) + "px";
+      el.style.top  = (ev.pageY - oy) + "px";
+    }
+
+    function up(){
+      document.removeEventListener("mousemove", move);
+      document.removeEventListener("mouseup", up);
       saveAll();
-    };
-  };
-}
+    }
 
-/* ===== CONNECTIONS ===== */
-function connectNearest(){
-  if(!selected||nodes.length<2) return;
-  let min=Infinity,target=null;
-  nodes.forEach(n=>{
-    if(n===selected) return;
-    const dx=parseInt(n.style.left)-parseInt(selected.style.left);
-    const dy=parseInt(n.style.top)-parseInt(selected.style.top);
-    const d=Math.hypot(dx,dy);
-    if(d<min){min=d;target=n;}
-  });
-  if(target){
-    connections.push([selected,target]);
-    drawLines();saveAll();
-  }
-}
-
-function cancelConnections(){
-  connections=connections.filter(c=>c[0]!==selected&&c[1]!==selected);
-  drawLines();saveAll();
-}
-
-function drawLines(){
-  svg.innerHTML="";
-  connections.forEach(([a,b])=>{
-    const ax=parseInt(a.style.left)+a.offsetWidth/2;
-    const ay=parseInt(a.style.top)+a.firstChild.offsetHeight/2;
-    const bx=parseInt(b.style.left)+b.offsetWidth/2;
-    const by=parseInt(b.style.top)+b.firstChild.offsetHeight/2;
-    const l=document.createElementNS("http://www.w3.org/2000/svg","line");
-    l.setAttribute("x1",ax);l.setAttribute("y1",ay);
-    l.setAttribute("x2",bx);l.setAttribute("y2",by);
-    l.setAttribute("stroke","#aaa");l.setAttribute("stroke-width","2");
-    svg.appendChild(l);
+    document.addEventListener("mousemove", move);
+    document.addEventListener("mouseup", up);
   });
 }
 
-/* ===== DELETE ===== */
-function deleteBubble(){
-  connections=connections.filter(c=>c[0]!==selected&&c[1]!==selected);
-  nodes=nodes.filter(n=>n!==selected);
-  selected.remove();
-  selected=null;
-  panel.hidden=true;
-  drawLines();saveAll();
-}
-
-/* ===== SAVE ===== */
+/* =========================
+   SAVE / LOAD (localStorage)
+========================= */
 function saveAll(){
-  if(loading) return;
-  set(DB_REF,{
-    nodes:nodes.map(n=>({
-      left:n.style.left,
-      top:n.style.top,
-      title:n.dataset.title,
-      desc:n.dataset.desc,
-      size:n.dataset.size,
-      img:n.dataset.img
-    })),
-    connections:connections.map(c=>[
-      nodes.indexOf(c[0]),
-      nodes.indexOf(c[1])
-    ])
-  });
+  const data = nodes.map(n => ({
+    left: n.style.left,
+    top: n.style.top,
+    title: n.querySelector(".node-title").textContent
+  }));
+
+  localStorage.setItem("skillTree", JSON.stringify(data));
 }
 
-/* ===== LOAD ===== */
-onValue(DB_REF,snapshot=>{
-  if(!snapshot.exists()) return;
-  loading=true;
+function loadAll(){
+  const raw = localStorage.getItem("skillTree");
+  if (!raw) return;
 
-  nodes=[];connections=[];
-  canvas.querySelectorAll(".node").forEach(n=>n.remove());
+  loading = true;
+  const data = JSON.parse(raw);
 
-  const data=snapshot.val();
-  data.nodes?.forEach(n=>addBubble(n));
-  data.connections?.forEach(([i,j])=>{
-    if(nodes[i]&&nodes[j]) connections.push([nodes[i],nodes[j]]);
-  });
+  nodes.forEach(n => n.remove());
+  nodes = [];
 
-  drawLines();
-  loading=false;
+  data.forEach(d => addBubble(d));
+
+  loading = false;
+}
+
+/* =========================
+   EVENTOS
+========================= */
+btnAdd.addEventListener("click", () => {
+  addBubble();
 });
 
-document.addEventListener("click",()=>{
-  panel.hidden=true;
-  selected=null;
-});
+/* =========================
+   INIT
+========================= */
+loadAll();
 </script>
 
 </body>
