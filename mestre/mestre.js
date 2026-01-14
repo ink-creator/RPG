@@ -10,13 +10,13 @@ import { getDatabase, ref, onChildAdded } from "https://www.gstatic.com/firebase
 // ============================
 // ⚠️ USE A MESMA CONFIG DO JOGADOR
 const firebaseConfig = {
-  apiKey: "SUA_API_KEY",
-  authDomain: "SEU_DOMINIO",
-  databaseURL: "SUA_DATABASE_URL",
-  projectId: "SEU_PROJECT_ID",
-  storageBucket: "SEU_BUCKET",
-  messagingSenderId: "SEU_SENDER_ID",
-  appId: "SEU_APP_ID"
+  apiKey: "AIzaSyBCCbxXH6UZEqpItsdVaaG354Nqu28HA44",
+  authDomain: "rpg-ficha-online.firebaseapp.com",
+  databaseURL: "https://rpg-ficha-online-default-rtdb.firebaseio.com",
+  projectId: "rpg-ficha-online",
+  storageBucket: "rpg-ficha-online.firebasestorage.app",
+  messagingSenderId: "213971701978",
+  appId: "1:213971701978:web:b030274505603fd49255e3"
 };
 
 const app = initializeApp(firebaseConfig);
