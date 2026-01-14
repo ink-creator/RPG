@@ -1,36 +1,23 @@
-import { db, ref, set, onValue } from "./firebase.js";
+// ficha.js
+import { db, ref, set, onValue, push } from "./firebase.js";
 
-// ============================
-// PLAYER ID (MÓDULO SEGURO)
-// ============================
+// PLAYER_ID precisa estar definido antes
 const PLAYER_ID = localStorage.getItem("playerId");
+if (!PLAYER_ID) alert("PLAYER_ID não definido! Faça login primeiro.");
 
-if (!PLAYER_ID) {
-  alert("Sessão inválida. Faça login novamente.");
-  window.location.href = "../index.html";
-}
-
-// ============================
-// INPUTS
-// ============================
 const inputs = document.querySelectorAll("input");
 
 /* =========================
-   BARRAS
+   ATUALIZA BARRAS
 ========================= */
-
 function atualizarBarra(tipo) {
   const atual = document.getElementById(`${tipo}-atual`);
   const max = document.getElementById(`${tipo}-max`);
   const barra = document.getElementById(tipo);
-
   if (!atual || !max || !barra) return;
 
-  let a = Number(atual.value);
-  let m = Number(max.value);
-
-  if (!Number.isFinite(a)) a = 0;
-  if (!Number.isFinite(m)) m = 0;
+  let a = Number(atual.value) || 0;
+  let m = Number(max.value) || 0;
 
   if (m <= 0) {
     barra.style.width = "0%";
@@ -44,37 +31,27 @@ function atualizarBarra(tipo) {
 }
 
 /* =========================
-   INPUTS + FIREBASE
+   SINCRONIZAÇÃO COM FIREBASE
 ========================= */
-
 inputs.forEach(input => {
   if (!input.id) return;
-
   const caminho = `jogadores/${PLAYER_ID}/${input.id}`;
   const referencia = ref(db, caminho);
 
   // Firebase → Input
   onValue(referencia, snapshot => {
     if (!snapshot.exists()) return;
-
     const valor = String(snapshot.val());
-    if (input.value !== valor) {
-      input.value = valor;
-    }
-
+    if (input.value !== valor) input.value = valor;
     const partes = input.id.split("-");
-    if (partes.length === 2) {
-      atualizarBarra(partes[0]);
-    }
+    if (partes.length === 2) atualizarBarra(partes[0]);
   });
 
+  // Input → Firebase
   const salvar = () => {
     set(referencia, input.value);
-
     const partes = input.id.split("-");
-    if (partes.length === 2) {
-      atualizarBarra(partes[0]);
-    }
+    if (partes.length === 2) atualizarBarra(partes[0]);
   };
 
   input.addEventListener("input", salvar);
@@ -83,20 +60,14 @@ inputs.forEach(input => {
 });
 
 /* =========================
-   FORÇAR ATUALIZAÇÃO MOBILE
+   Atualização periódica mobile
 ========================= */
-
-// Garante atualização mesmo se o teclado não disparar eventos
 ["vida", "sanidade", "energia"].forEach(tipo => {
   const atual = document.getElementById(`${tipo}-atual`);
-
-  if (atual) {
-    setInterval(() => atualizarBarra(tipo), 200);
-  }
+  if (atual) setInterval(() => atualizarBarra(tipo), 200);
 });
 
 /* =========================
-   INICIALIZAÇÃO
+   Inicializa barras
 ========================= */
-
 ["vida", "sanidade", "energia"].forEach(atualizarBarra);
