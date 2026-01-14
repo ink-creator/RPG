@@ -43,7 +43,6 @@ svg{
   pointer-events:none;
 }
 
-/* ===== WRAPPER ===== */
 .node{
   position:absolute;
   display:flex;
@@ -53,7 +52,6 @@ svg{
   user-select:none;
 }
 
-/* ===== BOLHA ===== */
 .bubble{
   width:90px;
   height:90px;
@@ -72,7 +70,6 @@ svg{
   object-fit:cover;
 }
 
-/* ===== TÍTULO FORA ===== */
 .node-title{
   margin-top:6px;
   font-size:12px;
@@ -82,7 +79,6 @@ svg{
   word-wrap:break-word;
 }
 
-/* ===== PANEL ===== */
 #panel{
   position:fixed;
   right:20px;
@@ -153,7 +149,11 @@ svg{
   <button class="panel-btn danger" onclick="deleteBubble()">🗑️ Excluir</button>
 </div>
 
-<script>
+<script type="module">
+import { db, ref, set, onValue } from "./firebase.js";
+
+/* ===== SEU CÓDIGO ORIGINAL ===== */
+
 let nodes=[];
 let connections=[];
 let selected=null;
@@ -167,8 +167,6 @@ const titleInput=document.getElementById("titleInput");
 const descInput=document.getElementById("descInput");
 const fileInput=document.getElementById("fileInput");
 const sizeInput=document.getElementById("sizeInput");
-
-/* ===== CREATE ===== */
 
 function addBubble(data={}){
   const node=document.createElement("div");
@@ -210,8 +208,6 @@ function addBubble(data={}){
   if(!loading) saveAll();
 }
 
-/* ===== SELECT ===== */
-
 function selectNode(node){
   selected=node;
   panel.hidden=false;
@@ -223,8 +219,6 @@ function selectNode(node){
 }
 
 panel.onclick=e=>e.stopPropagation();
-
-/* ===== DRAG ===== */
 
 function drag(el){
   let ox,oy;
@@ -244,8 +238,6 @@ function drag(el){
     };
   };
 }
-
-/* ===== CONNECTIONS ===== */
 
 function connectNearest(){
   if(!selected || nodes.length<2) return;
@@ -299,69 +291,14 @@ function drawLines(){
   });
 }
 
-/* ===== PANEL ===== */
+/* ===== SAVE / LOAD (FIREBASE) ===== */
 
-titleInput.oninput=()=>{
-  if(selected){
-    selected.dataset.title=titleInput.value;
-    selected.querySelector(".node-title").textContent=titleInput.value;
-    saveAll();
-  }
-};
-
-descInput.oninput=()=>{
-  if(selected){
-    selected.dataset.desc=descInput.value;
-    saveAll();
-  }
-};
-
-fileInput.onchange=()=>{
-  if(!selected || !fileInput.files[0]) return;
-
-  const reader=new FileReader();
-  reader.onload=e=>{
-    selected.dataset.img=e.target.result;
-    const bubble=selected.querySelector(".bubble");
-    bubble.innerHTML="";
-    const img=document.createElement("img");
-    img.src=e.target.result;
-    bubble.appendChild(img);
-    saveAll();
-  };
-  reader.readAsDataURL(fileInput.files[0]);
-};
-
-sizeInput.oninput=()=>{
-  if(selected){
-    const bubble=selected.querySelector(".bubble");
-    bubble.style.width=bubble.style.height=sizeInput.value+"px";
-    selected.dataset.size=sizeInput.value;
-    drawLines();
-    saveAll();
-  }
-};
-
-/* ===== DELETE ===== */
-
-function deleteBubble(){
-  if(!selected) return;
-
-  connections=connections.filter(c=>c[0]!==selected && c[1]!==selected);
-  nodes=nodes.filter(n=>n!==selected);
-  selected.remove();
-  selected=null;
-  panel.hidden=true;
-  drawLines();
-  saveAll();
-}
-
-/* ===== SAVE / LOAD ===== */
+const DB_REF = ref(db, "skillTree");
 
 function saveAll(){
   if(loading) return;
 
-  localStorage.setItem("skillTree",JSON.stringify({
+  set(DB_REF,{
     nodes:nodes.map(n=>({
       left:n.style.left,
       top:n.style.top,
@@ -374,28 +311,29 @@ function saveAll(){
       nodes.indexOf(c[0]),
       nodes.indexOf(c[1])
     ])
-  }));
+  });
 }
 
 function loadAll(){
-  const raw=localStorage.getItem("skillTree");
-  if(!raw) return;
+  onValue(DB_REF,snapshot=>{
+    if(!snapshot.exists()) return;
 
-  loading=true;
-  const data=JSON.parse(raw);
+    loading=true;
+    const data=snapshot.val();
 
-  nodes=[];
-  connections=[];
-  canvas.querySelectorAll(".node").forEach(n=>n.remove());
+    nodes=[];
+    connections=[];
+    canvas.querySelectorAll(".node").forEach(n=>n.remove());
 
-  data.nodes.forEach(n=>addBubble(n));
-  data.connections.forEach(([i,j])=>{
-    if(nodes[i] && nodes[j])
-      connections.push([nodes[i],nodes[j]]);
+    data.nodes.forEach(n=>addBubble(n));
+    data.connections.forEach(([i,j])=>{
+      if(nodes[i] && nodes[j])
+        connections.push([nodes[i],nodes[j]]);
+    });
+
+    drawLines();
+    loading=false;
   });
-
-  drawLines();
-  loading=false;
 }
 
 document.addEventListener("click",()=>{
