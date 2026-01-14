@@ -49,16 +49,23 @@ function avaliarResultado(valor, dado) {
 // HISTÓRICO
 // ============================
 function salvarHistorico({ skill, valor, dado, resultado }) {
-  if (!window.PLAYER_ID) return;
+  if (!window.PLAYER_ID || !window.db) return;
 
-  push(ref(db, `historico/${PLAYER_ID}/logs`), {
+  const historicoRef = ref(
+    window.db,
+    `historico/${PLAYER_ID}/logs`
+  );
+
+  push(historicoRef, {
+    player: PLAYER_ID,
     skill,
     valor,
     dado,
     resultado,
     timestamp: Date.now()
-  }).catch(() => {});
+  });
 }
+
 
 // ============================
 // ROLAR DADO
@@ -117,3 +124,4 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 });
+
