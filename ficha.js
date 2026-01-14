@@ -1,3 +1,7 @@
+import { getPlayerId } from "./player.js";
+
+const PLAYER_ID = getPlayerId();
+
 // ============================
 // PLAYER_ID seguro (mock automático)
 // ============================
