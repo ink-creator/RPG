@@ -1,4 +1,4 @@
-onValue(ref(db, "historico"), snapshot => {
+onValue(ref(bb, "historico"), snapshot => {
   lista.innerHTML = ""; // LIMPA SEMPRE, PRIMEIRA LINHA
 
   if (!snapshot.exists()) {
