@@ -1,14 +1,15 @@
 // ficha.js
 import { db, ref, set, onValue } from "./firebase.js";
 
-// PLAYER_ID precisa estar definido antes
+// Pega o PLAYER_ID do localStorage
 const PLAYER_ID = localStorage.getItem("playerId");
 if (!PLAYER_ID) alert("PLAYER_ID não definido! Faça login primeiro.");
 
+// Seleciona todos os inputs da ficha
 const inputs = document.querySelectorAll("input");
 
 /* =========================
-   ATUALIZA BARRAS
+   ATUALIZA BARRAS (vida, sanidade, energia)
 ========================= */
 function atualizarBarra(tipo) {
   const atual = document.getElementById(`${tipo}-atual`);
@@ -60,7 +61,7 @@ inputs.forEach(input => {
 });
 
 /* =========================
-   Atualização periódica mobile
+   Atualização periódica das barras (mobile)
 ========================= */
 ["vida", "sanidade", "energia"].forEach(tipo => {
   const atual = document.getElementById(`${tipo}-atual`);
@@ -71,3 +72,8 @@ inputs.forEach(input => {
    Inicializa barras
 ========================= */
 ["vida", "sanidade", "energia"].forEach(atualizarBarra);
+
+// ============================
+// OBS: Nenhuma função de rolar dado aqui!
+// As rolagens agora ficam apenas no ink.js
+// ============================
