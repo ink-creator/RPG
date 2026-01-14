@@ -33,8 +33,8 @@ const TABELA_ORDEM = {
 // ============================
 // AVALIA RESULTADO
 // ============================
-function avaliarResultado(valor, dado) {
-  const regra = TABELA_ORDEM[valor];
+function avaliarResultado(valorSkill, dado) {
+  const regra = TABELA_ORDEM[valorSkill];
   if (!regra) return "FALHA";
 
   if (regra.extremo !== null && dado >= regra.extremo) return "EXTREMO";
@@ -45,9 +45,9 @@ function avaliarResultado(valor, dado) {
 }
 
 // ============================
-// ROLAR DADO (SPRITE 2D) COM HISTÓRICO
+// ROLAR DADO (SPRITE 2D)
 // ============================
-function rolarDado2D(valorSkill, nome, inputId) {
+function rolarDado2D(nome, valorSkill) {
   const overlay = document.getElementById("dice-overlay");
   const sprite  = document.getElementById("dice-sprite");
   const texto   = document.getElementById("dice-text");
@@ -65,48 +65,48 @@ function rolarDado2D(valorSkill, nome, inputId) {
     const dado = Math.floor(Math.random() * 20) + 1;
     const resultado = avaliarResultado(valorSkill, dado);
 
-    // Atualiza sprite visual (opcional)
+    // Atualiza sprite do dado (se tiver spritesheet)
     sprite.style.backgroundPositionX = `${-64 * (dado - 1)}px`;
 
-    // Atualiza overlay
-    texto.textContent = `${resultado} (${dado})`;
-    texto.className = `dice-text ${resultado.toLowerCase()}`;
+    // Define cor do resultado
+    let cor = "#2196f3"; // NORMAL
+    if (resultado === "EXTREMO") cor = "gold";
+    else if (resultado === "BOM") cor = "#4caf50";
+    else if (resultado === "FALHA") cor = "#f44336";
+
+    texto.innerHTML = `${nome}: <span style="color:${cor}">${resultado}</span> (${dado})`;
+    texto.className = `dice-text ${resultado}`;
 
     // Salva no Firebase
     const histRef = ref(db, `historico/${PLAYER_ID}`);
     push(histRef, {
       nome,
-      valorSkill,
-      dado,
       resultado,
-      data: Date.now(),
-      inputId
+      dado,
+      data: Date.now()
     });
 
-    // Esconde overlay
     setTimeout(() => overlay.classList.add("hidden"), 1500);
   }, 1000);
 }
 
 // ============================
-// LABEL → ROLAR DADO (SEM FOCO)
+// ATIVAR LABELS PARA ROLAR DADO
 // ============================
 document.addEventListener("DOMContentLoaded", () => {
-
   document.querySelectorAll("label[for]").forEach(label => {
     label.style.cursor = "pointer";
 
-    // BLOQUEIA O FOCO NATIVO DO INPUT
+    // Evita foco nativo
     label.addEventListener(
       "mousedown",
       (e) => {
         e.preventDefault();
         e.stopImmediatePropagation();
       },
-      true // capture
+      true
     );
 
-    // CLIQUE PARA ROLAR
     label.addEventListener("click", (e) => {
       e.preventDefault();
       e.stopImmediatePropagation();
@@ -115,15 +115,15 @@ document.addEventListener("DOMContentLoaded", () => {
       const input = document.getElementById(inputId);
       if (!input) return;
 
-      const valor = parseInt(input.value, 10);
-      if (isNaN(valor) || valor < 1 || valor > 20) {
+      const valorSkill = parseInt(input.value, 10);
+      if (isNaN(valorSkill) || valorSkill < 1 || valorSkill > 20) {
         alert(`O valor de "${label.textContent.trim()}" precisa ser de 1 a 20.`);
         return;
       }
 
-      const nome = label.textContent.trim();
-      rolarDado2D(valor, nome, inputId);
+      rolarDado2D(label.textContent.trim(), valorSkill);
     });
   });
-
 });
+
+export { rolarDado2D };
