@@ -11,14 +11,12 @@ body{
   font-family:Arial,sans-serif;
   overflow:hidden;
 }
-
 #toolbar{
   position:fixed;
   top:10px;
   left:10px;
   z-index:10;
 }
-
 #toolbar button{
   padding:10px 14px;
   background:#6a5acd;
@@ -28,13 +26,11 @@ body{
   border-radius:8px;
   cursor:pointer;
 }
-
 #canvas{
   width:100vw;
   height:100vh;
   position:relative;
 }
-
 svg{
   position:absolute;
   inset:0;
@@ -42,7 +38,6 @@ svg{
   height:100%;
   pointer-events:none;
 }
-
 .node{
   position:absolute;
   display:flex;
@@ -51,7 +46,6 @@ svg{
   cursor:grab;
   user-select:none;
 }
-
 .bubble{
   width:90px;
   height:90px;
@@ -63,22 +57,18 @@ svg{
   align-items:center;
   justify-content:center;
 }
-
 .bubble img{
   width:100%;
   height:100%;
   object-fit:cover;
 }
-
 .node-title{
   margin-top:6px;
   font-size:12px;
   color:white;
   text-align:center;
   max-width:120px;
-  word-wrap:break-word;
 }
-
 #panel{
   position:fixed;
   right:20px;
@@ -91,7 +81,6 @@ svg{
   box-shadow:0 0 25px rgba(0,0,0,.6);
   z-index:20;
 }
-
 #panel input,
 #panel textarea{
   width:100%;
@@ -102,12 +91,6 @@ svg{
   padding:6px;
   margin-bottom:8px;
 }
-
-#panel textarea{
-  resize:vertical;
-  min-height:80px;
-}
-
 .panel-btn{
   width:100%;
   padding:8px;
@@ -118,7 +101,6 @@ svg{
   border-radius:6px;
   cursor:pointer;
 }
-
 .panel-btn.warn{ background:#e67e22; }
 .panel-btn.danger{ background:#c0392b; }
 </style>
@@ -137,19 +119,13 @@ svg{
 <div id="panel" hidden>
   <input id="titleInput" placeholder="Nome">
   <textarea id="descInput" placeholder="Descrição"></textarea>
-
-  <label style="font-size:12px;">Imagem</label>
   <input id="fileInput" type="file" accept="image/*">
-
-  <label style="font-size:12px;">Tamanho</label>
   <input id="sizeInput" type="range" min="60" max="160">
-
   <button class="panel-btn" onclick="connectNearest()">🔗 Conectar próxima</button>
   <button class="panel-btn warn" onclick="cancelConnections()">❌ Cancelar ligações</button>
   <button class="panel-btn danger" onclick="deleteBubble()">🗑️ Excluir</button>
 </div>
 
-<!-- ================= FIREBASE ================= -->
 <script type="module">
 import { db } from "./firebase.js";
 import { ref, set, onValue } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
@@ -159,8 +135,7 @@ const DB_REF = ref(db, "skillTree");
 let nodes = [];
 let connections = [];
 let selected = null;
-let loading = false;
-let firebaseLoaded = false;
+let loading = true;
 
 const canvas = document.getElementById("canvas");
 const svg = document.getElementById("lines");
@@ -175,12 +150,12 @@ const sizeInput = document.getElementById("sizeInput");
 window.addBubble = function(data = {}) {
   const node = document.createElement("div");
   node.className = "node";
-  node.style.left = data.left ?? "200px";
-  node.style.top = data.top ?? "200px";
+  node.style.left = data.left || "200px";
+  node.style.top = data.top || "200px";
 
   const bubble = document.createElement("div");
   bubble.className = "bubble";
-  bubble.style.width = bubble.style.height = (data.size ?? 90) + "px";
+  bubble.style.width = bubble.style.height = (data.size || 90) + "px";
 
   if (data.img) {
     const img = document.createElement("img");
@@ -190,12 +165,12 @@ window.addBubble = function(data = {}) {
 
   const title = document.createElement("div");
   title.className = "node-title";
-  title.textContent = data.title ?? "";
+  title.textContent = data.title || "";
 
-  node.dataset.title = data.title ?? "";
-  node.dataset.desc = data.desc ?? "";
-  node.dataset.size = data.size ?? 90;
-  node.dataset.img = data.img ?? "";
+  node.dataset.title = data.title || "";
+  node.dataset.desc = data.desc || "";
+  node.dataset.size = data.size || 90;
+  node.dataset.img = data.img || "";
 
   node.appendChild(bubble);
   node.appendChild(title);
@@ -209,7 +184,7 @@ window.addBubble = function(data = {}) {
   canvas.appendChild(node);
   nodes.push(node);
 
-  if (!loading && firebaseLoaded) saveAll();
+  if (!loading) saveAll();
 };
 
 /* ===== SELECT ===== */
@@ -253,7 +228,7 @@ window.connectNearest = function(){
 
   nodes.forEach(n => {
     if (n === selected) return;
-    if (connections.some(c => 
+    if (connections.some(c =>
       (c[0] === selected && c[1] === n) ||
       (c[1] === selected && c[0] === n)
     )) return;
@@ -262,7 +237,7 @@ window.connectNearest = function(){
     const dy = parseInt(n.style.top) - parseInt(selected.style.top);
     const d = Math.hypot(dx, dy);
 
-    if (d < min) { min = d; target = n; }
+    if (d < min){ min = d; target = n; }
   });
 
   if (target){
@@ -279,6 +254,7 @@ window.cancelConnections = function(){
   saveAll();
 };
 
+/* ===== DRAW ===== */
 function drawLines(){
   svg.innerHTML = "";
   connections.forEach(([a,b]) => {
@@ -300,18 +276,16 @@ function drawLines(){
 
 /* ===== PANEL ===== */
 titleInput.oninput = () => {
-  if (selected){
-    selected.dataset.title = titleInput.value;
-    selected.querySelector(".node-title").textContent = titleInput.value;
-    saveAll();
-  }
+  if (!selected) return;
+  selected.dataset.title = titleInput.value;
+  selected.querySelector(".node-title").textContent = titleInput.value;
+  saveAll();
 };
 
 descInput.oninput = () => {
-  if (selected){
-    selected.dataset.desc = descInput.value;
-    saveAll();
-  }
+  if (!selected) return;
+  selected.dataset.desc = descInput.value;
+  saveAll();
 };
 
 fileInput.onchange = () => {
@@ -331,13 +305,12 @@ fileInput.onchange = () => {
 };
 
 sizeInput.oninput = () => {
-  if (selected){
-    const bubble = selected.querySelector(".bubble");
-    bubble.style.width = bubble.style.height = sizeInput.value + "px";
-    selected.dataset.size = sizeInput.value;
-    drawLines();
-    saveAll();
-  }
+  if (!selected) return;
+  const bubble = selected.querySelector(".bubble");
+  bubble.style.width = bubble.style.height = sizeInput.value + "px";
+  selected.dataset.size = sizeInput.value;
+  drawLines();
+  saveAll();
 };
 
 /* ===== DELETE ===== */
@@ -353,50 +326,23 @@ window.deleteBubble = function(){
   saveAll();
 };
 
-/* ===== SAVE / LOAD (FIREBASE) ===== */
-function saveAll(){
-  if (loading) return;
-
-  set(DB_REF, {
-    nodes: nodes.map(n => ({
-      left: n.style.left,
-      top: n.style.top,
-      title: n.dataset.title,
-      desc: n.dataset.desc,
-      size: n.dataset.size,
-      img: n.dataset.img
-    })),
-    connections: connections.map(c => [
-      nodes.indexOf(c[0]),
-      nodes.indexOf(c[1])
-    ])
-  });
-}
-
-onValue(DB_REF, snapshot => {
-  if (firebaseLoaded) return;
-
-  if (!snapshot.exists()){
-    firebaseLoaded = true;
-    return;
-  }
-
+/* ===== FIREBASE LOAD ===== */
+onValue(DB_REF, snap => {
   loading = true;
-
+  nodes.forEach(n => n.remove());
   nodes = [];
   connections = [];
-  canvas.querySelectorAll(".node").forEach(n => n.remove());
 
-  const data = snapshot.val();
-
-  data.nodes?.forEach(n => addBubble(n));
-  data.connections?.forEach(([i,j]) => {
-    if (nodes[i] && nodes[j]) connections.push([nodes[i], nodes[j]]);
-  });
+  if (snap.exists()){
+    const data = snap.val();
+    data.nodes?.forEach(n => addBubble(n));
+    data.connections?.forEach(([i,j]) => {
+      if (nodes[i] && nodes[j]) connections.push([nodes[i], nodes[j]]);
+    });
+  }
 
   drawLines();
   loading = false;
-  firebaseLoaded = true;
 });
 
 /* ===== UI ===== */
