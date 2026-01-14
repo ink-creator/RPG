@@ -2,66 +2,91 @@
    VARIÁVEIS GLOBAIS
 ========================= */
 :root {
-  --bg: #0d0d0d;
-  --panel: #1a1a1a;
-  --border: #5a0000;
+  --bg: #0b0b12;
+  --panel: #1c1c28;
+  --border: #ff1a1a;
   --text: #e0e0e0;
-  --accent: #a00000;
+  --accent: #ff1a1a;
+  --secondary: #00fff7;
+  --highlight: #ff0055;
+  --input-bg: #0d0d14;
+  --input-border: #444;
+  --bar-bg: #222;
 }
 
 /* =========================
    BASE
 ========================= */
 body {
-  background: var(--bg);
+  background: radial-gradient(circle at top, #08080d, #0b0b12);
   color: var(--text);
-  font-family: Georgia, serif;
+  font-family: 'Verdana', Geneva, sans-serif;
   margin: 0;
 }
 
 .sheet {
-  max-width: 1200px;
-  margin: auto;
-  padding: 15px;
+  max-width: 1300px;
+  margin: 20px auto;
+  padding: 20px;
   background: var(--panel);
-  border: 3px solid var(--border);
+  border: 2px solid var(--border);
+  border-radius: 12px;
+  box-shadow: 0 0 20px rgba(255, 0, 0, 0.5);
 }
 
-input {
-  width: 100%;
-  background: #000;
-  color: var(--text);
-  border: 1px solid #444;
-  padding: 6px;
-  margin-bottom: 0;
-}
-
+/* =========================
+   HEADINGS
+========================= */
 h2 {
   text-align: center;
-  border-bottom: 1px solid var(--border);
+  font-size: 1.3em;
   color: var(--accent);
+  border-bottom: 2px solid var(--border);
+  padding-bottom: 6px;
+  margin-bottom: 10px;
+  text-shadow: 0 0 6px var(--highlight);
 }
 
 /* =========================
    LAYOUT
 ========================= */
-.top {
+.top, .middle {
   display: grid;
-  grid-template-columns: 1fr 2fr 1fr;
   gap: 15px;
+}
+
+.top {
+  grid-template-columns: 1fr 2fr 1fr;
 }
 
 .middle {
-  display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 15px;
-  margin-top: 15px;
 }
 
-.block,
-.inventory {
-  border: 2px solid var(--border);
-  padding: 10px;
+/* =========================
+   BLOCOS
+========================= */
+.block, .info {
+  background: linear-gradient(145deg, #11111b, #1f1f2f);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 12px;
+  box-shadow: 0 0 8px rgba(255,0,0,0.3);
+}
+
+.fields-grid {
+  display: flex;
+  gap: 10px;
+}
+
+.fields-grid .column {
+  flex: 1;
+}
+
+.fields-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
 
 /* =========================
@@ -70,38 +95,39 @@ h2 {
 .field {
   display: flex;
   flex-direction: column;
-  margin-bottom: 1px;
-   position: relative;
+  margin-bottom: 5px;
+  position: relative;
 }
 
 .field label {
-  font-size: 15px;
-  color: #aaa;
-  margin-bottom: 1px;
-  line-height: 1;
-  cursor: pointer;
-  pointer-events: auto;
-  z-index: 2;
+  font-size: 13px;
+  color: var(--secondary);
+  margin-bottom: 2px;
+  font-weight: bold;
+  text-shadow: 0 0 3px var(--accent);
 }
 
 .field input {
-  padding: 3px 6px;
+  padding: 6px 8px;
   font-size: 14px;
-  position: relative;
-  z-index: 1;
+  background: var(--input-bg);
+  color: var(--text);
+  border: 1px solid var(--input-border);
+  border-radius: 5px;
+  outline: none;
+  transition: all 0.2s ease;
 }
 
-.cabecinha {
-  text-align: center;
-  margin-bottom: 15px;
-  color: var(--accent);
+.field input:focus {
+  border-color: var(--highlight);
+  box-shadow: 0 0 6px var(--highlight);
 }
 
 /* =========================
-   BARRAS (VIDA / SANIDADE / ENERGIA)
+   STATUS BARS
 ========================= */
 .bar-group {
-  margin-bottom: 15px;
+  margin-bottom: 12px;
 }
 
 .bar-inputs {
@@ -115,106 +141,110 @@ h2 {
 }
 
 .bar {
-  background: #333;
+  background: var(--bar-bg);
   height: 16px;
+  border-radius: 6px;
   border: 1px solid #000;
-  margin-bottom: 5px;
+  overflow: hidden;
+  margin: 4px 0;
 }
 
 .bar div {
   height: 100%;
   width: 0%;
+  transition: width 0.3s ease;
+  border-radius: 6px;
 }
 
 #vida {
-  background: #b00000;
+  background: linear-gradient(90deg, #ff1a1a, #ff5555);
 }
 
 #sanidade {
-  background: #7a00b0;
+  background: linear-gradient(90deg, #8a00ff, #d05fff);
 }
 
 #energia {
-  background: #007a3d;
+  background: linear-gradient(90deg, #00fff7, #00c4b7);
 }
 
 /* =========================
-   INVENTÁRIO
+   HOVER & INTERAÇÕES
 ========================= */
-.inventory .grid {
-  display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  gap: 5px;
+.roll-label {
+  cursor: pointer;
+  transition: color 0.2s ease, text-shadow 0.2s ease;
+}
+
+.roll-label:hover {
+  color: var(--highlight);
+  text-shadow: 0 0 6px var(--highlight);
 }
 
 /* =========================
-   RESPONSIVO
+   DICE OVERLAY
 ========================= */
-@media (max-width: 900px) {
-  .top,
-  .middle {
-    grid-template-columns: 1fr;
-  }
-}
-/* overlay que cobre a tela */
 #dice-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0,0,0,0.5);
+  background: rgba(0,0,0,0.8);
   display: none;
   justify-content: center;
   align-items: center;
   z-index: 999;
 }
 
-#dice-overlay.show {
-  display: flex;
-}
+#dice-overlay.show { display: flex; }
 
-
-/* sprite do dado */
 #dice-sprite {
   width: 64px;
   height: 64px;
-  background-image: url(../bah.png); /* coloque seu spritesheet do dado */
+  background-image: url(../bah.png);
   background-size: cover;
   margin-right: 20px;
   transition: background-position 0.3s ease-out;
 }
 
-/* animação de rolagem */
-#dice-sprite.rolling {
-  animation: rodar 1s linear;
-}
+#dice-sprite.rolling { animation: rodar 1s linear; }
 
-/* texto do resultado do dado */
 .dice-text {
   font-size: 2em;
   font-weight: bold;
   color: white;
+  text-shadow: 0 0 8px #ff1a1a;
 }
 
-/* cores para resultados */
-.dice-text.EXTREMO { color: gold; }
-.dice-text.BOM { color: #4caf50; }
-.dice-text.NORMAL { color: #2196f3; }
-.dice-text.FALHA { color: #f44336; }
+.dice-text.EXTREMO { color: gold; text-shadow: 0 0 12px gold; }
+.dice-text.BOM { color: #4caf50; text-shadow: 0 0 10px #4caf50; }
+.dice-text.NORMAL { color: #2196f3; text-shadow: 0 0 10px #2196f3; }
+.dice-text.FALHA { color: #f44336; text-shadow: 0 0 10px #f44336; }
 
-/* animação de rolagem (opcional) */
 @keyframes rodar {
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
 }
 
-/* classe que esconde o overlay */
 .hidden { display: none; }
-button {
-  background: var(--accent);
-  color: var(--text);
-  border: none;
-  padding: 10px 15px;
-  cursor: pointer;
-  font-size: 1em;
+
+/* =========================
+   RESPONSIVO
+========================= */
+@media (max-width: 1000px) {
+  .top, .middle {
+    grid-template-columns: 1fr;
+  }
+
+  .fields-grid {
+    flex-direction: column;
+  }
 }
 
-
+@media (max-width: 600px) {
+  .sheet {
+    padding: 10px;
+  }
+  .field input {
+    font-size: 13px;
+    padding: 5px 6px;
+  }
+}
