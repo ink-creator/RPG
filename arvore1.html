@@ -94,6 +94,9 @@ const treeRef = ref(db, `skillTrees/${TREE_ID}`);
 const canvas = document.getElementById("canvas");
 const svg = document.getElementById("lines");
 const panel = document.getElementById("panel");
+panel.addEventListener("click", e => {
+  e.stopPropagation();
+});
 
 const btnAdd = document.getElementById("btnAdd");
 const btnConnect = document.getElementById("btnConnect");
