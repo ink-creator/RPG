@@ -1,112 +1,94 @@
-import { db } from "../firebase.js";
-import {
-  ref,
-  onValue,
-  remove
-} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
-
-const historicoDiv = document.getElementById("historico");
-const filtroJogador = document.getElementById("filtroJogador");
-const filtroPericia = document.getElementById("filtroPericia");
-const btnLimpar = document.getElementById("limparHistorico");
-
-let historicoCompleto = [];
+// ============================
+// FIREBASE (IMPORTS)
+// ============================
+// ⚠️ Ajuste os caminhos conforme seu projeto
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+import { getDatabase, ref, onChildAdded } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
 // ============================
-// CARREGA HISTÓRICO
+// CONFIG FIREBASE
 // ============================
+// ⚠️ USE A MESMA CONFIG DO JOGADOR
+const firebaseConfig = {
+  apiKey: "SUA_API_KEY",
+  authDomain: "SEU_DOMINIO",
+  databaseURL: "SUA_DATABASE_URL",
+  projectId: "SEU_PROJECT_ID",
+  storageBucket: "SEU_BUCKET",
+  messagingSenderId: "SEU_SENDER_ID",
+  appId: "SEU_APP_ID"
+};
 
-const historicoRef = ref(db, "historicoDados");
-
-onValue(historicoRef, snapshot => {
-  historicoCompleto = [];
-
-  const dados = snapshot.val();
-  if (!dados) {
-    historicoDiv.innerHTML = "<p>Sem rolagens.</p>";
-    return;
-  }
-
-  Object.values(dados).forEach(item => {
-    historicoCompleto.push(item);
-  });
-
-  historicoCompleto.sort((a, b) => b.timestamp - a.timestamp);
-
-  atualizarFiltros();
-  renderizarHistorico();
-});
+const app = initializeApp(firebaseConfig);
+const db  = getDatabase(app);
 
 // ============================
-// ATUALIZA FILTROS
+// REFERÊNCIA DO HISTÓRICO
 // ============================
+// Exemplo: historico/mesa01
+const historicoRef = ref(db, "historico");
 
-function atualizarFiltros() {
-  const jogadores = new Set();
-  const pericias = new Set();
+// ============================
+// ELEMENTO HTML DO HISTÓRICO
+// ============================
+// <div id="historico"></div>
+const container = document.getElementById("historico");
 
-  historicoCompleto.forEach(h => {
-    jogadores.add(h.jogador);
-    pericias.add(h.pericia);
-  });
-
-  filtroJogador.innerHTML =
-    `<option value="">Todos os jogadores</option>` +
-    [...jogadores].map(j => `<option value="${j}">${j}</option>`).join("");
-
-  filtroPericia.innerHTML =
-    `<option value="">Todas as perícias</option>` +
-    [...pericias].map(p => `<option value="${p}">${p}</option>`).join("");
+if (!container) {
+  console.warn("Elemento #historico não encontrado");
 }
 
 // ============================
-// RENDERIZA HISTÓRICO
+// ESCUTA NOVAS ROLAGENS
 // ============================
+onChildAdded(historicoRef, (snapshot) => {
+  const data = snapshot.val();
+  if (!data) return;
 
-function renderizarHistorico() {
-  historicoDiv.innerHTML = "";
+  adicionarAoHistorico(data);
+});
 
-  const jogadorSel = filtroJogador.value;
-  const periciaSel = filtroPericia.value;
+// ============================
+// ADICIONA NO DOM
+// ============================
+function adicionarAoHistorico(dado) {
+  if (!container) return;
 
-  historicoCompleto
-    .filter(h =>
-      (!jogadorSel || h.jogador === jogadorSel) &&
-      (!periciaSel || h.pericia === periciaSel)
-    )
-    .slice(0, 100)
-    .forEach(h => {
-      const div = document.createElement("div");
-      div.className = `log ${h.resultado}`;
+  /*
+    Estrutura esperada do dado:
+    {
+      jogador: "Gustavo",
+      pericia: "Luta",
+      valor: 12,
+      dado: 17,
+      resultado: "BOM",
+      timestamp: 1700000000000
+    }
+  */
 
-      const data = new Date(h.timestamp).toLocaleString("pt-BR");
+  const linha = document.createElement("div");
+  linha.className = `log ${dado.resultado || "FALHA"}`;
 
-      div.innerHTML = `
-        <strong>${h.jogador}</strong>
-        — ${h.pericia} (${h.valorSkill})
-        → <strong>${h.resultado}</strong>
-        <span class="dado">[d20: ${h.dado}]</span>
-        <span class="data">${data}</span>
-      `;
+  linha.innerHTML = `
+    <span class="jogador">${dado.jogador || "?"}</span>
+    <span class="pericia">${dado.pericia || "?"}</span>
+    <span class="resultado">${dado.resultado || "?"}</span>
+    <span class="dado">(${dado.dado ?? "?"})</span>
+  `;
 
-      historicoDiv.appendChild(div);
-    });
+  container.prepend(linha);
+
+  destacarSeExtremo(linha, dado.resultado);
 }
 
 // ============================
-// EVENTOS DOS FILTROS
+// DESTAQUE EXTREMO
 // ============================
+function destacarSeExtremo(elemento, resultado) {
+  if (resultado !== "EXTREMO") return;
 
-filtroJogador.addEventListener("change", renderizarHistorico);
-filtroPericia.addEventListener("change", renderizarHistorico);
-
-// ============================
-// LIMPAR HISTÓRICO (SÓ MESTRE)
-// ============================
-
-btnLimpar.addEventListener("click", () => {
-  const ok = confirm("Tem certeza que deseja apagar TODO o histórico?");
-  if (!ok) return;
-
-  remove(historicoRef);
-});
+  elemento.classList.add("extremo-flash");
+  setTimeout(() => {
+    elemento.classList.remove("extremo-flash");
+  }, 1200);
+}
