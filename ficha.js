@@ -1,3 +1,14 @@
+// ============================
+// PLAYER_ID seguro (mock automático)
+// ============================
+let PLAYER_ID = localStorage.getItem("playerId");
+
+if (!PLAYER_ID) {
+  PLAYER_ID = "debug-player";
+  localStorage.setItem("playerId", PLAYER_ID);
+  console.warn("PLAYER_ID não encontrado. Usando mock:", PLAYER_ID);
+}
+
 // ficha.js
 import { db, ref, set, onValue } from "./firebase.js";
 
