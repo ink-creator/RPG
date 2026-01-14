@@ -31,7 +31,7 @@ const TABELA_ORDEM = {
 };
 
 // ============================
-// FUNÇÃO DE AVALIAÇÃO
+// FUNÇÃO PARA AVALIAR RESULTADO
 // ============================
 function avaliarResultado(valorSkill, dado) {
   const regra = TABELA_ORDEM[valorSkill];
@@ -43,12 +43,9 @@ function avaliarResultado(valorSkill, dado) {
 }
 
 // ============================
-// ROLAR DADO COM OVERLAY E FIREBASE
+// FUNÇÃO PRINCIPAL DE ROLAR DADO
 // ============================
-function rolarDado(nome, valorSkill, inputId = null) {
-  const dado = Math.floor(Math.random() * 20) + 1;
-  const resultado = avaliarResultado(valorSkill, dado);
-
+function rolarDado(nome, valorSkill, inputId) {
   const overlay = document.getElementById("dice-overlay");
   const sprite = document.getElementById("dice-sprite");
   const texto = document.getElementById("dice-text");
@@ -56,43 +53,46 @@ function rolarDado(nome, valorSkill, inputId = null) {
   overlay.classList.remove("hidden");
   sprite.classList.add("rolling");
 
+  // Rola dado 1-20
+  const dado = Math.floor(Math.random() * 20) + 1;
+  const resultado = avaliarResultado(valorSkill, dado);
+
+  // Atualiza overlay após animação
   setTimeout(() => {
     sprite.classList.remove("rolling");
 
-    // exibe resultado no overlay com cor
-    texto.textContent = `${nome}: ${resultado} (${dado})`;
-    texto.className = "dice-text " + resultado; // EXTREMO, BOM, NORMAL, FALHA
+    // Define cor do resultado
+    let cor = "#2196f3"; // NORMAL
+    if (resultado === "EXTREMO") cor = "gold";
+    else if (resultado === "BOM") cor = "#4caf50";
+    else if (resultado === "FALHA") cor = "#f44336";
 
-    // atualiza input se fornecido
-    if (inputId) {
-      const inputEl = document.getElementById(inputId);
-      if (inputEl) inputEl.value = dado;
-    }
+    texto.innerHTML = `${nome}: <span style="color:${cor}">${resultado}</span> (${dado})`;
 
-    // salva no histórico Firebase
+    // Salva no Firebase
     const histRef = ref(db, `historico/${PLAYER_ID}`);
     push(histRef, {
       nome,
-      dado,
       resultado,
-      data: Date.now()
+      dado,
+      data: Date.now(),
+      inputId
     });
 
-    // esconde overlay depois de 2s
     setTimeout(() => overlay.classList.add("hidden"), 2000);
   }, 1000);
 }
 
 // ============================
-// ATIVA LABELS PARA ROLAR
+// ATIVAR TODOS OS LABELS
 // ============================
 document.querySelectorAll(".roll-label").forEach(label => {
   label.addEventListener("click", () => {
     const inputId = label.dataset.input;
     const valorSkill = Number(document.getElementById(inputId)?.value) || 20;
-    rolarDado(label.textContent, valorSkill, inputId);
+    const nome = label.textContent;
+    rolarDado(nome, valorSkill, inputId);
   });
 });
 
-// exporta função principal
 export { rolarDado };
