@@ -1,5 +1,5 @@
 // ink.js
-import { PLAYER_ID } from "./player.js";
+import { PLAYER_ID } from "./players.js";
 import { db, ref, push } from "./firebase.js";
 
 // ============================
@@ -97,4 +97,5 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 export { rolarDado2D };
+
 
