@@ -1,5 +1,18 @@
-import { db, ref, set, onValue } from "../firebase.js";
+import { db, ref, set, onValue } from "./firebase.js";
 
+// ============================
+// PLAYER ID (MÓDULO SEGURO)
+// ============================
+const PLAYER_ID = localStorage.getItem("playerId");
+
+if (!PLAYER_ID) {
+  alert("Sessão inválida. Faça login novamente.");
+  window.location.href = "../index.html";
+}
+
+// ============================
+// INPUTS
+// ============================
 const inputs = document.querySelectorAll("input");
 
 /* =========================
@@ -55,7 +68,7 @@ inputs.forEach(input => {
     }
   });
 
-  const salvarLocal = () => {
+  const salvar = () => {
     set(referencia, input.value);
 
     const partes = input.id.split("-");
@@ -64,19 +77,18 @@ inputs.forEach(input => {
     }
   };
 
-  input.addEventListener("input", salvarLocal);
-  input.addEventListener("change", salvarLocal);
-  input.addEventListener("blur", salvarLocal);
+  input.addEventListener("input", salvar);
+  input.addEventListener("change", salvar);
+  input.addEventListener("blur", salvar);
 });
 
 /* =========================
    FORÇAR ATUALIZAÇÃO MOBILE
 ========================= */
 
-// garante atualização mesmo se o teclado não disparar eventos
+// Garante atualização mesmo se o teclado não disparar eventos
 ["vida", "sanidade", "energia"].forEach(tipo => {
   const atual = document.getElementById(`${tipo}-atual`);
-  const max = document.getElementById(`${tipo}-max`);
 
   if (atual) {
     setInterval(() => atualizarBarra(tipo), 200);
