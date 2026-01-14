@@ -35,3 +35,5 @@ ligarBarra("sanidade-atual", "sanidade-max", "sanidade");
 // ENERGIA
 ligarBarra("energia-atual", "energia-max", "energia");
 
+// depois de setar os valores nos inputs
+atualizarVida();
