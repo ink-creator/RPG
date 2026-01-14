@@ -43,7 +43,7 @@ function avaliarResultado(valorSkill, dado) {
 }
 
 // ============================
-// FUNÇÃO PRINCIPAL DE ROLAR DADO
+// FUNÇÃO PRINCIPAL PARA ROLAR DADO
 // ============================
 function rolarDado(nome, valorSkill, inputId) {
   const overlay = document.getElementById("dice-overlay");
@@ -53,11 +53,10 @@ function rolarDado(nome, valorSkill, inputId) {
   overlay.classList.remove("hidden");
   sprite.classList.add("rolling");
 
-  // Rola dado 1-20
+  // Rola dado 1–20
   const dado = Math.floor(Math.random() * 20) + 1;
   const resultado = avaliarResultado(valorSkill, dado);
 
-  // Atualiza overlay após animação
   setTimeout(() => {
     sprite.classList.remove("rolling");
 
@@ -67,29 +66,32 @@ function rolarDado(nome, valorSkill, inputId) {
     else if (resultado === "BOM") cor = "#4caf50";
     else if (resultado === "FALHA") cor = "#f44336";
 
+    // Mostra resultado no overlay
     texto.innerHTML = `${nome}: <span style="color:${cor}">${resultado}</span> (${dado})`;
 
     // Salva no Firebase
     const histRef = ref(db, `historico/${PLAYER_ID}`);
     push(histRef, {
       nome,
-      resultado,
+      valorSkill,
       dado,
+      resultado,
       data: Date.now(),
       inputId
     });
 
+    // Fecha overlay depois de 2s
     setTimeout(() => overlay.classList.add("hidden"), 2000);
   }, 1000);
 }
 
 // ============================
-// ATIVAR TODOS OS LABELS
+// ATIVA TODOS OS LABELS
 // ============================
 document.querySelectorAll(".roll-label").forEach(label => {
   label.addEventListener("click", () => {
     const inputId = label.dataset.input;
-    const valorSkill = Number(document.getElementById(inputId)?.value) || 20;
+    const valorSkill = Number(document.getElementById(inputId)?.value) || 1; // pega do input
     const nome = label.textContent;
     rolarDado(nome, valorSkill, inputId);
   });
