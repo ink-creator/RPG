@@ -3,6 +3,8 @@ function ligarBarra(atualId, maxId, barraId) {
   const maxInput   = document.getElementById(maxId);
   const barra      = document.getElementById(barraId);
 
+  if (!atualInput || !maxInput || !barra) return;
+
   function atualizar() {
     const atual = Number(atualInput.value);
     const max   = Number(maxInput.value);
@@ -12,27 +14,19 @@ function ligarBarra(atualId, maxId, barraId) {
       return;
     }
 
-    let porcentagem = (atual / max) * 100;
-
-    // trava entre 0 e 100
-    porcentagem = Math.max(0, Math.min(100, porcentagem));
-
+    const porcentagem = Math.max(0, Math.min(100, (atual / max) * 100));
     barra.style.width = porcentagem + "%";
   }
 
   atualInput.addEventListener("input", atualizar);
   maxInput.addEventListener("input", atualizar);
 
-  atualizar(); // atualiza ao carregar
+  atualizar(); // 👈 CRUCIAL: atualiza ao carregar
 }
 
-// VIDA
-ligarBarra("vida-atual", "vida-max", "vida");
-
-// SANIDADE
-ligarBarra("sanidade-atual", "sanidade-max", "sanidade");
-
-// ENERGIA
-ligarBarra("energia-atual", "energia-max", "energia");
-
-
+// garante que o DOM existe
+window.addEventListener("DOMContentLoaded", () => {
+  ligarBarra("vida-atual", "vida-max", "vida");
+  ligarBarra("sanidade-atual", "sanidade-max", "sanidade");
+  ligarBarra("energia-atual", "energia-max", "energia");
+});
