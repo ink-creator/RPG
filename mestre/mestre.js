@@ -1,42 +1,43 @@
 import { db } from "../firebase.js";
-import {
-  ref,
-  onChildAdded,
-  remove
-} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+import { ref, onValue } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
-document.addEventListener("DOMContentLoaded", () => {
-  const area = document.getElementById("historico-mestre");
-  const btn = document.getElementById("limpar-historico");
+const historicoContainer = document.getElementById("historico");
 
-  const historicoRef = ref(db, "historico");
+// ============================
+// FUNÇÃO PARA RENDERIZAR O HISTÓRICO
+// ============================
+function renderHistorico(data) {
+  if (!historicoContainer) return;
 
-  onChildAdded(historicoRef, playerSnap => {
-    const player = playerSnap.key;
-    const logsRef = ref(db, `historico/${player}/logs`);
+  historicoContainer.innerHTML = ""; // limpa antes de renderizar
 
-    onChildAdded(logsRef, snap => {
-      const d = snap.val();
-      if (!d) return;
+  // data = objeto com keys sendo os ids dos logs
+  for (const key in data) {
+    const log = data[key];
+    const div = document.createElement("div");
+    div.className = "log-entry";
+    div.textContent = `${log.skill} → Valor: ${log.valor}, Dado: ${log.dado}, Resultado: ${log.resultado} (${new Date(log.timestamp).toLocaleTimeString()})`;
+    historicoContainer.appendChild(div);
+  }
+}
 
-      const hora = new Date(d.timestamp).toLocaleTimeString();
+// ============================
+// PEGANDO TODOS OS HISTÓRICOS
+// ============================
+const historicoRef = ref(db, "historico"); // pega todos os jogadores
 
-      const div = document.createElement("div");
-      div.className = "log-item";
-      div.innerHTML = `
-        <small>${player}</small><br>
-        <b>${d.skill}</b> (${d.valor}) → <b>${d.dado}</b>
-        <span class="${d.resultado}">${d.resultado}</span>
-        <small>[${hora}]</small>
-      `;
+onValue(historicoRef, snapshot => {
+  if (!snapshot.exists()) return;
 
-      area.prepend(div);
-    });
-  });
+  const allData = snapshot.val();
+  historicoContainer.innerHTML = "";
 
-  btn.onclick = () => {
-    if (!confirm("Apagar TODO o histórico?")) return;
-    remove(historicoRef);
-    area.innerHTML = "";
-  };
+  for (const playerId in allData) {
+    const playerLogs = allData[playerId].logs;
+    const titulo = document.createElement("h3");
+    titulo.textContent = `Jogador: ${playerId}`;
+    historicoContainer.appendChild(titulo);
+
+    renderHistorico(playerLogs);
+  }
 });
