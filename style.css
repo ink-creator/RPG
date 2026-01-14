@@ -171,7 +171,7 @@ h2 {
 #dice-sprite {
   width: 64px;
   height: 64px;
-  background-image: url('bah.png'); /* coloque seu spritesheet do dado */
+  background-image: url(../bah.png); /* coloque seu spritesheet do dado */
   background-size: cover;
   margin-right: 20px;
   transition: background-position 0.3s ease-out;
@@ -203,3 +203,4 @@ h2 {
 
 /* classe que esconde o overlay */
 .hidden { display: none; }
+
