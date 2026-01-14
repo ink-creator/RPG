@@ -1,6 +1,6 @@
 // ink.js
-import { db, ref, push } from "./firebase.js";
 import { PLAYER_ID } from "./player.js";
+import { db, ref, push } from "./firebase.js";
 
 // ============================
 // TABELA DE RESULTADOS
@@ -97,3 +97,4 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 export { rolarDado2D };
+
