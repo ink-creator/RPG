@@ -26,3 +26,10 @@ onValue(ref(db, "historico"), snapshot => {
     }
   }
 });
+import { db, ref, remove } from "../firebase.js";
+
+document.getElementById("limpar-historico").addEventListener("click", () => {
+  if (!confirm("Tem certeza que deseja apagar TODO o histórico?")) return;
+
+  remove(ref(db, "historico"));
+});
