@@ -1,10 +1,4 @@
 // ============================
-// FIREBASE
-// ============================
-import { db } from "../firebase.js";
-import { ref, push } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
-
-// ============================
 // TABELA DE RESULTADOS
 // ============================
 const TABELA_ORDEM = {
@@ -31,7 +25,7 @@ const TABELA_ORDEM = {
 };
 
 // ============================
-// AVALIAR RESULTADO
+// AVALIA RESULTADO
 // ============================
 function avaliarResultado(valor, dado) {
   const regra = TABELA_ORDEM[valor];
@@ -45,26 +39,9 @@ function avaliarResultado(valor, dado) {
 }
 
 // ============================
-// SALVAR HISTÓRICO (FIREBASE)
-// ============================
-function salvarHistorico({ jogador, playerId, pericia, valorSkill, dado, resultado }) {
-  const historicoRef = ref(db, "historicoDados");
-
-  push(historicoRef, {
-    jogador,
-    playerId,
-    pericia,
-    valorSkill,
-    dado,
-    resultado,
-    timestamp: Date.now()
-  });
-}
-
-// ============================
 // ROLAR DADO (SPRITE 2D)
 // ============================
-function rolarDado2D(valorSkill, periciaNome) {
+function rolarDado2D(valorSkill) {
   const overlay = document.getElementById("dice-overlay");
   const sprite  = document.getElementById("dice-sprite");
   const texto   = document.getElementById("dice-text");
@@ -87,19 +64,9 @@ function rolarDado2D(valorSkill, periciaNome) {
     texto.textContent = `${resultado} (${dado})`;
     texto.className = `dice-text ${resultado}`;
 
-    const nomeJogador =
-      document.getElementById("nome")?.value || "Desconhecido";
-
-    salvarHistorico({
-      jogador: nomeJogador,
-      playerId: window.PLAYER_ID || "desconhecido",
-      pericia: periciaNome,
-      valorSkill,
-      dado,
-      resultado
-    });
-
-    setTimeout(() => overlay.classList.add("hidden"), 1500);
+    setTimeout(() => {
+      overlay.classList.add("hidden");
+    }, 1500);
   }, 1000);
 }
 
@@ -111,17 +78,17 @@ document.addEventListener("DOMContentLoaded", () => {
   document.querySelectorAll("label[for]").forEach(label => {
     label.style.cursor = "pointer";
 
-    // IMPEDE O FOCO NATIVO NO INPUT
+    // BLOQUEIA O FOCO NATIVO DO INPUT
     label.addEventListener(
       "mousedown",
       (e) => {
         e.preventDefault();
         e.stopImmediatePropagation();
       },
-      true // CAPTURE (ESSENCIAL)
+      true // capture (ESSENCIAL)
     );
 
-    // CLIQUE = ROLAR DADO
+    // CLIQUE PARA ROLAR
     label.addEventListener("click", (e) => {
       e.preventDefault();
       e.stopImmediatePropagation();
@@ -136,7 +103,7 @@ document.addEventListener("DOMContentLoaded", () => {
         return;
       }
 
-      rolarDado2D(valor, label.textContent.trim());
+      rolarDado2D(valor);
     });
   });
 
