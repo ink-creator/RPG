@@ -1,4 +1,14 @@
 // ============================
+// IMPORT FIREBASE
+// ============================
+import { getDatabase, ref, push } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+
+// ============================
+// DATABASE
+// ============================
+const db = getDatabase();
+
+// ============================
 // TABELA DE RESULTADOS
 // ============================
 const TABELA_ORDEM = {
@@ -39,6 +49,23 @@ function avaliarResultado(valor, dado) {
 }
 
 // ============================
+// SALVAR HISTÓRICO (INVISÍVEL)
+// ============================
+function salvarHistorico({ skill, valor, dado, resultado }) {
+  if (!window.PLAYER_ID) return;
+
+  const historicoRef = ref(db, `historico/${PLAYER_ID}/logs`);
+
+  push(historicoRef, {
+    skill,
+    valor,
+    dado,
+    resultado,
+    timestamp: Date.now()
+  });
+}
+
+// ============================
 // ROLAR DADO (SPRITE 2D)
 // ============================
 function rolarDado2D(valorSkill) {
@@ -64,6 +91,14 @@ function rolarDado2D(valorSkill) {
     texto.textContent = `${resultado} (${dado})`;
     texto.className = `dice-text ${resultado}`;
 
+    // 🔥 SALVA NO HISTÓRICO
+    salvarHistorico({
+      skill: window.__skillAtual || "Desconhecido",
+      valor: valorSkill,
+      dado,
+      resultado
+    });
+
     setTimeout(() => {
       overlay.classList.add("hidden");
     }, 1500);
@@ -78,18 +113,18 @@ document.addEventListener("DOMContentLoaded", () => {
   document.querySelectorAll("label[for]").forEach(label => {
     label.style.cursor = "pointer";
 
-    // BLOQUEIA O FOCO NATIVO DO INPUT
+    // bloqueia foco do input
     label.addEventListener(
       "mousedown",
-      (e) => {
+      e => {
         e.preventDefault();
         e.stopImmediatePropagation();
       },
-      true // capture (ESSENCIAL)
+      true
     );
 
-    // CLIQUE PARA ROLAR
-    label.addEventListener("click", (e) => {
+    // clique rola o dado
+    label.addEventListener("click", e => {
       e.preventDefault();
       e.stopImmediatePropagation();
 
@@ -102,6 +137,9 @@ document.addEventListener("DOMContentLoaded", () => {
         alert(`O valor de "${label.textContent.trim()}" precisa ser de 1 a 20.`);
         return;
       }
+
+      // guarda skill atual
+      window.__skillAtual = label.textContent.trim();
 
       rolarDado2D(valor);
     });
