@@ -15,70 +15,77 @@
 
     <!-- INFO ESQUERDA -->
     <div class="info left">
-      <div class="field"><label>Nome</label><input id="nome"></div>
-      <div class="field"><label>Raça</label><input id="raca"></div>
-      <div class="field"><label>Semi Raça</label><input id="sraca"></div>
-      <div class="field"><label>Altura</label><input id="altura"></div>
-      <div class="field"><label>Idade</label><input id="idade"></div>
-      <div class="field"><label>Peso</label><input id="peso"></div>
-      <div class="field"><label>Dinheiro</label><input id="dinheiro"></div>
+      <div class="fields-group">
+        <div class="field"><label>Nome</label><input id="nome"></div>
+        <div class="field"><label>Raça</label><input id="raca"></div>
+        <div class="field"><label>Semi Raça</label><input id="sraca"></div>
+        <div class="field"><label>Altura</label><input id="altura"></div>
+        <div class="field"><label>Idade</label><input id="idade"></div>
+        <div class="field"><label>Peso</label><input id="peso"></div>
+        <div class="field"><label>Dinheiro</label><input id="dinheiro"></div>
+      </div>
     </div>
 
     <!-- GERAIS -->
     <div class="info center">
       <h2>GERAIS</h2>
-
-      <div class="field"><label class="roll-label" data-input="agilidade">Agilidade</label><input id="agilidade" type="number"></div>
-      <div class="field"><label class="roll-label" data-input="briga">Briga</label><input id="briga" type="number"></div>
-      <div class="field"><label class="roll-label" data-input="constituicao">Constituição</label><input id="constituicao" type="number"></div>
-      <div class="field"><label class="roll-label" data-input="destreza">Destreza</label><input id="destreza" type="number"></div>
-      <div class="field"><label class="roll-label" data-input="forca">Força</label><input id="forca" type="number"></div>
-      <div class="field"><label class="roll-label" data-input="furtar">Furtar</label><input id="furtar" type="number"></div>
-      <div class="field"><label class="roll-label" data-input="infiltracao">Infiltração</label><input id="infiltracao" type="number"></div>
-      <div class="field"><label class="roll-label" data-input="intelecto">Intelecto</label><input id="intelecto" type="number"></div>
-      <div class="field"><label class="roll-label" data-input="sorte">Sorte</label><input id="sorte" type="number"></div>
-      <div class="field"><label class="roll-label" data-input="vigilancia">Vigilância</label><input id="vigilancia" type="number"></div>
-      <div class="field"><label class="roll-label" data-input="vontade">Vontade</label><input id="vontade" type="number"></div>
+      <div class="fields-group">
+        <div class="field"><label class="roll-label" data-input="agilidade">Agilidade</label><input id="agilidade" type="number"></div>
+        <div class="field"><label class="roll-label" data-input="briga">Briga</label><input id="briga" type="number"></div>
+        <div class="field"><label class="roll-label" data-input="constituicao">Constituição</label><input id="constituicao" type="number"></div>
+        <div class="field"><label class="roll-label" data-input="destreza">Destreza</label><input id="destreza" type="number"></div>
+        <div class="field"><label class="roll-label" data-input="forca">Força</label><input id="forca" type="number"></div>
+        <div class="field"><label class="roll-label" data-input="furtar">Furtar</label><input id="furtar" type="number"></div>
+        <div class="field"><label class="roll-label" data-input="infiltracao">Infiltração</label><input id="infiltracao" type="number"></div>
+        <div class="field"><label class="roll-label" data-input="intelecto">Intelecto</label><input id="intelecto" type="number"></div>
+        <div class="field"><label class="roll-label" data-input="sorte">Sorte</label><input id="sorte" type="number"></div>
+        <div class="field"><label class="roll-label" data-input="vigilancia">Vigilância</label><input id="vigilancia" type="number"></div>
+        <div class="field"><label class="roll-label" data-input="vontade">Vontade</label><input id="vontade" type="number"></div>
+        <div class="field"><label class="roll-label" data-input="voar">Voar</label><input id="voar" type="number"></div>
+      </div>
     </div>
 
     <!-- STATUS -->
     <div class="info right">
-      <!-- VIDA -->
-      <div class="bar-group">
-        <label>VIDA</label>
-        <div class="bar-inputs">
-          <div class="field"><label>Atual</label><input id="vida-atual" type="number"></div>
-          <span>/</span>
-          <div class="field"><label>Máx</label><input id="vida-max" type="number"></div>
+      <div class="status-container">
+        <!-- VIDA -->
+        <div class="bar-group">
+          <label>VIDA</label>
+          <div class="bar-inputs">
+            <div class="field"><label>Atual</label><input id="vida-atual" type="number"></div>
+            <span>/</span>
+            <div class="field"><label>Máx</label><input id="vida-max" type="number"></div>
+          </div>
+          <div class="bar"><div id="vida"></div></div>
+          <div class="field"><label>Resistência</label><input id="vida-resistencia"></div>
         </div>
-        <div class="bar"><div id="vida"></div></div>
-        <div class="field"><label>Resistência</label><input id="vida-resistencia"></div>
-      </div>
 
-      <!-- SANIDADE -->
-      <div class="bar-group">
-        <label>SANIDADE</label>
-        <div class="bar-inputs">
-          <div class="field"><label>Atual</label><input id="sanidade-atual" type="number"></div>
-          <span>/</span>
-          <div class="field"><label>Máx</label><input id="sanidade-max" type="number"></div>
+        <!-- SANIDADE -->
+        <div class="bar-group">
+          <label>SANIDADE</label>
+          <div class="bar-inputs">
+            <div class="field"><label>Atual</label><input id="sanidade-atual" type="number"></div>
+            <span>/</span>
+            <div class="field"><label>Máx</label><input id="sanidade-max" type="number"></div>
+          </div>
+          <div class="bar"><div id="sanidade"></div></div>
+          <div class="field"><label>Resistência</label><input id="sanidade-resistencia"></div>
         </div>
-        <div class="bar"><div id="sanidade"></div></div>
-        <div class="field"><label>Resistência</label><input id="sanidade-resistencia"></div>
-      </div>
 
-      <!-- ENERGIA -->
-      <div class="bar-group">
-        <label>ENERGIA</label>
-        <div class="bar-inputs">
-          <div class="field"><label>Atual</label><input id="energia-atual" type="number"></div>
-          <span>/</span>
-          <div class="field"><label>Máx</label><input id="energia-max" type="number"></div>
+        <!-- ENERGIA -->
+        <div class="bar-group">
+          <label>ENERGIA</label>
+          <div class="bar-inputs">
+            <div class="field"><label>Atual</label><input id="energia-atual" type="number"></div>
+            <span>/</span>
+            <div class="field"><label>Máx</label><input id="energia-max" type="number"></div>
+          </div>
+          <div class="bar"><div id="energia"></div></div>
+          <div class="field"><label>Resistência</label><input id="energia-resistencia"></div>
         </div>
-        <div class="bar"><div id="energia"></div></div>
-        <div class="field"><label>Resistência</label><input id="energia-resistencia"></div>
       </div>
     </div>
+
   </div>
 
   <!-- MEIO -->
@@ -86,61 +93,91 @@
 
     <div class="block">
       <h2>INTERPESSOAL</h2>
-
-      <div class="field"><label class="roll-label" data-input="charme">Charme</label><input id="charme" type="number"></div>
-      <div class="field"><label class="roll-label" data-input="disfarce">Disfarce</label><input id="disfarce" type="number"></div>
-      <div class="field"><label class="roll-label" data-input="elogiar">Elogiar</label><input id="elogiar" type="number"></div>
-      <div class="field"><label class="roll-label" data-input="flertar">Flertar</label><input id="flertar" type="number"></div>
-      <div class="field"><label class="roll-label" data-input="interrogar">Interrogar</label><input id="interrogar" type="number"></div>
-      <div class="field"><label class="roll-label" data-input="intimidar">Intimidar</label><input id="intimidar" type="number"></div>
-      <div class="field"><label class="roll-label" data-input="manipulacao">Manipulação</label><input id="manipulacao" type="number"></div>
-      <div class="field"><label class="roll-label" data-input="negociar">Negociar</label><input id="negociar" type="number"></div>
-      <div class="field"><label class="roll-label" data-input="provocar">Provocar</label><input id="provocar" type="number"></div>
-      <div class="field"><label class="roll-label" data-input="psicologia">Psicologia</label><input id="psicologia" type="number"></div>
-      <div class="field"><label class="roll-label" data-input="terapia">Terapia</label><input id="terapia" type="number"></div>
+      <div class="fields-group">
+        <div class="field"><label class="roll-label" data-input="charme">Charme</label><input id="charme" type="number"></div>
+        <div class="field"><label class="roll-label" data-input="disfarce">Disfarce</label><input id="disfarce" type="number"></div>
+        <div class="field"><label class="roll-label" data-input="elogiar">Elogiar</label><input id="elogiar" type="number"></div>
+        <div class="field"><label class="roll-label" data-input="flertar">Flertar</label><input id="flertar" type="number"></div>
+        <div class="field"><label class="roll-label" data-input="interrogar">Interrogar</label><input id="interrogar" type="number"></div>
+        <div class="field"><label class="roll-label" data-input="intimidar">Intimidar</label><input id="intimidar" type="number"></div>
+        <div class="field"><label class="roll-label" data-input="manipulacao">Manipulação</label><input id="manipulacao" type="number"></div>
+        <div class="field"><label class="roll-label" data-input="negociar">Negociar</label><input id="negociar" type="number"></div>
+        <div class="field"><label class="roll-label" data-input="provocar">Provocar</label><input id="provocar" type="number"></div>
+        <div class="field"><label class="roll-label" data-input="psicologia">Psicologia</label><input id="psicologia" type="number"></div>
+        <div class="field"><label class="roll-label" data-input="terapia">Terapia</label><input id="terapia" type="number"></div>
+      </div>
     </div>
 
     <div class="block">
       <h2>TÉCNICO</h2>
-
-      <div class="field"><label class="roll-label" data-input="analise-documentos">Análise de Documentos</label><input id="analise-documentos" type="number"></div>
-      <div class="field"><label class="roll-label" data-input="aviacao">Aviação</label><input id="aviacao" type="number"></div>
-      <div class="field"><label class="roll-label" data-input="balistica">Balística</label><input id="balistica" type="number"></div>
-      <div class="field"><label class="roll-label" data-input="cartografia">Cartografia</label><input id="cartografia" type="number"></div>
-      <div class="field"><label class="roll-label" data-input="explosivos">Explosivos</label><input id="explosivos" type="number"></div>
-      <div class="field"><label class="roll-label" data-input="falsificacao">Falsificação</label><input id="falsificacao" type="number"></div>
-      <div class="field"><label class="roll-label" data-input="forense">Perícia Forense</label><input id="forense" type="number"></div>
-      <div class="field"><label class="roll-label" data-input="mecanica">Mecânica</label><input id="mecanica" type="number"></div>
-      <div class="field"><label class="roll-label" data-input="pesquisa">Pesquisa</label><input id="pesquisa" type="number"></div>
-      <div class="field"><label class="roll-label" data-input="pilotagem">Pilotagem</label><input id="pilotagem" type="number"></div>
-      <div class="field"><label class="roll-label" data-input="tecnologia">Tecnologia</label><input id="tecnologia" type="number"></div>
+      <div class="fields-group">
+        <div class="field"><label class="roll-label" data-input="analise-documentos">Análise de Documentos</label><input id="analise-documentos" type="number"></div>
+        <div class="field"><label class="roll-label" data-input="aviacao">Aviação</label><input id="aviacao" type="number"></div>
+        <div class="field"><label class="roll-label" data-input="balistica">Balística</label><input id="balistica" type="number"></div>
+        <div class="field"><label class="roll-label" data-input="cartografia">Cartografia</label><input id="cartografia" type="number"></div>
+        <div class="field"><label class="roll-label" data-input="explosivos">Explosivos</label><input id="explosivos" type="number"></div>
+        <div class="field"><label class="roll-label" data-input="falsificacao">Falsificação</label><input id="falsificacao" type="number"></div>
+        <div class="field"><label class="roll-label" data-input="forense">Perícia Forense</label><input id="forense" type="number"></div>
+        <div class="field"><label class="roll-label" data-input="mecanica">Mecânica</label><input id="mecanica" type="number"></div>
+        <div class="field"><label class="roll-label" data-input="pesquisa">Pesquisa</label><input id="pesquisa" type="number"></div>
+        <div class="field"><label class="roll-label" data-input="pilotagem">Pilotagem</label><input id="pilotagem" type="number"></div>
+        <div class="field"><label class="roll-label" data-input="tecnologia">Tecnologia</label><input id="tecnologia" type="number"></div>
+      </div>
     </div>
 
     <div class="block">
       <h2>ACADÊMICO</h2>
-
-      <div class="field"><label class="roll-label" data-input="curiosidades">Conhecimento Geral</label><input id="curiosidades" type="number"></div>
-      <div class="field"><label class="roll-label" data-input="fisica">Física</label><input id="fisica" type="number"></div>
-      <div class="field"><label class="roll-label" data-input="geografia">Geografia</label><input id="geografia" type="number"></div>
-      <div class="field"><label class="roll-label" data-input="historia">História</label><input id="historia" type="number"></div>
-      <div class="field"><label class="roll-label" data-input="historia-artistica">História Artística</label><input id="historia-artistica" type="number"></div>
-      <div class="field"><label class="roll-label" data-input="historia-natural">História Natural</label><input id="historia-natural" type="number"></div>
-      <div class="field"><label class="roll-label" data-input="linguagem">Linguagem</label><input id="linguagem" type="number"></div>
-      <div class="field"><label class="roll-label" data-input="matematica">Matemática</label><input id="matematica" type="number"></div>
-      <div class="field"><label class="roll-label" data-input="poderes">Poderes</label><input id="poderes" type="number"></div>
-      <div class="field"><label class="roll-label" data-input="quimica">Química</label><input id="quimica" type="number"></div>
-      <div class="field"><label class="roll-label" data-input="religiao">Religião</label><input id="religiao" type="number"></div>
+      <div class="fields-group">
+        <div class="field"><label class="roll-label" data-input="curiosidades">Conhecimento Geral</label><input id="curiosidades" type="number"></div>
+        <div class="field"><label class="roll-label" data-input="fisica">Física</label><input id="fisica" type="number"></div>
+        <div class="field"><label class="roll-label" data-input="geografia">Geografia</label><input id="geografia" type="number"></div>
+        <div class="field"><label class="roll-label" data-input="historia">História</label><input id="historia" type="number"></div>
+        <div class="field"><label class="roll-label" data-input="historia-artistica">História Artística</label><input id="historia-artistica" type="number"></div>
+        <div class="field"><label class="roll-label" data-input="historia-natural">História Natural</label><input id="historia-natural" type="number"></div>
+        <div class="field"><label class="roll-label" data-input="linguagem">Linguagem</label><input id="linguagem" type="number"></div>
+        <div class="field"><label class="roll-label" data-input="matematica">Matemática</label><input id="matematica" type="number"></div>
+        <div class="field"><label class="roll-label" data-input="poderes">Poderes</label><input id="poderes" type="number"></div>
+        <div class="field"><label class="roll-label" data-input="quimica">Química</label><input id="quimica" type="number"></div>
+        <div class="field"><label class="roll-label" data-input="religiao">Religião</label><input id="religiao" type="number"></div>
+      </div>
     </div>
 
   </div>
+
 <script>
-  localStorage.setItem("playerId", "p1");
+  localStorage.setItem("playerId", "p5");
 </script>
+
 <div id="dice-overlay" class="hidden">
   <div id="dice-sprite"></div>
   <div id="dice-text" class="dice-text"></div>
 </div>
 
+<a href="../arvore5.html"
+   style="
+     display:inline-block;
+     margin-top:12px;
+     padding:6px 14px;
+     font-family:'Times New Roman', serif;
+     font-size:16px;
+     letter-spacing:1px;
+     color:#ff1a1a;
+     text-decoration:none;
+     border:1px solid #ff1a1a;
+     background:linear-gradient(180deg,#1a1a1a,#050505);
+     box-shadow: inset 0 0 6px rgba(255,0,0,0.4), 0 0 10px rgba(255,0,0,0.2);
+     transition:all 0.25s ease;
+   "
+   onmouseover="
+     this.style.color='#ffffff';
+     this.style.boxShadow='inset 0 0 10px rgba(255,0,0,0.8), 0 0 18px rgba(255,0,0,0.6)';
+   "
+   onmouseout="
+     this.style.color='#ff1a1a';
+     this.style.boxShadow='inset 0 0 6px rgba(255,0,0,0.4), 0 0 10px rgba(255,0,0,0.2)';
+   ">
+⛧ Skill Tree ⛧
+</a>
 
 <script type="module" src="../main.js"></script>
 </body>
