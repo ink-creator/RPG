@@ -24,8 +24,30 @@
   <a href="../players/p4.html">Ficha Claymant (Cayo)</a><br>
   <a href="../players/p5.html">Ficha Stella (Juliana)</a>
 </div>
- <h1>Histórico de Rolagens</h1>
-  <div id="historico"></div>
-<script type="module" src="./mestre.js"></script>
+<h2>Histórico de Rolagens</h2>
+<ul id="historico"></ul>
+
+<script type="module">
+import { db, ref, onValue } from "./firebase.js";
+
+const HIST_LIST = document.getElementById("historico");
+
+onValue(ref(db, "historico"), snapshot => {
+  HIST_LIST.innerHTML = ""; // limpa lista
+  if (!snapshot.exists()) return;
+
+  const data = snapshot.val();
+  for (const playerId in data) {
+    const rolls = data[playerId];
+    for (const key in rolls) {
+      const item = rolls[key];
+      const li = document.createElement("li");
+      const dataStr = new Date(item.data).toLocaleString();
+      li.textContent = `[${dataStr}] ${playerId}: ${item.nome} → ${item.resultado}`;
+      HIST_LIST.appendChild(li);
+    }
+  }
+});
+</script>
 </body>
 </html>
