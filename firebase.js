@@ -3,13 +3,13 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.2/firebas
 import { getDatabase, ref, set, onValue, push } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-database.js";
 
 const firebaseConfig = {
-  apiKey: "SUA_API_KEY",
-  authDomain: "SEU_AUTH_DOMAIN",
-  databaseURL: "SUA_DATABASE_URL",
-  projectId: "SEU_PROJECT_ID",
-  storageBucket: "SEU_BUCKET",
-  messagingSenderId: "SEU_SENDER_ID",
-  appId: "SEU_APP_ID"
+  apiKey: "AIzaSyBCCbxXH6UZEqpItsdVaaG354Nqu28HA44",
+  authDomain: "rpg-ficha-online.firebaseapp.com",
+  databaseURL: "https://rpg-ficha-online-default-rtdb.firebaseio.com",
+  projectId: "rpg-ficha-online",
+  storageBucket: "rpg-ficha-online.firebasestorage.app",
+  messagingSenderId: "213971701978",
+  appId: "1:213971701978:web:b030274505603fd49255e3"
 };
 
 // Inicializa Firebase
