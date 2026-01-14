@@ -1,4 +1,4 @@
-import { db, ref, set, onValue } from "./firebase.js";
+import { db, ref, set, onValue } from "../firebase.js";
 
 const inputs = document.querySelectorAll("input");
 
