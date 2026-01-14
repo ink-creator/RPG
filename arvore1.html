@@ -68,26 +68,29 @@ svg{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;}
   <button class="panel-btn danger" id="btnDelete">🗑️ Excluir bolha</button>
 </div>
 
-<!-- FIREBASE -->
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
-/* 🔥 CONFIG FIREBASE */
+/* =========================
+   FIREBASE
+========================= */
 const firebaseConfig = {
-  apiKey: "AIzaSyBCCbxXH6UZEqpItsdVaaG354Nqu28HA44",
-  authDomain: "rpg-ficha-online.firebaseapp.com",
-  databaseURL: "https://rpg-ficha-online-default-rtdb.firebaseio.com",
-  projectId: "rpg-ficha-online",
+  apiKey: "SUA_API_KEY",
+  authDomain: "SEU_DOMINIO",
+  databaseURL: "SUA_DATABASE_URL",
+  projectId: "SEU_PROJECT_ID"
 };
 
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
-const treeRef = ref(db, "skillTree");
 
-/* =======================
+const TREE_ID = document.body.dataset.tree || "default";
+const treeRef = ref(db, `skillTrees/${TREE_ID}`);
+
+/* =========================
    ESTADO
-======================= */
+========================= */
 const canvas = document.getElementById("canvas");
 const svg = document.getElementById("lines");
 const panel = document.getElementById("panel");
@@ -101,177 +104,211 @@ const titleInput = document.getElementById("titleInput");
 const descInput = document.getElementById("descInput");
 const fileInput = document.getElementById("fileInput");
 
-let nodes=[], connections=[], selected=null, loading=false;
+let nodes = [];
+let connections = [];
+let selected = null;
 
-/* =======================
+let loading = true;
+let initialized = false;
+
+/* =========================
    CREATE
-======================= */
-function addBubble(data={}){
-  const node=document.createElement("div");
-  node.className="node";
-  node.style.left=data.left||"200px";
-  node.style.top=data.top||"200px";
+========================= */
+function addBubble(data = {}, silent = false){
+  const node = document.createElement("div");
+  node.className = "node";
+  node.style.left = data.left || "200px";
+  node.style.top  = data.top  || "200px";
 
-  const bubble=document.createElement("div");
-  bubble.className="bubble";
+  const bubble = document.createElement("div");
+  bubble.className = "bubble";
 
-  if(data.img){
-    const img=document.createElement("img");
-    img.src=data.img;
+  if (data.img) {
+    const img = document.createElement("img");
+    img.src = data.img;
     bubble.appendChild(img);
   }
 
-  const title=document.createElement("div");
-  title.className="node-title";
-  title.textContent=data.title||"";
+  const title = document.createElement("div");
+  title.className = "node-title";
+  title.textContent = data.title || "";
 
-  node.dataset.title=data.title||"";
-  node.dataset.desc=data.desc||"";
-  node.dataset.img=data.img||"";
+  node.dataset.title = data.title || "";
+  node.dataset.desc  = data.desc  || "";
+  node.dataset.img   = data.img   || "";
 
-  node.append(bubble,title);
-  node.onclick=e=>{e.stopPropagation();selectNode(node);}
+  node.append(bubble, title);
+  node.onclick = e => { e.stopPropagation(); selectNode(node); };
+
   drag(node);
   canvas.appendChild(node);
   nodes.push(node);
 
-  if(!loading) saveAll();
+  if (!silent && initialized) saveAll();
 }
 
-/* =======================
+/* =========================
    SELECT
-======================= */
+========================= */
 function selectNode(node){
-  selected=node;
-  panel.hidden=false;
-  titleInput.value=node.dataset.title;
-  descInput.value=node.dataset.desc;
+  selected = node;
+  panel.hidden = false;
+  titleInput.value = node.dataset.title;
+  descInput.value  = node.dataset.desc;
 }
 
-document.addEventListener("click",()=>{selected=null;panel.hidden=true;});
+document.addEventListener("click",()=>{
+  selected = null;
+  panel.hidden = true;
+});
 
-/* =======================
+/* =========================
    DRAG
-======================= */
+========================= */
 function drag(el){
-  let ox,oy;
-  el.onmousedown=e=>{
-    ox=e.offsetX;oy=e.offsetY;
-    document.onmousemove=ev=>{
-      el.style.left=(ev.pageX-ox)+"px";
-      el.style.top=(ev.pageY-oy)+"px";
+  let ox, oy;
+  el.onmousedown = e => {
+    ox = e.offsetX;
+    oy = e.offsetY;
+    document.onmousemove = ev => {
+      el.style.left = (ev.pageX - ox) + "px";
+      el.style.top  = (ev.pageY - oy) + "px";
       drawLines();
     };
-    document.onmouseup=()=>{
-      document.onmousemove=null;
+    document.onmouseup = () => {
+      document.onmousemove = null;
       saveAll();
     };
   };
 }
 
-/* =======================
+/* =========================
    LINES
-======================= */
+========================= */
 function connectNearest(){
-  if(!selected||nodes.length<2)return;
-  let min=Infinity,target=null;
-  nodes.forEach(n=>{
-    if(n===selected)return;
-    const dx=parseInt(n.style.left)-parseInt(selected.style.left);
-    const dy=parseInt(n.style.top)-parseInt(selected.style.top);
-    const d=Math.hypot(dx,dy);
-    if(d<min){min=d;target=n;}
+  if (!selected || nodes.length < 2) return;
+
+  let min = Infinity, target = null;
+  nodes.forEach(n => {
+    if (n === selected) return;
+    const dx = parseInt(n.style.left) - parseInt(selected.style.left);
+    const dy = parseInt(n.style.top)  - parseInt(selected.style.top);
+    const d = Math.hypot(dx, dy);
+    if (d < min) { min = d; target = n; }
   });
-  if(target){
-    connections.push([selected,target]);
-    drawLines();saveAll();
+
+  if (target) {
+    connections.push([selected, target]);
+    drawLines();
+    saveAll();
   }
 }
 
 function drawLines(){
-  svg.innerHTML="";
-  connections.forEach(([a,b])=>{
-    const l=document.createElementNS("http://www.w3.org/2000/svg","line");
-    l.setAttribute("x1",parseInt(a.style.left)+45);
-    l.setAttribute("y1",parseInt(a.style.top)+45);
-    l.setAttribute("x2",parseInt(b.style.left)+45);
-    l.setAttribute("y2",parseInt(b.style.top)+45);
+  svg.innerHTML = "";
+  connections.forEach(([a,b]) => {
+    const l = document.createElementNS("http://www.w3.org/2000/svg","line");
+    l.setAttribute("x1", parseInt(a.style.left)+45);
+    l.setAttribute("y1", parseInt(a.style.top)+45);
+    l.setAttribute("x2", parseInt(b.style.left)+45);
+    l.setAttribute("y2", parseInt(b.style.top)+45);
     l.setAttribute("stroke","#aaa");
     l.setAttribute("stroke-width","2");
     svg.appendChild(l);
   });
 }
 
-/* =======================
+/* =========================
    PANEL
-======================= */
-titleInput.oninput=()=>{if(selected){selected.dataset.title=titleInput.value;selected.querySelector(".node-title").textContent=titleInput.value;saveAll();}};
-descInput.oninput=()=>{if(selected){selected.dataset.desc=descInput.value;saveAll();}};
+========================= */
+titleInput.oninput = () => {
+  if (!selected) return;
+  selected.dataset.title = titleInput.value;
+  selected.querySelector(".node-title").textContent = titleInput.value;
+  saveAll();
+};
 
-fileInput.onchange=()=>{
-  if(!selected||!fileInput.files[0])return;
-  const r=new FileReader();
-  r.onload=e=>{
-    selected.dataset.img=e.target.result;
-    const b=selected.querySelector(".bubble");
-    b.innerHTML="";
-    const img=document.createElement("img");
-    img.src=e.target.result;
+descInput.oninput = () => {
+  if (!selected) return;
+  selected.dataset.desc = descInput.value;
+  saveAll();
+};
+
+fileInput.onchange = () => {
+  if (!selected || !fileInput.files[0]) return;
+  const r = new FileReader();
+  r.onload = e => {
+    selected.dataset.img = e.target.result;
+    const b = selected.querySelector(".bubble");
+    b.innerHTML = "";
+    const img = document.createElement("img");
+    img.src = e.target.result;
     b.appendChild(img);
     saveAll();
   };
   r.readAsDataURL(fileInput.files[0]);
 };
 
-btnDelete.onclick=()=>{
-  if(!selected)return;
-  connections=connections.filter(c=>c[0]!==selected&&c[1]!==selected);
-  nodes=nodes.filter(n=>n!==selected);
-  selected.remove();selected=null;panel.hidden=true;
-  drawLines();saveAll();
+btnDelete.onclick = () => {
+  if (!selected) return;
+  connections = connections.filter(c => c[0] !== selected && c[1] !== selected);
+  nodes = nodes.filter(n => n !== selected);
+  selected.remove();
+  selected = null;
+  panel.hidden = true;
+  drawLines();
+  saveAll();
 };
 
-btnClear.onclick=()=>{
-  if(!selected)return;
-  connections=connections.filter(c=>c[0]!==selected&&c[1]!==selected);
-  drawLines();saveAll();
+btnClear.onclick = () => {
+  if (!selected) return;
+  connections = connections.filter(c => c[0] !== selected && c[1] !== selected);
+  drawLines();
+  saveAll();
 };
 
-btnConnect.onclick=connectNearest;
-btnAdd.onclick=()=>addBubble();
+btnConnect.onclick = connectNearest;
+btnAdd.onclick = () => addBubble();
 
-/* =======================
+/* =========================
    FIREBASE SAVE / LOAD
-======================= */
+========================= */
 function saveAll(){
-  if(loading)return;
-  set(treeRef,{
-    nodes:nodes.map(n=>({
-      left:n.style.left,
-      top:n.style.top,
-      title:n.dataset.title,
-      desc:n.dataset.desc,
-      img:n.dataset.img
+  if (loading || !initialized) return;
+
+  set(treeRef, {
+    nodes: nodes.map(n => ({
+      left: n.style.left,
+      top: n.style.top,
+      title: n.dataset.title,
+      desc: n.dataset.desc,
+      img: n.dataset.img
     })),
-    connections:connections.map(c=>[
+    connections: connections.map(c => [
       nodes.indexOf(c[0]),
       nodes.indexOf(c[1])
     ])
   });
 }
 
-onValue(treeRef,snap=>{
-  if(!snap.exists())return;
-  loading=true;
-  const data=snap.val();
-  nodes.forEach(n=>n.remove());
-  nodes=[];connections=[];
-  data.nodes.forEach(n=>addBubble(n));
-  data.connections.forEach(([i,j])=>{
-    if(nodes[i]&&nodes[j])connections.push([nodes[i],nodes[j]]);
-  });
+onValue(treeRef, snapshot => {
+  loading = true;
+
+  nodes.forEach(n => n.remove());
+  nodes = [];
+  connections = [];
+
+  if (snapshot.exists()) {
+    const data = snapshot.val();
+    data.nodes?.forEach(n => addBubble(n, true));
+    data.connections?.forEach(([i,j]) => {
+      if (nodes[i] && nodes[j]) connections.push([nodes[i], nodes[j]]);
+    });
+  }
+
   drawLines();
-  loading=false;
+  loading = false;
+  initialized = true;
 });
 </script>
 
