@@ -1,5 +1,5 @@
 // ficha.js
-import { db, ref, set, onValue, push } from "./firebase.js";
+import { db, ref, set, onValue } from "./firebase.js";
 
 // PLAYER_ID precisa estar definido antes
 const PLAYER_ID = localStorage.getItem("playerId");
@@ -71,37 +71,3 @@ inputs.forEach(input => {
    Inicializa barras
 ========================= */
 ["vida", "sanidade", "energia"].forEach(atualizarBarra);
-// Seleciona todos os elementos que podem rolar
-document.querySelectorAll(".roll-label").forEach(label => {
-  label.addEventListener("click", () => {
-    const inputId = label.dataset.input;
-    const inputEl = document.getElementById(inputId);
-    if (!inputEl) return;
-
-    // rolagem aleatória
-    const resultado = Math.floor(Math.random() * 20) + 1; // d20
-    inputEl.value = resultado;
-
-    // mostra animação
-    const overlay = document.getElementById("dice-overlay");
-    const sprite = document.getElementById("dice-sprite");
-    const texto = document.getElementById("dice-text");
-    overlay.classList.remove("hidden");
-    texto.textContent = resultado;
-
-    sprite.classList.add("rolling");
-    setTimeout(() => {
-      sprite.classList.remove("rolling");
-      overlay.classList.add("hidden");
-    }, 1000);
-
-    // envia para histórico
-    const playerId = PLAYER_ID; // define em algum lugar
-    const data = {
-      nome: inputId,
-      resultado,
-      data: Date.now()
-    };
-    set(ref(db, `historico/${playerId}/${Date.now()}`), data);
-  });
-});
