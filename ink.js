@@ -6,15 +6,14 @@ import { getDatabase, ref, push } from "https://www.gstatic.com/firebasejs/10.7.
 // CONFIGURAÇÃO DO FIREBASE
 // ============================
 const firebaseConfig = {
-  apiKey: "SUA_API_KEY",
-  authDomain: "SEU_PROJECT_ID.firebaseapp.com",
-  databaseURL: "https://SEU_PROJECT_ID.firebaseio.com",
-  projectId: "SEU_PROJECT_ID",
-  storageBucket: "SEU_PROJECT_ID.appspot.com",
-  messagingSenderId: "SEU_SENDER_ID",
-  appId: "SEU_APP_ID"
+  apiKey: "AIzaSyBCCbxXH6UZEqpItsdVaaG354Nqu28HA44",
+  authDomain: "rpg-ficha-online.firebaseapp.com",
+  databaseURL: "https://rpg-ficha-online-default-rtdb.firebaseio.com",
+  projectId: "rpg-ficha-online",
+  storageBucket: "rpg-ficha-online.firebasestorage.app",
+  messagingSenderId: "213971701978",
+  appId: "1:213971701978:web:b030274505603fd49255e3"
 };
-
 // Inicializa o Firebase
 const app = initializeApp(firebaseConfig);
 window.db = getDatabase(app); // Salva o database globalmente para usar no salvarHistorico
@@ -98,3 +97,4 @@ function salvarHistorico(data) {
     timestamp: Date.now()
   });
 }
+
