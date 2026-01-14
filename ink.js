@@ -1,7 +1,28 @@
 import { rolarDado2D } from "../dice.js";
-import { ref, push } from
-  "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { getDatabase, ref, push } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
+// ============================
+// CONFIGURAÇÃO DO FIREBASE
+// ============================
+const firebaseConfig = {
+  apiKey: "SUA_API_KEY",
+  authDomain: "SEU_PROJECT_ID.firebaseapp.com",
+  databaseURL: "https://SEU_PROJECT_ID.firebaseio.com",
+  projectId: "SEU_PROJECT_ID",
+  storageBucket: "SEU_PROJECT_ID.appspot.com",
+  messagingSenderId: "SEU_SENDER_ID",
+  appId: "SEU_APP_ID"
+};
+
+// Inicializa o Firebase
+const app = initializeApp(firebaseConfig);
+window.db = getDatabase(app); // Salva o database globalmente para usar no salvarHistorico
+window.PLAYER_ID = "player1"; // Pode mudar para cada jogador dinamicamente
+
+// ============================
+// EVENTOS
+// ============================
 document.addEventListener("DOMContentLoaded", () => {
 
   document.querySelectorAll("label[for]").forEach(label => {
@@ -68,13 +89,12 @@ function salvarHistorico(data) {
 
   const historicoRef = ref(
     window.db,
-    `historico/${PLAYER_ID}/logs`
+    `historico/${window.PLAYER_ID}/logs`
   );
 
   push(historicoRef, {
-    player: PLAYER_ID,
+    player: window.PLAYER_ID,
     ...data,
     timestamp: Date.now()
   });
 }
-
