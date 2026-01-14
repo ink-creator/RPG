@@ -1,5 +1,5 @@
-import { rolarDado2D } from "./dice.js";
-import { db } from "./firebase.js";
+import { rolarDado2D } from "../dice.js";
+import { db } from "../firebase.js";
 import { ref, push } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
 // ============================
@@ -79,5 +79,6 @@ function salvarHistorico(data) {
     timestamp: Date.now()
   });
 }
+
 
 
