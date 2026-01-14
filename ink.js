@@ -1,3 +1,14 @@
+// ============================
+// PLAYER_ID seguro (mock automático)
+// ============================
+let PLAYER_ID = localStorage.getItem("playerId");
+
+if (!PLAYER_ID) {
+  PLAYER_ID = "debug-player";
+  localStorage.setItem("playerId", PLAYER_ID);
+  console.warn("PLAYER_ID não encontrado. Usando mock:", PLAYER_ID);
+}
+
 // ink.js
 import { db, ref, push } from "./firebase.js";
 
@@ -126,3 +137,4 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 export { rolarDado2D };
+
