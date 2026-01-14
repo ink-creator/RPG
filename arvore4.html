@@ -76,7 +76,7 @@ import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebase
    FIREBASE
 ========================= */
 const firebaseConfig = {
-   apiKey: "AIzaSyBCCbxXH6UZEqpItsdVaaG354Nqu28HA44",
+  apiKey: "AIzaSyBCCbxXH6UZEqpItsdVaaG354Nqu28HA44",
   authDomain: "rpg-ficha-online.firebaseapp.com",
   databaseURL: "https://rpg-ficha-online-default-rtdb.firebaseio.com",
   projectId: "rpg-ficha-online",
@@ -110,11 +110,22 @@ let selected = null;
 
 let loading = true;
 let initialized = false;
+let isEditing = false;
+
+/* =========================
+   FIX: painel não fecha
+========================= */
+panel.addEventListener("click", e => e.stopPropagation());
+
+document.addEventListener("click", () => {
+  selected = null;
+  panel.hidden = true;
+});
 
 /* =========================
    CREATE
 ========================= */
-function addBubble(data = {}, silent = false){
+function addBubble(data = {}, silent = false) {
   const node = document.createElement("div");
   node.className = "node";
   node.style.left = data.left || "200px";
@@ -138,7 +149,11 @@ function addBubble(data = {}, silent = false){
   node.dataset.img   = data.img   || "";
 
   node.append(bubble, title);
-  node.onclick = e => { e.stopPropagation(); selectNode(node); };
+
+  node.onclick = e => {
+    e.stopPropagation();
+    selectNode(node);
+  };
 
   drag(node);
   canvas.appendChild(node);
@@ -150,31 +165,29 @@ function addBubble(data = {}, silent = false){
 /* =========================
    SELECT
 ========================= */
-function selectNode(node){
+function selectNode(node) {
   selected = node;
   panel.hidden = false;
   titleInput.value = node.dataset.title;
   descInput.value  = node.dataset.desc;
 }
 
-document.addEventListener("click",()=>{
-  selected = null;
-  panel.hidden = true;
-});
-
 /* =========================
    DRAG
 ========================= */
-function drag(el){
+function drag(el) {
   let ox, oy;
+
   el.onmousedown = e => {
     ox = e.offsetX;
     oy = e.offsetY;
+
     document.onmousemove = ev => {
       el.style.left = (ev.pageX - ox) + "px";
       el.style.top  = (ev.pageY - oy) + "px";
       drawLines();
     };
+
     document.onmouseup = () => {
       document.onmousemove = null;
       saveAll();
@@ -185,16 +198,21 @@ function drag(el){
 /* =========================
    LINES
 ========================= */
-function connectNearest(){
+function connectNearest() {
   if (!selected || nodes.length < 2) return;
 
-  let min = Infinity, target = null;
+  let min = Infinity;
+  let target = null;
+
   nodes.forEach(n => {
     if (n === selected) return;
     const dx = parseInt(n.style.left) - parseInt(selected.style.left);
     const dy = parseInt(n.style.top)  - parseInt(selected.style.top);
     const d = Math.hypot(dx, dy);
-    if (d < min) { min = d; target = n; }
+    if (d < min) {
+      min = d;
+      target = n;
+    }
   });
 
   if (target) {
@@ -204,38 +222,44 @@ function connectNearest(){
   }
 }
 
-function drawLines(){
+function drawLines() {
   svg.innerHTML = "";
-  connections.forEach(([a,b]) => {
-    const l = document.createElementNS("http://www.w3.org/2000/svg","line");
-    l.setAttribute("x1", parseInt(a.style.left)+45);
-    l.setAttribute("y1", parseInt(a.style.top)+45);
-    l.setAttribute("x2", parseInt(b.style.left)+45);
-    l.setAttribute("y2", parseInt(b.style.top)+45);
-    l.setAttribute("stroke","#aaa");
-    l.setAttribute("stroke-width","2");
+  connections.forEach(([a, b]) => {
+    const l = document.createElementNS("http://www.w3.org/2000/svg", "line");
+    l.setAttribute("x1", parseInt(a.style.left) + 45);
+    l.setAttribute("y1", parseInt(a.style.top)  + 45);
+    l.setAttribute("x2", parseInt(b.style.left) + 45);
+    l.setAttribute("y2", parseInt(b.style.top)  + 45);
+    l.setAttribute("stroke", "#aaa");
+    l.setAttribute("stroke-width", "2");
     svg.appendChild(l);
   });
 }
 
 /* =========================
-   PANEL
+   PANEL INPUTS
 ========================= */
 titleInput.oninput = () => {
   if (!selected) return;
+  isEditing = true;
   selected.dataset.title = titleInput.value;
   selected.querySelector(".node-title").textContent = titleInput.value;
   saveAll();
+  isEditing = false;
 };
 
 descInput.oninput = () => {
   if (!selected) return;
+  isEditing = true;
   selected.dataset.desc = descInput.value;
   saveAll();
+  isEditing = false;
 };
 
 fileInput.onchange = () => {
   if (!selected || !fileInput.files[0]) return;
+  isEditing = true;
+
   const r = new FileReader();
   r.onload = e => {
     selected.dataset.img = e.target.result;
@@ -245,10 +269,14 @@ fileInput.onchange = () => {
     img.src = e.target.result;
     b.appendChild(img);
     saveAll();
+    isEditing = false;
   };
   r.readAsDataURL(fileInput.files[0]);
 };
 
+/* =========================
+   DELETE / CLEAR
+========================= */
 btnDelete.onclick = () => {
   if (!selected) return;
   connections = connections.filter(c => c[0] !== selected && c[1] !== selected);
@@ -273,7 +301,7 @@ btnAdd.onclick = () => addBubble();
 /* =========================
    FIREBASE SAVE / LOAD
 ========================= */
-function saveAll(){
+function saveAll() {
   if (loading || !initialized) return;
 
   set(treeRef, {
@@ -292,6 +320,8 @@ function saveAll(){
 }
 
 onValue(treeRef, snapshot => {
+  if (isEditing) return;
+
   loading = true;
 
   nodes.forEach(n => n.remove());
@@ -301,7 +331,7 @@ onValue(treeRef, snapshot => {
   if (snapshot.exists()) {
     const data = snapshot.val();
     data.nodes?.forEach(n => addBubble(n, true));
-    data.connections?.forEach(([i,j]) => {
+    data.connections?.forEach(([i, j]) => {
       if (nodes[i] && nodes[j]) connections.push([nodes[i], nodes[j]]);
     });
   }
