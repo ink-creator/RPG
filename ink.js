@@ -46,15 +46,12 @@ function avaliarResultado(valor, dado) {
 }
 
 // ============================
-// SALVAR HISTÓRICO (INVISÍVEL)
+// HISTÓRICO
 // ============================
 function salvarHistorico({ skill, valor, dado, resultado }) {
   if (!window.PLAYER_ID) return;
 
-  const historicoRef = ref(db, `historico/${window.PLAYER_ID}/logs`);
-
-  // 🔒 push é assíncrono, mas não interfere mais no foco
-  push(historicoRef, {
+  push(ref(db, `historico/${PLAYER_ID}/logs`), {
     skill,
     valor,
     dado,
@@ -64,19 +61,16 @@ function salvarHistorico({ skill, valor, dado, resultado }) {
 }
 
 // ============================
-// ROLAR DADO (SPRITE 2D)
+// ROLAR DADO
 // ============================
-function rolarDado2D(valorSkill) {
+function rolarDado2D(valorSkill, skillNome) {
   const overlay = document.getElementById("dice-overlay");
   const sprite  = document.getElementById("dice-sprite");
   const texto   = document.getElementById("dice-text");
 
-  if (!overlay || !sprite || !texto) return;
-
   overlay.classList.remove("hidden");
   sprite.classList.add("rolling");
   texto.textContent = "";
-  texto.className = "dice-text";
 
   setTimeout(() => {
     sprite.classList.remove("rolling");
@@ -85,47 +79,31 @@ function rolarDado2D(valorSkill) {
     const resultado = avaliarResultado(valorSkill, dado);
 
     sprite.style.backgroundPositionX = `${-64 * (dado - 1)}px`;
-
     texto.textContent = `${resultado} (${dado})`;
     texto.className = `dice-text ${resultado}`;
 
-    // 🔥 SALVA HISTÓRICO
     salvarHistorico({
-      skill: window.__skillAtual || "Desconhecido",
+      skill: skillNome,
       valor: valorSkill,
       dado,
       resultado
     });
 
-    setTimeout(() => {
-      overlay.classList.add("hidden");
-    }, 1500);
+    setTimeout(() => overlay.classList.add("hidden"), 1500);
   }, 1000);
 }
 
 // ============================
-// CONTROLE DE LABEL → DADO
+// CLIQUE NO LABEL (SEM FOR)
 // ============================
 document.addEventListener("DOMContentLoaded", () => {
-
-  document.querySelectorAll("label[for]").forEach(label => {
+  document.querySelectorAll(".roll-label").forEach(label => {
     label.style.cursor = "pointer";
-
-    // ❌ impede label focar input
-    label.addEventListener(
-      "mousedown",
-      e => {
-        e.preventDefault();
-        e.stopImmediatePropagation();
-      },
-      true
-    );
 
     label.addEventListener("click", e => {
       e.preventDefault();
-      e.stopImmediatePropagation();
 
-      const inputId = label.getAttribute("for");
+      const inputId = label.dataset.input;
       const input = document.getElementById(inputId);
       if (!input) return;
 
@@ -135,20 +113,7 @@ document.addEventListener("DOMContentLoaded", () => {
         return;
       }
 
-      // guarda skill atual
-      window.__skillAtual = label.textContent.trim();
-
-      rolarDado2D(valor);
+      rolarDado2D(valor, label.textContent.trim());
     });
   });
-
-});
-
-// ============================
-// 🔒 BLOQUEIO DEFINITIVO DE FOCO FANTASMA
-// ============================
-document.addEventListener("focusin", e => {
-  if (e.target.tagName === "INPUT") {
-    e.target.blur();
-  }
 });
