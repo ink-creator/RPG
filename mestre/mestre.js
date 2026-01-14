@@ -1,3 +1,11 @@
+import { db, ref, remove } from "../firebase.js";
+
+document.getElementById("limpar-historico").addEventListener("click", () => {
+  if (!confirm("Tem certeza que deseja apagar TODO o histórico?")) return;
+
+  remove(ref(db, "historico"));
+});
+
 import { db, ref, onValue } from "../firebase.js";
 
 const lista = document.getElementById("historico");
@@ -25,11 +33,4 @@ onValue(ref(db, "historico"), snapshot => {
       lista.appendChild(li);
     }
   }
-});
-import { db, ref, remove } from "../firebase.js";
-
-document.getElementById("limpar-historico").addEventListener("click", () => {
-  if (!confirm("Tem certeza que deseja apagar TODO o histórico?")) return;
-
-  remove(ref(db, "historico"));
 });
