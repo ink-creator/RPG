@@ -1,34 +1,35 @@
-function atualizarBarra(atualId, maxId, barraId) {
+function atualizarBarra(minId, atualId, maxId, barraId) {
+  const minInput   = document.getElementById(minId);
   const atualInput = document.getElementById(atualId);
   const maxInput   = document.getElementById(maxId);
   const barra      = document.getElementById(barraId);
 
   function atualizar() {
-    const atual = parseFloat(atualInput.value) || 0;
-    const max   = parseFloat(maxInput.value) || 0;
+    const min   = parseFloat(minInput.value);
+    const atual = parseFloat(atualInput.value);
+    const max   = parseFloat(maxInput.value);
 
-    let porcentagem = 0;
-    if (max > 0) {
-      porcentagem = Math.min((atual / max) * 100, 100);
+    // validações
+    if (isNaN(min) || isNaN(atual) || isNaN(max) || max <= min) {
+      barra.style.width = "0%";
+      return;
     }
+
+    let porcentagem = ((atual - min) / (max - min)) * 100;
+
+    // clamp
+    porcentagem = Math.max(0, Math.min(100, porcentagem));
 
     barra.style.width = porcentagem + "%";
   }
 
+  minInput.addEventListener("input", atualizar);
   atualInput.addEventListener("input", atualizar);
   maxInput.addEventListener("input", atualizar);
 
-  atualizar(); // atualiza ao carregar a página
+  atualizar();
 }
 
-// VIDA
-atualizarBarra("vida-atual", "vida-max", "vida");
-
-// SANIDADE
-atualizarBarra("sanidade-atual", "sanidade-max", "sanidade");
-
-// ENERGIA
-atualizarBarra("energia-atual", "energia-max", "energia");
 
 // ============================
 // TABELA DE RESULTADOS
