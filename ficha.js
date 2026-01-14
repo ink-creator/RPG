@@ -1,5 +1,5 @@
 // ficha.js
-import { PLAYER_ID } from "./player.js";
+import { PLAYER_ID } from "./players.js";
 import { db, ref, set, onValue } from "./firebase.js";
 
 // ============================
