@@ -248,3 +248,44 @@ h2 {
     padding: 5px 6px;
   }
 }
+.bar {
+  background: #111;
+  height: 16px;
+  border-radius: 6px;
+  border: 1px solid #000;
+  overflow: hidden;
+  margin: 6px 0;
+  box-shadow: inset 0 0 6px rgba(0,0,0,0.8);
+}
+
+.bar div {
+  height: 100%;
+  width: 0%;
+  transition: width 0.3s ease;
+  border-radius: 6px;
+}
+
+/* VIDA */
+#vida {
+  background: linear-gradient(90deg, #ff1a1a, #ff5e5e);
+  box-shadow:
+    0 0 6px #ff1a1a,
+    0 0 12px rgba(255, 26, 26, 0.8);
+}
+
+/* SANIDADE */
+#sanidade {
+  background: linear-gradient(90deg, #8a00ff, #d05fff);
+  box-shadow:
+    0 0 6px #8a00ff,
+    0 0 12px rgba(138, 0, 255, 0.8);
+}
+
+/* ENERGIA */
+#energia {
+  background: linear-gradient(90deg, #00fff7, #00c4b7);
+  box-shadow:
+    0 0 6px #00fff7,
+    0 0 12px rgba(0, 255, 247, 0.8);
+}
+
