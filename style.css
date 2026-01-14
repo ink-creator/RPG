@@ -208,5 +208,13 @@ h2 {
 
 /* classe que esconde o overlay */
 .hidden { display: none; }
+button {
+  background: var(--accent);
+  color: var(--text);
+  border: none;
+  padding: 10px 15px;
+  cursor: pointer;
+  font-size: 1em;
+}
 
 
