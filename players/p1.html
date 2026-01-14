@@ -1,173 +1,410 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Ficha</title>
-  <link rel="stylesheet" href="../style.css">
+<meta charset="UTF-8">
+<title>Editor de Árvore de Habilidades</title>
+
+<style>
+body{
+  margin:0;
+  background:radial-gradient(circle at center,#0e0e14,#050509);
+  font-family:Arial,sans-serif;
+  overflow:hidden;
+}
+
+#toolbar{
+  position:fixed;
+  top:10px;
+  left:10px;
+  z-index:10;
+}
+
+#toolbar button{
+  padding:10px 14px;
+  background:#6a5acd;
+  border:none;
+  color:white;
+  font-weight:bold;
+  border-radius:8px;
+  cursor:pointer;
+}
+
+#canvas{
+  width:100vw;
+  height:100vh;
+  position:relative;
+}
+
+svg{
+  position:absolute;
+  inset:0;
+  width:100%;
+  height:100%;
+  pointer-events:none;
+}
+
+.node{
+  position:absolute;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  cursor:grab;
+  user-select:none;
+}
+
+.bubble{
+  width:90px;
+  height:90px;
+  border-radius:50%;
+  background:#222;
+  border:2px solid #aaa;
+  overflow:hidden;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+
+.bubble img{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+}
+
+.node-title{
+  margin-top:6px;
+  font-size:12px;
+  color:white;
+  text-align:center;
+  max-width:120px;
+  word-wrap:break-word;
+}
+
+#panel{
+  position:fixed;
+  right:20px;
+  top:20px;
+  width:260px;
+  background:#151520;
+  border-radius:12px;
+  padding:14px;
+  color:white;
+  box-shadow:0 0 25px rgba(0,0,0,.6);
+  z-index:20;
+}
+
+#panel input,
+#panel textarea{
+  width:100%;
+  background:#0f0f18;
+  color:white;
+  border:1px solid #444;
+  border-radius:6px;
+  padding:6px;
+  margin-bottom:8px;
+}
+
+#panel textarea{
+  resize:vertical;
+  min-height:80px;
+}
+
+.panel-btn{
+  width:100%;
+  padding:8px;
+  margin-top:6px;
+  background:#6a5acd;
+  border:none;
+  color:white;
+  border-radius:6px;
+  cursor:pointer;
+}
+
+.panel-btn.warn{ background:#e67e22; }
+.panel-btn.danger{ background:#c0392b; }
+</style>
 </head>
-<body data-player="p1">
 
-<div class="sheet">
+<body>
 
-  <!-- TOPO -->
-  <div class="top">
-
-    <!-- INFO ESQUERDA -->
-    <div class="info left">
-      <div class="field"><label>Nome</label><input id="nome"></div>
-      <div class="field"><label>Raça</label><input id="raca"></div>
-      <div class="field"><label>Semi Raça</label><input id="sraca"></div>
-      <div class="field"><label>Altura</label><input id="altura"></div>
-      <div class="field"><label>Idade</label><input id="idade"></div>
-      <div class="field"><label>Peso</label><input id="peso"></div>
-      <div class="field"><label>Dinheiro</label><input id="dinheiro"></div>
-    </div>
-
-    <!-- GERAIS -->
-    <div class="info center">
-      <h2>GERAIS</h2>
-
-      <div class="field"><label class="roll-label" data-input="agilidade">Agilidade</label><input id="agilidade" type="number"></div>
-      <div class="field"><label class="roll-label" data-input="briga">Briga</label><input id="briga" type="number"></div>
-      <div class="field"><label class="roll-label" data-input="constituicao">Constituição</label><input id="constituicao" type="number"></div>
-      <div class="field"><label class="roll-label" data-input="destreza">Destreza</label><input id="destreza" type="number"></div>
-      <div class="field"><label class="roll-label" data-input="forca">Força</label><input id="forca" type="number"></div>
-      <div class="field"><label class="roll-label" data-input="furtar">Furtar</label><input id="furtar" type="number"></div>
-      <div class="field"><label class="roll-label" data-input="infiltracao">Infiltração</label><input id="infiltracao" type="number"></div>
-      <div class="field"><label class="roll-label" data-input="intelecto">Intelecto</label><input id="intelecto" type="number"></div>
-      <div class="field"><label class="roll-label" data-input="sorte">Sorte</label><input id="sorte" type="number"></div>
-      <div class="field"><label class="roll-label" data-input="vigilancia">Vigilância</label><input id="vigilancia" type="number"></div>
-      <div class="field"><label class="roll-label" data-input="vontade">Vontade</label><input id="vontade" type="number"></div>
-    </div>
-
-    <!-- STATUS -->
-    <div class="info right">
-      <!-- VIDA -->
-      <div class="bar-group">
-        <label>VIDA</label>
-        <div class="bar-inputs">
-          <div class="field"><label>Atual</label><input id="vida-atual" type="number"></div>
-          <span>/</span>
-          <div class="field"><label>Máx</label><input id="vida-max" type="number"></div>
-        </div>
-        <div class="bar"><div id="vida"></div></div>
-        <div class="field"><label>Resistência</label><input id="vida-resistencia"></div>
-      </div>
-
-      <!-- SANIDADE -->
-      <div class="bar-group">
-        <label>SANIDADE</label>
-        <div class="bar-inputs">
-          <div class="field"><label>Atual</label><input id="sanidade-atual" type="number"></div>
-          <span>/</span>
-          <div class="field"><label>Máx</label><input id="sanidade-max" type="number"></div>
-        </div>
-        <div class="bar"><div id="sanidade"></div></div>
-        <div class="field"><label>Resistência</label><input id="sanidade-resistencia"></div>
-      </div>
-
-      <!-- ENERGIA -->
-      <div class="bar-group">
-        <label>ENERGIA</label>
-        <div class="bar-inputs">
-          <div class="field"><label>Atual</label><input id="energia-atual" type="number"></div>
-          <span>/</span>
-          <div class="field"><label>Máx</label><input id="energia-max" type="number"></div>
-        </div>
-        <div class="bar"><div id="energia"></div></div>
-        <div class="field"><label>Resistência</label><input id="energia-resistencia"></div>
-      </div>
-    </div>
-  </div>
-
-  <!-- MEIO -->
-  <div class="middle">
-
-    <div class="block">
-      <h2>INTERPESSOAL</h2>
-
-      <div class="field"><label class="roll-label" data-input="charme">Charme</label><input id="charme" type="number"></div>
-      <div class="field"><label class="roll-label" data-input="disfarce">Disfarce</label><input id="disfarce" type="number"></div>
-      <div class="field"><label class="roll-label" data-input="elogiar">Elogiar</label><input id="elogiar" type="number"></div>
-      <div class="field"><label class="roll-label" data-input="flertar">Flertar</label><input id="flertar" type="number"></div>
-      <div class="field"><label class="roll-label" data-input="interrogar">Interrogar</label><input id="interrogar" type="number"></div>
-      <div class="field"><label class="roll-label" data-input="intimidar">Intimidar</label><input id="intimidar" type="number"></div>
-      <div class="field"><label class="roll-label" data-input="manipulacao">Manipulação</label><input id="manipulacao" type="number"></div>
-      <div class="field"><label class="roll-label" data-input="negociar">Negociar</label><input id="negociar" type="number"></div>
-      <div class="field"><label class="roll-label" data-input="provocar">Provocar</label><input id="provocar" type="number"></div>
-      <div class="field"><label class="roll-label" data-input="psicologia">Psicologia</label><input id="psicologia" type="number"></div>
-      <div class="field"><label class="roll-label" data-input="terapia">Terapia</label><input id="terapia" type="number"></div>
-    </div>
-
-    <div class="block">
-      <h2>TÉCNICO</h2>
-
-      <div class="field"><label class="roll-label" data-input="analise-documentos">Análise de Documentos</label><input id="analise-documentos" type="number"></div>
-      <div class="field"><label class="roll-label" data-input="aviacao">Aviação</label><input id="aviacao" type="number"></div>
-      <div class="field"><label class="roll-label" data-input="balistica">Balística</label><input id="balistica" type="number"></div>
-      <div class="field"><label class="roll-label" data-input="cartografia">Cartografia</label><input id="cartografia" type="number"></div>
-      <div class="field"><label class="roll-label" data-input="explosivos">Explosivos</label><input id="explosivos" type="number"></div>
-      <div class="field"><label class="roll-label" data-input="falsificacao">Falsificação</label><input id="falsificacao" type="number"></div>
-      <div class="field"><label class="roll-label" data-input="forense">Perícia Forense</label><input id="forense" type="number"></div>
-      <div class="field"><label class="roll-label" data-input="mecanica">Mecânica</label><input id="mecanica" type="number"></div>
-      <div class="field"><label class="roll-label" data-input="pesquisa">Pesquisa</label><input id="pesquisa" type="number"></div>
-      <div class="field"><label class="roll-label" data-input="pilotagem">Pilotagem</label><input id="pilotagem" type="number"></div>
-      <div class="field"><label class="roll-label" data-input="tecnologia">Tecnologia</label><input id="tecnologia" type="number"></div>
-    </div>
-
-    <div class="block">
-      <h2>ACADÊMICO</h2>
-
-      <div class="field"><label class="roll-label" data-input="curiosidades">Conhecimento Geral</label><input id="curiosidades" type="number"></div>
-      <div class="field"><label class="roll-label" data-input="fisica">Física</label><input id="fisica" type="number"></div>
-      <div class="field"><label class="roll-label" data-input="geografia">Geografia</label><input id="geografia" type="number"></div>
-      <div class="field"><label class="roll-label" data-input="historia">História</label><input id="historia" type="number"></div>
-      <div class="field"><label class="roll-label" data-input="historia-artistica">História Artística</label><input id="historia-artistica" type="number"></div>
-      <div class="field"><label class="roll-label" data-input="historia-natural">História Natural</label><input id="historia-natural" type="number"></div>
-      <div class="field"><label class="roll-label" data-input="linguagem">Linguagem</label><input id="linguagem" type="number"></div>
-      <div class="field"><label class="roll-label" data-input="matematica">Matemática</label><input id="matematica" type="number"></div>
-      <div class="field"><label class="roll-label" data-input="poderes">Poderes</label><input id="poderes" type="number"></div>
-      <div class="field"><label class="roll-label" data-input="quimica">Química</label><input id="quimica" type="number"></div>
-      <div class="field"><label class="roll-label" data-input="religiao">Religião</label><input id="religiao" type="number"></div>
-    </div>
-
-  </div>
-<script>
-  localStorage.setItem("playerId", "p1");
-</script>
-<div id="dice-overlay" class="hidden">
-  <div id="dice-sprite"></div>
-  <div id="dice-text" class="dice-text"></div>
+<div id="toolbar">
+  <button onclick="addBubble()">➕ Adicionar Bolha</button>
 </div>
 
-<a href="../arvore1.html"
-style="
-  display:inline-block;
-  margin-top:12px;
-  padding:6px 14px;
-  font-family:'Times New Roman', serif;
-  font-size:16px;
-  letter-spacing:1px;
-  color:#ff1a1a;
-  text-decoration:none;
-  border:1px solid #ff1a1a;
-  background:linear-gradient(180deg,#1a1a1a,#050505);
-  box-shadow:
-    inset 0 0 6px rgba(255,0,0,0.4),
-    0 0 10px rgba(255,0,0,0.2);
-  transition:all 0.25s ease;
-"
-onmouseover="
-  this.style.color='#ffffff';
-  this.style.boxShadow='inset 0 0 10px rgba(255,0,0,0.8), 0 0 18px rgba(255,0,0,0.6)';
-"
-onmouseout="
-  this.style.color='#ff1a1a';
-  this.style.boxShadow='inset 0 0 6px rgba(255,0,0,0.4), 0 0 10px rgba(255,0,0,0.2)';
-">
-⛧ Skill Tree ⛧
-</a>
-<script type="module" src="../main.js"></script>
+<div id="canvas">
+  <svg id="lines"></svg>
+</div>
+
+<div id="panel" hidden>
+  <input id="titleInput" placeholder="Nome">
+  <textarea id="descInput" placeholder="Descrição"></textarea>
+
+  <label style="font-size:12px;">Imagem</label>
+  <input id="fileInput" type="file" accept="image/*">
+
+  <label style="font-size:12px;">Tamanho</label>
+  <input id="sizeInput" type="range" min="60" max="160">
+
+  <button class="panel-btn" onclick="connectNearest()">🔗 Conectar próxima</button>
+  <button class="panel-btn warn" onclick="cancelConnections()">❌ Cancelar ligações</button>
+  <button class="panel-btn danger" onclick="deleteBubble()">🗑️ Excluir</button>
+</div>
+
+<!-- ================= FIREBASE ================= -->
+<script type="module">
+import { db } from "./firebase.js";
+import { ref, set, onValue } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+
+const DB_REF = ref(db, "skillTree");
+
+let nodes = [];
+let connections = [];
+let selected = null;
+let loading = false;
+let firebaseLoaded = false;
+
+const canvas = document.getElementById("canvas");
+const svg = document.getElementById("lines");
+const panel = document.getElementById("panel");
+
+const titleInput = document.getElementById("titleInput");
+const descInput = document.getElementById("descInput");
+const fileInput = document.getElementById("fileInput");
+const sizeInput = document.getElementById("sizeInput");
+
+/* ===== CREATE ===== */
+window.addBubble = function(data = {}) {
+  const node = document.createElement("div");
+  node.className = "node";
+  node.style.left = data.left ?? "200px";
+  node.style.top = data.top ?? "200px";
+
+  const bubble = document.createElement("div");
+  bubble.className = "bubble";
+  bubble.style.width = bubble.style.height = (data.size ?? 90) + "px";
+
+  if (data.img) {
+    const img = document.createElement("img");
+    img.src = data.img;
+    bubble.appendChild(img);
+  }
+
+  const title = document.createElement("div");
+  title.className = "node-title";
+  title.textContent = data.title ?? "";
+
+  node.dataset.title = data.title ?? "";
+  node.dataset.desc = data.desc ?? "";
+  node.dataset.size = data.size ?? 90;
+  node.dataset.img = data.img ?? "";
+
+  node.appendChild(bubble);
+  node.appendChild(title);
+
+  node.onclick = e => {
+    e.stopPropagation();
+    selectNode(node);
+  };
+
+  drag(node);
+  canvas.appendChild(node);
+  nodes.push(node);
+
+  if (!loading && firebaseLoaded) saveAll();
+};
+
+/* ===== SELECT ===== */
+function selectNode(node){
+  selected = node;
+  panel.hidden = false;
+
+  titleInput.value = node.dataset.title;
+  descInput.value = node.dataset.desc;
+  sizeInput.value = node.dataset.size;
+  fileInput.value = "";
+}
+
+panel.onclick = e => e.stopPropagation();
+
+/* ===== DRAG ===== */
+function drag(el){
+  let ox, oy;
+  el.onmousedown = e => {
+    ox = e.offsetX;
+    oy = e.offsetY;
+
+    document.onmousemove = ev => {
+      el.style.left = (ev.pageX - ox) + "px";
+      el.style.top = (ev.pageY - oy) + "px";
+      drawLines();
+    };
+
+    document.onmouseup = () => {
+      document.onmousemove = null;
+      saveAll();
+    };
+  };
+}
+
+/* ===== CONNECTIONS ===== */
+window.connectNearest = function(){
+  if (!selected || nodes.length < 2) return;
+
+  let min = Infinity, target = null;
+
+  nodes.forEach(n => {
+    if (n === selected) return;
+    if (connections.some(c => 
+      (c[0] === selected && c[1] === n) ||
+      (c[1] === selected && c[0] === n)
+    )) return;
+
+    const dx = parseInt(n.style.left) - parseInt(selected.style.left);
+    const dy = parseInt(n.style.top) - parseInt(selected.style.top);
+    const d = Math.hypot(dx, dy);
+
+    if (d < min) { min = d; target = n; }
+  });
+
+  if (target){
+    connections.push([selected, target]);
+    drawLines();
+    saveAll();
+  }
+};
+
+window.cancelConnections = function(){
+  if (!selected) return;
+  connections = connections.filter(c => c[0] !== selected && c[1] !== selected);
+  drawLines();
+  saveAll();
+};
+
+function drawLines(){
+  svg.innerHTML = "";
+  connections.forEach(([a,b]) => {
+    const ax = parseInt(a.style.left) + a.offsetWidth / 2;
+    const ay = parseInt(a.style.top) + a.firstChild.offsetHeight / 2;
+    const bx = parseInt(b.style.left) + b.offsetWidth / 2;
+    const by = parseInt(b.style.top) + b.firstChild.offsetHeight / 2;
+
+    const l = document.createElementNS("http://www.w3.org/2000/svg","line");
+    l.setAttribute("x1", ax);
+    l.setAttribute("y1", ay);
+    l.setAttribute("x2", bx);
+    l.setAttribute("y2", by);
+    l.setAttribute("stroke", "#aaa");
+    l.setAttribute("stroke-width", "2");
+    svg.appendChild(l);
+  });
+}
+
+/* ===== PANEL ===== */
+titleInput.oninput = () => {
+  if (selected){
+    selected.dataset.title = titleInput.value;
+    selected.querySelector(".node-title").textContent = titleInput.value;
+    saveAll();
+  }
+};
+
+descInput.oninput = () => {
+  if (selected){
+    selected.dataset.desc = descInput.value;
+    saveAll();
+  }
+};
+
+fileInput.onchange = () => {
+  if (!selected || !fileInput.files[0]) return;
+
+  const reader = new FileReader();
+  reader.onload = e => {
+    selected.dataset.img = e.target.result;
+    const bubble = selected.querySelector(".bubble");
+    bubble.innerHTML = "";
+    const img = document.createElement("img");
+    img.src = e.target.result;
+    bubble.appendChild(img);
+    saveAll();
+  };
+  reader.readAsDataURL(fileInput.files[0]);
+};
+
+sizeInput.oninput = () => {
+  if (selected){
+    const bubble = selected.querySelector(".bubble");
+    bubble.style.width = bubble.style.height = sizeInput.value + "px";
+    selected.dataset.size = sizeInput.value;
+    drawLines();
+    saveAll();
+  }
+};
+
+/* ===== DELETE ===== */
+window.deleteBubble = function(){
+  if (!selected) return;
+
+  connections = connections.filter(c => c[0] !== selected && c[1] !== selected);
+  nodes = nodes.filter(n => n !== selected);
+  selected.remove();
+  selected = null;
+  panel.hidden = true;
+  drawLines();
+  saveAll();
+};
+
+/* ===== SAVE / LOAD (FIREBASE) ===== */
+function saveAll(){
+  if (loading) return;
+
+  set(DB_REF, {
+    nodes: nodes.map(n => ({
+      left: n.style.left,
+      top: n.style.top,
+      title: n.dataset.title,
+      desc: n.dataset.desc,
+      size: n.dataset.size,
+      img: n.dataset.img
+    })),
+    connections: connections.map(c => [
+      nodes.indexOf(c[0]),
+      nodes.indexOf(c[1])
+    ])
+  });
+}
+
+onValue(DB_REF, snapshot => {
+  if (firebaseLoaded) return;
+
+  if (!snapshot.exists()){
+    firebaseLoaded = true;
+    return;
+  }
+
+  loading = true;
+
+  nodes = [];
+  connections = [];
+  canvas.querySelectorAll(".node").forEach(n => n.remove());
+
+  const data = snapshot.val();
+
+  data.nodes?.forEach(n => addBubble(n));
+  data.connections?.forEach(([i,j]) => {
+    if (nodes[i] && nodes[j]) connections.push([nodes[i], nodes[j]]);
+  });
+
+  drawLines();
+  loading = false;
+  firebaseLoaded = true;
+});
+
+/* ===== UI ===== */
+document.addEventListener("click", () => {
+  panel.hidden = true;
+  selected = null;
+});
+</script>
+
 </body>
 </html>
