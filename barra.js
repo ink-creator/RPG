@@ -65,3 +65,4 @@ window.addEventListener("DOMContentLoaded", () => {
   );
 
 });
+atualizar()
