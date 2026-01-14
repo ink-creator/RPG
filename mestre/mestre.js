@@ -1,15 +1,24 @@
 import { db } from "../firebase.js";
-import { ref, onChildAdded, remove } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+import {
+  ref,
+  onChildAdded,
+  remove
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
 document.addEventListener("DOMContentLoaded", () => {
   const area = document.getElementById("historico-mestre");
   const btn = document.getElementById("limpar-historico");
+
   const historicoRef = ref(db, "historico");
 
   onChildAdded(historicoRef, playerSnap => {
     const player = playerSnap.key;
-    onChildAdded(ref(db, `historico/${player}/logs`), snap => {
+    const logsRef = ref(db, `historico/${player}/logs`);
+
+    onChildAdded(logsRef, snap => {
       const d = snap.val();
+      if (!d) return;
+
       const hora = new Date(d.timestamp).toLocaleTimeString();
 
       const div = document.createElement("div");
@@ -20,6 +29,7 @@ document.addEventListener("DOMContentLoaded", () => {
         <span class="${d.resultado}">${d.resultado}</span>
         <small>[${hora}]</small>
       `;
+
       area.prepend(div);
     });
   });
