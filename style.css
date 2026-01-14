@@ -161,11 +161,16 @@ h2 {
   position: fixed;
   inset: 0;
   background: rgba(0,0,0,0.5);
-  display: flex;
+  display: none;
   justify-content: center;
   align-items: center;
   z-index: 999;
 }
+
+#dice-overlay.show {
+  display: flex;
+}
+
 
 /* sprite do dado */
 #dice-sprite {
@@ -203,4 +208,5 @@ h2 {
 
 /* classe que esconde o overlay */
 .hidden { display: none; }
+
 
