@@ -1,3 +1,6 @@
+// ink.js
+import { db, ref, push } from "./firebase.js";
+
 // ============================
 // PLAYER_ID seguro (mock automático)
 // ============================
@@ -8,12 +11,6 @@ if (!PLAYER_ID) {
   localStorage.setItem("playerId", PLAYER_ID);
   console.warn("PLAYER_ID não encontrado. Usando mock:", PLAYER_ID);
 }
-
-// ink.js
-import { db, ref, push } from "./firebase.js";
-
-const PLAYER_ID = localStorage.getItem("playerId");
-if (!PLAYER_ID) alert("PLAYER_ID não definido! Faça login primeiro.");
 
 // ============================
 // TABELA DE RESULTADOS
@@ -65,59 +62,63 @@ function rolarDado2D(nome, valorSkill) {
 
   if (!overlay || !sprite || !texto) return;
 
-  overlay.classList.remove("hidden");
+  overlay.classList.add("show");
   sprite.classList.add("rolling");
   texto.textContent = "";
   texto.className = "dice-text";
 
-  setTimeout(() => {
+  const fecharOverlay = () => {
     sprite.classList.remove("rolling");
+    overlay.classList.remove("show");
+  };
 
-    // Rola d20
-    const dado = Math.floor(Math.random() * 20) + 1;
-    const resultado = avaliarResultado(valorSkill, dado);
+  setTimeout(() => {
+    try {
+      const dado = Math.floor(Math.random() * 20) + 1;
+      const resultado = avaliarResultado(valorSkill, dado);
 
-    // Exibe resultado com cores
-    let cor = "#2196f3"; // NORMAL
-    if (resultado === "EXTREMO") cor = "gold";
-    else if (resultado === "BOM") cor = "#4caf50";
-    else if (resultado === "FALHA") cor = "#f44336";
+      let cor = "#2196f3";
+      if (resultado === "EXTREMO") cor = "gold";
+      else if (resultado === "BOM") cor = "#4caf50";
+      else if (resultado === "FALHA") cor = "#f44336";
 
-    texto.innerHTML = `${nome}: <span style="color:${cor}">${resultado}</span> (${dado})`;
+      texto.innerHTML = `${nome}: <span style="color:${cor}">${resultado}</span> (${dado})`;
 
-    // Salva histórico no Firebase
-    const histRef = ref(db, `historico/${PLAYER_ID}`);
-    push(histRef, {
-      nome,
-      resultado,
-      dado,
-      data: Date.now()
-    });
+      const histRef = ref(db, `historico/${PLAYER_ID}`);
+      push(histRef, {
+        nome,
+        resultado,
+        dado,
+        data: Date.now()
+      });
 
-    // Fecha overlay após 2s
-    setTimeout(() => overlay.classList.add("hidden"), 2000);
+    } catch (err) {
+      console.error("Erro ao rolar dado:", err);
+      texto.textContent = "Erro ao rolar dado";
+    } finally {
+      setTimeout(fecharOverlay, 2000);
+    }
   }, 1000);
 }
 
 // ============================
-// ATIVA TODOS OS LABELS PARA ROLAR DADO
+// ATIVA OS LABELS PARA ROLAR DADO
 // ============================
 document.addEventListener("DOMContentLoaded", () => {
   document.querySelectorAll(".roll-label").forEach(label => {
     label.style.cursor = "pointer";
 
-    // Evita foco nativo do input
+    // Evita foco automático no input
     label.addEventListener(
       "mousedown",
-      (e) => {
+      e => {
         e.preventDefault();
         e.stopImmediatePropagation();
       },
       true
     );
 
-    // Clique para rolar dado
-    label.addEventListener("click", (e) => {
+    label.addEventListener("click", e => {
       e.preventDefault();
       e.stopImmediatePropagation();
 
@@ -125,7 +126,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const input = document.getElementById(inputId);
       if (!input) return;
 
-      const valor = parseInt(input.value, 10); // <- PEGA O QUE O USUÁRIO DIGITOU
+      const valor = parseInt(input.value, 10);
       if (isNaN(valor) || valor < 1 || valor > 20) {
         alert(`O valor de "${label.textContent.trim()}" precisa ser de 1 a 20.`);
         return;
@@ -136,5 +137,8 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 });
 
+// ============================
+// EXPORT (caso queira usar em outro módulo)
+// ============================
 export { rolarDado2D };
 
