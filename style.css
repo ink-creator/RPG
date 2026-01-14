@@ -156,73 +156,50 @@ h2 {
     grid-template-columns: 1fr;
   }
 }
-/* =========================
-   DADO OVERLAY
-========================= */
-/* =========================
-   OVERLAY DO DADO
-========================= */
+/* overlay que cobre a tela */
 #dice-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0,0,0,0.7);
+  background: rgba(0,0,0,0.5);
   display: flex;
-  align-items: flex-end;
-  justify-content: flex-end;
-  padding: 20px;
-  z-index: 9999;
+  justify-content: center;
+  align-items: center;
+  z-index: 999;
 }
 
-#dice-overlay.hidden {
-  display: none;
-}
-
-/* =========================
-   SPRITE DO D20
-========================= */
+/* sprite do dado */
 #dice-sprite {
   width: 64px;
   height: 64px;
-  background: url("../bah.png") left center; /* Coloque aqui seu sprite sheet */
-  background-size: 1280px 64px; /* 20 frames de 64px cada */
-  image-rendering: pixelated;
+  background-image: url('bah.png'); /* coloque seu spritesheet do dado */
+  background-size: cover;
+  margin-right: 20px;
+  transition: background-position 0.3s ease-out;
 }
 
+/* animação de rolagem */
 #dice-sprite.rolling {
-  animation: rollD20 1s steps(20) infinite;
+  animation: rodar 1s linear;
 }
 
-@keyframes rollD20 {
-  from { background-position-x: 0; }
-  to   { background-position-x: -1280px; }
-}
-
-/* =========================
-   TEXTO DO RESULTADO
-========================= */
+/* texto do resultado do dado */
 .dice-text {
-  color: #eee;
-  font-family: Georgia, serif;
-  margin-left: 12px;
-  font-size: 18px;
+  font-size: 2em;
+  font-weight: bold;
+  color: white;
 }
 
-.EXTREMO { color: gold; }
-.BOM     { color: #4caf50; }
-.NORMAL  { color: #2196f3; }
-.FALHA   { color: #f44336; }
-.filtros {
-  display: flex;
-  gap: 10px;
-  margin-bottom: 10px;
+/* cores para resultados */
+.dice-text.EXTREMO { color: gold; }
+.dice-text.BOM { color: #4caf50; }
+.dice-text.NORMAL { color: #2196f3; }
+.dice-text.FALHA { color: #f44336; }
+
+/* animação de rolagem (opcional) */
+@keyframes rodar {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }
 
-.filtros select,
-.filtros button {
-  padding: 6px;
-  background: #111;
-  color: #eee;
-  border: 1px solid #444;
-}
-
-
+/* classe que esconde o overlay */
+.hidden { display: none; }
