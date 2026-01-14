@@ -2,19 +2,13 @@ import { rolarDado2D } from "./dice.js";
 import { db } from "./firebase.js";
 import { ref, push } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
-// ============================
-// PLAYER ID
-// ============================
-window.PLAYER_ID = localStorage.getItem("playerId");
+const PLAYER_ID = localStorage.getItem("playerId");
 
-if (!window.PLAYER_ID) {
+if (!PLAYER_ID) {
   alert("Sessão inválida. Faça login novamente.");
   window.location.href = "../index.html";
 }
 
-// ============================
-// ROLAGEM
-// ============================
 document.addEventListener("DOMContentLoaded", () => {
   document.querySelectorAll("label.roll-label").forEach(label => {
     label.addEventListener("mousedown", e => e.preventDefault(), true);
@@ -44,9 +38,6 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 });
 
-// ============================
-// OVERLAY
-// ============================
 function mostrarOverlay(dado, resultado) {
   const overlay = document.getElementById("dice-overlay");
   const sprite = document.getElementById("dice-sprite");
@@ -67,19 +58,12 @@ function mostrarOverlay(dado, resultado) {
   }, 1000);
 }
 
-// ============================
-// FIREBASE – HISTÓRICO
-// ============================
 function salvarHistorico(data) {
-  const historicoRef = ref(db, `historico/${window.PLAYER_ID}/logs`);
+  const historicoRef = ref(db, `historico/${PLAYER_ID}/logs`);
 
   push(historicoRef, {
-    player: window.PLAYER_ID,
+    player: PLAYER_ID,
     ...data,
     timestamp: Date.now()
   });
 }
-
-
-
-
