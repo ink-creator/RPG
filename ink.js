@@ -2,12 +2,26 @@ import { rolarDado2D } from "./dice.js";
 import { db } from "./firebase.js";
 import { ref, push } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
+// ============================
+// PLAYER ID
+// ============================
+window.PLAYER_ID = localStorage.getItem("playerId");
+
+if (!window.PLAYER_ID) {
+  alert("Sessão inválida. Faça login novamente.");
+  window.location.href = "../index.html";
+}
+
+// ============================
+// ROLAGEM
+// ============================
 document.addEventListener("DOMContentLoaded", () => {
   document.querySelectorAll("label.roll-label").forEach(label => {
     label.addEventListener("mousedown", e => e.preventDefault(), true);
 
     label.addEventListener("click", e => {
       e.preventDefault();
+
       const input = document.getElementById(label.dataset.input);
       if (!input) return;
 
@@ -19,6 +33,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
       const { dado, resultado } = rolarDado2D(valor);
       mostrarOverlay(dado, resultado);
+
       salvarHistorico({
         skill: label.textContent.trim(),
         valor,
@@ -29,6 +44,9 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 });
 
+// ============================
+// OVERLAY
+// ============================
 function mostrarOverlay(dado, resultado) {
   const overlay = document.getElementById("dice-overlay");
   const sprite = document.getElementById("dice-sprite");
@@ -49,10 +67,12 @@ function mostrarOverlay(dado, resultado) {
   }, 1000);
 }
 
+// ============================
+// FIREBASE – HISTÓRICO
+// ============================
 function salvarHistorico(data) {
-  if (!db || !window.PLAYER_ID) return;
-
   const historicoRef = ref(db, `historico/${window.PLAYER_ID}/logs`);
+
   push(historicoRef, {
     player: window.PLAYER_ID,
     ...data,
