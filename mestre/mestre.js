@@ -1,13 +1,12 @@
 import { db, ref, onValue, remove } from "../firebase.js";
 
+console.log("mestre.js carregado"); // DEBUG
+
 const lista = document.getElementById("historico");
 const btnLimpar = document.getElementById("limpar-historico");
 
-// ============================
-// LISTENER DO HISTÓRICO
-// ============================
 onValue(ref(db, "historico"), snapshot => {
-  lista.innerHTML = ""; // LIMPA SEMPRE
+  lista.innerHTML = "";
 
   if (!snapshot.exists()) {
     const li = document.createElement("li");
@@ -31,10 +30,7 @@ onValue(ref(db, "historico"), snapshot => {
   }
 });
 
-// ============================
-// BOTÃO LIMPAR HISTÓRICO
-// ============================
 btnLimpar.addEventListener("click", () => {
-  if (!confirm("Tem certeza que deseja apagar TODO o histórico?")) return;
+  if (!confirm("Apagar todo o histórico?")) return;
   remove(ref(db, "historico"));
 });
