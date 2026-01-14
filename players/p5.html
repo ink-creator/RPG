@@ -6,7 +6,7 @@
   <title>Ficha</title>
   <link rel="stylesheet" href="../style.css">
 </head>
-<body>
+<body data-player="p5">
 
 <div class="sheet">
 
@@ -24,25 +24,25 @@
       <div class="field"><label>Dinheiro</label><input id="dinheiro"></div>
     </div>
 
-    <!-- GERAL -->
+    <!-- GERAIS -->
     <div class="info center">
-      <h2>GERAL</h2>
-    <div class="field"><label for="agilidade">Agilidade</label><input id="agilidade" type="number"></div>
-    <div class="field"><label for="briga">Briga</label><input id="briga" type="number"></div>
-    <div class="field"><label for="constituicao">Constituição</label><input id="constituicao" type="number"></div>
-    <div class="field"><label for="destreza">Destreza</label><input id="destreza" type="number"></div>
-    <div class="field"><label for="forca">Força</label><input id="forca" type="number"></div>
-    <div class="field"><label for="furtar">Furtar</label><input id="furtar" type="number"></div>
-    <div class="field"><label for="infiltracao">Infiltração</label><input id="infiltracao" type="number"></div>
-    <div class="field"><label for="intelecto">Intelecto</label><input id="intelecto" type="number"></div>
-    <div class="field"><label for="sorte">Sorte</label><input id="sorte" type="number"></div>
-    <div class="field"><label for="vigilancia">Vigilância</label><input id="vigilancia" type="number"></div>
-    <div class="field"><label for="vontade">Vontade</label><input id="vontade" type="number"></div>
-  </div>
+      <h2>GERAIS</h2>
+
+      <div class="field"><label class="roll-label" data-input="agilidade">Agilidade</label><input id="agilidade" type="number"></div>
+      <div class="field"><label class="roll-label" data-input="briga">Briga</label><input id="briga" type="number"></div>
+      <div class="field"><label class="roll-label" data-input="constituicao">Constituição</label><input id="constituicao" type="number"></div>
+      <div class="field"><label class="roll-label" data-input="destreza">Destreza</label><input id="destreza" type="number"></div>
+      <div class="field"><label class="roll-label" data-input="forca">Força</label><input id="forca" type="number"></div>
+      <div class="field"><label class="roll-label" data-input="furtar">Furtar</label><input id="furtar" type="number"></div>
+      <div class="field"><label class="roll-label" data-input="infiltracao">Infiltração</label><input id="infiltracao" type="number"></div>
+      <div class="field"><label class="roll-label" data-input="intelecto">Intelecto</label><input id="intelecto" type="number"></div>
+      <div class="field"><label class="roll-label" data-input="sorte">Sorte</label><input id="sorte" type="number"></div>
+      <div class="field"><label class="roll-label" data-input="vigilancia">Vigilância</label><input id="vigilancia" type="number"></div>
+      <div class="field"><label class="roll-label" data-input="vontade">Vontade</label><input id="vontade" type="number"></div>
+    </div>
 
     <!-- STATUS -->
     <div class="info right">
-
       <!-- VIDA -->
       <div class="bar-group">
         <label>VIDA</label>
@@ -78,7 +78,6 @@
         <div class="bar"><div id="energia"></div></div>
         <div class="field"><label>Resistência</label><input id="energia-resistencia"></div>
       </div>
-
     </div>
   </div>
 
@@ -87,100 +86,62 @@
 
     <div class="block">
       <h2>INTERPESSOAL</h2>
-      <div class="field"><label for="charme">Charme</label><input id="charme" type="number"></div>
-      <div class="field"><label for="disfarce">Disfarce</label><input id="disfarce" type="number"></div>
-      <div class="field"><label for="elogiar">Elogiar</label><input id="elogiar" type="number"></div>
-      <div class="field"><label for="flertar">Flertar</label><input id="flertar" type="number"></div>
-      <div class="field"><label for="interrogar">Interrogar</label><input id="interrogar" type="number"></div>
-      <div class="field"><label for="intimidar">Intimidar</label><input id="intimidar" type="number"></div>
-      <div class="field"><label for="manipulacao">Manipulação</label><input id="manipulacao" type="number"></div>
-      <div class="field"><label for="negociar">Negociar</label><input id="negociar" type="number"></div>
-      <div class="field"><label for="provocar">Provocar</label><input id="provocar" type="number"></div>
-      <div class="field"><label for="psicologia">Psicologia</label><input id="psicologia" type="number"></div>
-      <div class="field"><label for="terapia">Terapia</label><input id="terapia" type="number"></div>
+
+      <div class="field"><label class="roll-label" data-input="charme">Charme</label><input id="charme" type="number"></div>
+      <div class="field"><label class="roll-label" data-input="disfarce">Disfarce</label><input id="disfarce" type="number"></div>
+      <div class="field"><label class="roll-label" data-input="elogiar">Elogiar</label><input id="elogiar" type="number"></div>
+      <div class="field"><label class="roll-label" data-input="flertar">Flertar</label><input id="flertar" type="number"></div>
+      <div class="field"><label class="roll-label" data-input="interrogar">Interrogar</label><input id="interrogar" type="number"></div>
+      <div class="field"><label class="roll-label" data-input="intimidar">Intimidar</label><input id="intimidar" type="number"></div>
+      <div class="field"><label class="roll-label" data-input="manipulacao">Manipulação</label><input id="manipulacao" type="number"></div>
+      <div class="field"><label class="roll-label" data-input="negociar">Negociar</label><input id="negociar" type="number"></div>
+      <div class="field"><label class="roll-label" data-input="provocar">Provocar</label><input id="provocar" type="number"></div>
+      <div class="field"><label class="roll-label" data-input="psicologia">Psicologia</label><input id="psicologia" type="number"></div>
+      <div class="field"><label class="roll-label" data-input="terapia">Terapia</label><input id="terapia" type="number"></div>
     </div>
 
     <div class="block">
       <h2>TÉCNICO</h2>
-      <div class="field"><label for="analise-documentos">Análise de Documentos</label><input id="analise-documentos" type="number"></div>
-      <div class="field"><label for="aviacao">Aviação</label><input id="aviacao" type="number"></div>
-      <div class="field"><label for="balistica">Balística</label><input id="balistica" type="number"></div>
-      <div class="field"><label for="cartografia">Cartografia</label><input id="cartografia" type="number"></div>
-      <div class="field"><label for="explosivos">Explosivos</label><input id="explosivos" type="number"></div>
-      <div class="field"><label for="falsificacao">Falsificação</label><input id="falsificacao" type="number"></div>
-      <div class="field"><label for="forense">Perícia Forense</label><input id="forense" type="number"></div>
-      <div class="field"><label for="mecanica">Mecânica</label><input id="mecanica" type="number"></div>
-      <div class="field"><label for="pesquisa">Pesquisa</label><input id="pesquisa" type="number"></div>
-      <div class="field"><label for="pilotagem">Pilotagem</label><input id="pilotagem" type="number"></div>
-      <div class="field"><label for="tecnologia">Tecnologia</label><input id="tecnologia" type="number"></div>
+
+      <div class="field"><label class="roll-label" data-input="analise-documentos">Análise de Documentos</label><input id="analise-documentos" type="number"></div>
+      <div class="field"><label class="roll-label" data-input="aviacao">Aviação</label><input id="aviacao" type="number"></div>
+      <div class="field"><label class="roll-label" data-input="balistica">Balística</label><input id="balistica" type="number"></div>
+      <div class="field"><label class="roll-label" data-input="cartografia">Cartografia</label><input id="cartografia" type="number"></div>
+      <div class="field"><label class="roll-label" data-input="explosivos">Explosivos</label><input id="explosivos" type="number"></div>
+      <div class="field"><label class="roll-label" data-input="falsificacao">Falsificação</label><input id="falsificacao" type="number"></div>
+      <div class="field"><label class="roll-label" data-input="forense">Perícia Forense</label><input id="forense" type="number"></div>
+      <div class="field"><label class="roll-label" data-input="mecanica">Mecânica</label><input id="mecanica" type="number"></div>
+      <div class="field"><label class="roll-label" data-input="pesquisa">Pesquisa</label><input id="pesquisa" type="number"></div>
+      <div class="field"><label class="roll-label" data-input="pilotagem">Pilotagem</label><input id="pilotagem" type="number"></div>
+      <div class="field"><label class="roll-label" data-input="tecnologia">Tecnologia</label><input id="tecnologia" type="number"></div>
     </div>
 
     <div class="block">
-      <h2>ACADÊMICAS</h2>
-    <div class="field"><label for="curiosidades">Conhecimento Geral</label><input id="curiosidades" type="number"></div>
-    <div class="field"><label for="fisica">Física</label><input id="fisica" type="number"></div>
-    <div class="field"><label for="geografia">Geografia</label><input id="geografia" type="number"></div>
-    <div class="field"><label for="historia">História</label><input id="historia" type="number"></div>
-    <div class="field"><label for="historia-artistica">História Artística</label><input id="historia-artistica" type="number"></div>
-    <div class="field"><label for="historia-natural">História Natural</label><input id="historia-natural" type="number"></div>
-    <div class="field"><label for="linguagem">Linguagem</label><input id="linguagem" type="number"></div>
-    <div class="field"><label for="matematica">Matemática</label><input id="matematica" type="number"></div>
-    <div class="field"><label for="poderes">Poderes</label><input id="poderes" type="number"></div>
-    <div class="field"><label for="quimica">Química</label><input id="quimica" type="number"></div>
-    <div class="field"><label for="religiao">Religião</label><input id="religiao" type="number"></div>
+      <h2>ACADÊMICO</h2>
 
-
+      <div class="field"><label class="roll-label" data-input="curiosidades">Conhecimento Geral</label><input id="curiosidades" type="number"></div>
+      <div class="field"><label class="roll-label" data-input="fisica">Física</label><input id="fisica" type="number"></div>
+      <div class="field"><label class="roll-label" data-input="geografia">Geografia</label><input id="geografia" type="number"></div>
+      <div class="field"><label class="roll-label" data-input="historia">História</label><input id="historia" type="number"></div>
+      <div class="field"><label class="roll-label" data-input="historia-artistica">História Artística</label><input id="historia-artistica" type="number"></div>
+      <div class="field"><label class="roll-label" data-input="historia-natural">História Natural</label><input id="historia-natural" type="number"></div>
+      <div class="field"><label class="roll-label" data-input="linguagem">Linguagem</label><input id="linguagem" type="number"></div>
+      <div class="field"><label class="roll-label" data-input="matematica">Matemática</label><input id="matematica" type="number"></div>
+      <div class="field"><label class="roll-label" data-input="poderes">Poderes</label><input id="poderes" type="number"></div>
+      <div class="field"><label class="roll-label" data-input="quimica">Química</label><input id="quimica" type="number"></div>
+      <div class="field"><label class="roll-label" data-input="religiao">Religião</label><input id="religiao" type="number"></div>
     </div>
 
   </div>
-
-  <!-- INVENTÁRIO -->
-  <div class="inventory">
-    <h2>INVENTÁRIO</h2>
-    <div class="grid">
-      <div class="field"><label>Item</label><input id="item1"></div>
-      <div class="field"><label>Item</label><input id="item2"></div>
-      <div class="field"><label>Item</label><input id="item3"></div>
-      <div class="field"><label>Item</label><input id="item4"></div>
-      <div class="field"><label>Item</label><input id="item5"></div>
-      <div class="field"><label>Item</label><input id="item6"></div>
-      <div class="field"><label>Item</label><input id="item7"></div>
-      <div class="field"><label>Item</label><input id="item8"></div>
-      <div class="field"><label>Item</label><input id="item9"></div>
-      <div class="field"><label>Item</label><input id="item10"></div>
-      <div class="field"><label>Item</label><input id="item11"></div>
-      <div class="field"><label>Item</label><input id="item12"></div>
-      <div class="field"><label>Item</label><input id="item13"></div>
-      <div class="field"><label>Item</label><input id="item14"></div>
-      <div class="field"><label>Item</label><input id="item15"></div>
-      <div class="field"><label>Item</label><input id="item16"></div>
-      <div class="field"><label>Item</label><input id="item17"></div>
-      <div class="field"><label>Item</label><input id="item18"></div>
-      <div class="field"><label>Item</label><input id="item19"></div>
-      <div class="field"><label>Item</label><input id="item20"></div>
-    </div>
-  </div>
-
-</div>
-</div>
-<a href="https://docs.google.com/document/d/11sg2qGrx3ZZ-IxXZjSrQbaZ3yPjH0apHUJcIYVXakEA/edit?usp=sharing"  target="_blank">ficha</a>
 <script>
-  const PLAYER_ID = "jogador5";
+  localStorage.setItem("playerId", "p1");
 </script>
-<script type="module" src="../firebase.js"></script>
-<script type="module" src="../ficha.js"></script>
-<script src="../ink.js"></script>
 <div id="dice-overlay" class="hidden">
   <div id="dice-sprite"></div>
   <div id="dice-text" class="dice-text"></div>
 </div>
+
+
+<script type="module" src="../main.js"></script>
 </body>
 </html>
-
-
-
-
-
-
-
-
