@@ -1,6 +1,6 @@
 // ficha.js
-import { db, ref, set, onValue } from "./firebase.js";
 import { PLAYER_ID } from "./player.js";
+import { db, ref, set, onValue } from "./firebase.js";
 
 // ============================
 // INPUTS
