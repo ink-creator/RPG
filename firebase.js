@@ -1,6 +1,13 @@
 // firebase.js
-import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js";
-import { getDatabase, ref, set, onValue, push, remove } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-database.js";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import {
+  getDatabase,
+  ref,
+  set,
+  push,
+  onValue,
+  remove
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyBCCbxXH6UZEqpItsdVaaG354Nqu28HA44",
@@ -14,5 +21,7 @@ const firebaseConfig = {
 
 // Inicializa Firebase
 const app = initializeApp(firebaseConfig);
-export const db = getDatabase(app);
-export { ref, set, onValue, push, remove };
+const db = getDatabase(app);
+
+// ✅ EXPORTA TUDO O QUE O PROJETO USA
+export { db, ref, set, push, onValue, remove };
