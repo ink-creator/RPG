@@ -194,26 +194,26 @@ h2 {
   width: 64px;
   height: 64px;
 
-  background-image: url("./players/bah.png");
+  background-image: url("../img/bah.png");
   background-repeat: no-repeat;
-  background-size: 320px 256px; /* 5 x 4 */
+
+  /* 20 dados em uma linha */
+  background-size: 1280px 64px;
   background-position: 0 0;
 
-  /* REMOVE QUALQUER BLOCO */
   background-color: transparent;
-  box-shadow: none;
-  border: none;
 }
 
-/* ANIMAÇÃO */
+/* animação correta */
 #dice-sprite.rolling {
   animation: dice-roll 1s steps(20) infinite;
 }
 
 @keyframes dice-roll {
-  from { background-position: 0 0; }
-  to   { background-position: -320px -256px; }
+  from { background-position-x: 0; }
+  to   { background-position-x: -1280px; }
 }
+
 
 
 /* TEXTO DO RESULTADO */
@@ -244,6 +244,7 @@ h2 {
   color: #f44336;
   text-shadow: 0 0 12px #f44336;
 }
+
 
 
 
