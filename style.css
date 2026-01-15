@@ -176,15 +176,34 @@ h2 {
 #dice-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0,0,0,0.8);
+  background: rgba(0,0,0,0.85);
   display: none;
   justify-content: center;
   align-items: center;
   z-index: 999;
 }
 
-#dice-overlay.show { display: flex; }
+#dice-overlay.show {
+  display: flex;
+}
 
+#dice-sprite {
+  width: 64px;
+  height: 64px;
+  margin-right: 20px;
+
+  background-image: url(../bah.png);
+  background-size: 320px 256px; /* 5 colunas x 4 linhas */
+  background-position: 0 0;
+
+  image-rendering: pixelated;
+
+  box-shadow:
+    0 0 12px rgba(255,0,0,0.7),
+    inset 0 0 6px rgba(0,0,0,0.8);
+}
+
+/* ANIMAÇÃO DE ROLAGEM */
 #dice-sprite.rolling {
   animation: dice-roll 1s steps(20) infinite;
 }
@@ -194,50 +213,31 @@ h2 {
   to   { background-position: -320px -256px; }
 }
 
-
-#dice-sprite.rolling { animation: rodar 1s linear; }
-
+/* TEXTO DO RESULTADO */
 .dice-text {
   font-size: 2em;
   font-weight: bold;
-  color: white;
+  color: #ffffff;
   text-shadow: 0 0 8px #ff1a1a;
 }
 
-.dice-text.EXTREMO { color: gold; text-shadow: 0 0 12px gold; }
-.dice-text.BOM { color: #4caf50; text-shadow: 0 0 10px #4caf50; }
-.dice-text.NORMAL { color: #2196f3; text-shadow: 0 0 10px #2196f3; }
-.dice-text.FALHA { color: #f44336; text-shadow: 0 0 10px #f44336; }
-
-@keyframes rodar {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+/* CORES POR RESULTADO */
+.dice-text.EXTREMO {
+  color: gold;
+  text-shadow: 0 0 14px gold;
 }
 
-.hidden { display: none; }
-
-/* =========================
-   RESPONSIVO
-========================= */
-@media (max-width: 1000px) {
-  .top, .middle {
-    grid-template-columns: 1fr;
-  }
-
-  .fields-grid {
-    flex-direction: column;
-  }
+.dice-text.BOM {
+  color: #4caf50;
+  text-shadow: 0 0 12px #4caf50;
 }
 
-@media (max-width: 600px) {
-  .sheet {
-    padding: 10px;
-  }
-  .field input {
-    font-size: 13px;
-    padding: 5px 6px;
-  }
+.dice-text.NORMAL {
+  color: #2196f3;
+  text-shadow: 0 0 12px #2196f3;
 }
 
-
-
+.dice-text.FALHA {
+  color: #f44336;
+  text-shadow: 0 0 12px #f44336;
+}
