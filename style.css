@@ -192,7 +192,7 @@ h2 {
   height: 64px;
   margin-right: 20px;
 
-  background-image: url(../bah.png);
+  background-image: url(./players/bah.png);
   background-size: 320px 256px; /* 5 colunas x 4 linhas */
   background-position: 0 0;
 
@@ -241,3 +241,4 @@ h2 {
   color: #f44336;
   text-shadow: 0 0 12px #f44336;
 }
+
