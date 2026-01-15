@@ -185,14 +185,15 @@ h2 {
 
 #dice-overlay.show { display: flex; }
 
-#dice-sprite {
-  width: 64px;
-  height: 64px;
-  background-image: url(../bah.png);
-  background-size: cover;
-  margin-right: 20px;
-  transition: background-position 0.3s ease-out;
+#dice-sprite.rolling {
+  animation: dice-roll 1s steps(20) infinite;
 }
+
+@keyframes dice-roll {
+  from { background-position: 0 0; }
+  to   { background-position: -320px -256px; }
+}
+
 
 #dice-sprite.rolling { animation: rodar 1s linear; }
 
@@ -237,5 +238,6 @@ h2 {
     padding: 5px 6px;
   }
 }
+
 
 
