@@ -173,9 +173,6 @@ h2 {
 /* =========================
    DICE OVERLAY
 ========================= */
-/* =========================
-   DICE OVERLAY
-========================= */
 #dice-overlay {
   position: fixed;
   inset: 0;
@@ -197,7 +194,7 @@ h2 {
   width: 64px;
   height: 64px;
 
-  background-image: url("../img/bah.png");
+  background-image: url("./players/bah.png");
   background-repeat: no-repeat;
   background-size: 320px 256px; /* 5 x 4 */
   background-position: 0 0;
@@ -247,5 +244,6 @@ h2 {
   color: #f44336;
   text-shadow: 0 0 12px #f44336;
 }
+
 
 
