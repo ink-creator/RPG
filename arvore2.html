@@ -9,8 +9,8 @@ body{
   margin:0;
   background:#0b0b12;
   font-family:Arial,sans-serif;
-  Height: auto;
-  Overflow-y: auto;
+  height:auto;
+  overflow-y:auto;
 }
 #toolbar{position:fixed;top:10px;left:10px;z-index:10;}
 #toolbar button{
@@ -25,7 +25,14 @@ body{
 #canvas{width:100vw;height:100vh;position:relative;}
 svg{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;}
 
-.node{position:absolute;display:flex;flex-direction:column;align-items:center;cursor:grab;}
+.node{
+  position:absolute;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  cursor:grab;
+  transform-origin:center;
+}
 .bubble{
   width:90px;height:90px;border-radius:50%;
   background:#222;border:2px solid #aaa;
@@ -43,8 +50,16 @@ svg{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;}
   width:100%;background:#0f0f18;color:white;
   border:1px solid #444;border-radius:6px;padding:6px;margin-bottom:8px;
 }
-.panel-btn{width:100%;padding:8px;margin-top:6px;
-  background:#6a5acd;border:none;color:white;border-radius:6px;cursor:pointer;}
+.panel-btn{
+  width:100%;
+  padding:8px;
+  margin-top:6px;
+  background:#6a5acd;
+  border:none;
+  color:white;
+  border-radius:6px;
+  cursor:pointer;
+}
 .warn{background:#e67e22;}
 .danger{background:#c0392b;}
 </style>
@@ -64,6 +79,10 @@ svg{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;}
   <input id="titleInput" placeholder="Nome">
   <textarea id="descInput" placeholder="Descrição"></textarea>
   <input id="fileInput" type="file" accept="image/*">
+
+  <!-- CONTROLE DE TAMANHO -->
+  <input id="sizeInput" type="range" min="0.5" max="2" step="0.05">
+
   <button class="panel-btn" id="btnConnect">🔗 Conectar próxima</button>
   <button class="panel-btn warn" id="btnClear">❌ Remover ligações</button>
   <button class="panel-btn danger" id="btnDelete">🗑️ Excluir bolha</button>
@@ -102,8 +121,9 @@ const btnClear = document.getElementById("btnClear");
 const btnDelete = document.getElementById("btnDelete");
 
 const titleInput = document.getElementById("titleInput");
-const descInput = document.getElementById("descInput");
-const fileInput = document.getElementById("fileInput");
+const descInput  = document.getElementById("descInput");
+const fileInput  = document.getElementById("fileInput");
+const sizeInput  = document.getElementById("sizeInput");
 
 let nodes = [];
 let connections = [];
@@ -132,22 +152,25 @@ function addBubble(data = {}, silent = false) {
   node.style.left = data.left || "200px";
   node.style.top  = data.top  || "200px";
 
+  node.dataset.title = data.title || "";
+  node.dataset.desc  = data.desc  || "";
+  node.dataset.img   = data.img   || "";
+  node.dataset.size  = data.size  || "1";
+
+  node.style.transform = `scale(${node.dataset.size})`;
+
   const bubble = document.createElement("div");
   bubble.className = "bubble";
 
-  if (data.img) {
+  if (node.dataset.img) {
     const img = document.createElement("img");
-    img.src = data.img;
+    img.src = node.dataset.img;
     bubble.appendChild(img);
   }
 
   const title = document.createElement("div");
   title.className = "node-title";
-  title.textContent = data.title || "";
-
-  node.dataset.title = data.title || "";
-  node.dataset.desc  = data.desc  || "";
-  node.dataset.img   = data.img   || "";
+  title.textContent = node.dataset.title;
 
   node.append(bubble, title);
 
@@ -171,6 +194,7 @@ function selectNode(node) {
   panel.hidden = false;
   titleInput.value = node.dataset.title;
   descInput.value  = node.dataset.desc;
+  sizeInput.value  = node.dataset.size || 1;
 }
 
 /* =========================
@@ -257,6 +281,16 @@ descInput.oninput = () => {
   isEditing = false;
 };
 
+sizeInput.oninput = () => {
+  if (!selected) return;
+  isEditing = true;
+  selected.dataset.size = sizeInput.value;
+  selected.style.transform = `scale(${sizeInput.value})`;
+  drawLines();
+  saveAll();
+  isEditing = false;
+};
+
 fileInput.onchange = () => {
   if (!selected || !fileInput.files[0]) return;
   isEditing = true;
@@ -311,7 +345,8 @@ function saveAll() {
       top: n.style.top,
       title: n.dataset.title,
       desc: n.dataset.desc,
-      img: n.dataset.img
+      img: n.dataset.img,
+      size: n.dataset.size
     })),
     connections: connections.map(c => [
       nodes.indexOf(c[0]),
