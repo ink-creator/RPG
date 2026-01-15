@@ -173,6 +173,9 @@ h2 {
 /* =========================
    DICE OVERLAY
 ========================= */
+/* =========================
+   DICE OVERLAY
+========================= */
 #dice-overlay {
   position: fixed;
   inset: 0;
@@ -187,23 +190,25 @@ h2 {
   display: flex;
 }
 
+/* =========================
+   DADO
+========================= */
 #dice-sprite {
   width: 64px;
   height: 64px;
-  margin-right: 20px;
 
-  background-image: url(./players/bah.png);
-  background-size: 320px 256px; /* 5 colunas x 4 linhas */
+  background-image: url("../img/bah.png");
+  background-repeat: no-repeat;
+  background-size: 320px 256px; /* 5 x 4 */
   background-position: 0 0;
 
-  image-rendering: pixelated;
-
-  box-shadow:
-    0 0 12px rgba(255,0,0,0.7),
-    inset 0 0 6px rgba(0,0,0,0.8);
+  /* REMOVE QUALQUER BLOCO */
+  background-color: transparent;
+  box-shadow: none;
+  border: none;
 }
 
-/* ANIMAÇÃO DE ROLAGEM */
+/* ANIMAÇÃO */
 #dice-sprite.rolling {
   animation: dice-roll 1s steps(20) infinite;
 }
@@ -212,6 +217,7 @@ h2 {
   from { background-position: 0 0; }
   to   { background-position: -320px -256px; }
 }
+
 
 /* TEXTO DO RESULTADO */
 .dice-text {
@@ -241,4 +247,5 @@ h2 {
   color: #f44336;
   text-shadow: 0 0 12px #f44336;
 }
+
 
