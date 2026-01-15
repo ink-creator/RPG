@@ -66,8 +66,8 @@ function rolarDado2D(nome, valorSkill) {
     const col = (dado - 1) % 5;
     const row = Math.floor((dado - 1) / 5);
 
-    sprite.style.backgroundPosition =
-      `-${col * 64}px -${row * 64}px`;
+   sprite.style.backgroundPositionX =
+  `-${(dado - 1) * 64}px`;
 
     sprite.classList.remove("rolling");
 
@@ -108,6 +108,7 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 export { rolarDado2D };
+
 
 
 
