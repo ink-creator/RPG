@@ -194,7 +194,7 @@ h2 {
   width: 64px;
   height: 64px;
 
-  background-image: url("../img/bah.png");
+  background-image: url("./players/bah.png");
   background-repeat: no-repeat;
 
   /* 20 dados em uma linha */
@@ -244,6 +244,7 @@ h2 {
   color: #f44336;
   text-shadow: 0 0 12px #f44336;
 }
+
 
 
 
