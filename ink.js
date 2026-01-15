@@ -57,11 +57,22 @@ function rolarDado2D(nome, valorSkill) {
   texto.textContent = "";
   texto.className = "dice-text";
 
+  // tempo da animação
   setTimeout(() => {
     const dado = Math.floor(Math.random() * 20) + 1;
     const resultado = avaliarResultado(valorSkill, dado);
 
+    // calcula posição do sprite
+    const col = (dado - 1) % 5;
+    const row = Math.floor((dado - 1) / 5);
+
+    sprite.style.backgroundPosition =
+      `-${col * 64}px -${row * 64}px`;
+
+    sprite.classList.remove("rolling");
+
     texto.textContent = `${nome}: ${resultado} (${dado})`;
+    texto.classList.add(resultado);
 
     push(ref(db, `historico/${PLAYER_ID}`), {
       nome,
@@ -73,6 +84,7 @@ function rolarDado2D(nome, valorSkill) {
     setTimeout(() => overlay.classList.remove("show"), 2000);
   }, 1000);
 }
+
 
 // ============================
 // ATIVA LABELS
@@ -97,3 +109,4 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 export { rolarDado2D };
+
