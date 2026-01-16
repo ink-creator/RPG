@@ -47,7 +47,7 @@ svg{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;}
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+import { getDatabase, ref, set, get } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
 /* FIREBASE */
 const app = initializeApp({
@@ -76,16 +76,13 @@ const btnDelete  = document.getElementById("btnDelete");
 let nodes = [];
 let connections = [];
 let selected = null;
-let loading = true;
-let isEditing = false;
 
-/* PROTEÇÃO DE UI */
+/* UI PROTECTION */
 ["mousedown","click"].forEach(evt=>{
   panel.addEventListener(evt,e=>e.stopPropagation());
   document.getElementById("toolbar").addEventListener(evt,e=>e.stopPropagation());
 });
 
-/* CLIQUE FORA */
 document.addEventListener("mousedown", e=>{
   if(e.target.closest(".node")||e.target.closest("#panel")||e.target.closest("#toolbar")) return;
   selected=null;
@@ -122,7 +119,7 @@ function addBubble(data={}, silent=false){
 
   canvas.appendChild(node);
   nodes.push(node);
-  if(!silent && !loading) saveAll();
+  if(!silent) saveAll();
 }
 
 /* SELECT */
@@ -151,7 +148,7 @@ function drag(el){
   };
 }
 
-/* LINES */
+/* CONNECTIONS */
 function connectNearest(){
   if(!selected) return;
   let min=Infinity,target=null;
@@ -183,33 +180,29 @@ function drawLines(){
   });
 }
 
-/* PANEL INPUTS */
+/* PANEL */
 titleInput.oninput=()=>{
   if(!selected) return;
-  isEditing=true;
   selected.dataset.title=titleInput.value;
   selected.querySelector(".node-title").textContent=titleInput.value;
-  saveAll(); isEditing=false;
+  saveAll();
 };
 
 descInput.oninput=()=>{
   if(!selected) return;
-  isEditing=true;
   selected.dataset.desc=descInput.value;
-  saveAll(); isEditing=false;
+  saveAll();
 };
 
 sizeInput.oninput=()=>{
   if(!selected) return;
-  isEditing=true;
   selected.dataset.size=sizeInput.value;
   selected.style.transform=`scale(${sizeInput.value})`;
-  drawLines(); saveAll(); isEditing=false;
+  drawLines(); saveAll();
 };
 
 fileInput.onchange=()=>{
   if(!selected||!fileInput.files[0]) return;
-  isEditing=true;
   const r=new FileReader();
   r.onload=e=>{
     selected.dataset.img=e.target.result;
@@ -218,7 +211,7 @@ fileInput.onchange=()=>{
     const img=document.createElement("img");
     img.src=e.target.result;
     b.appendChild(img);
-    saveAll(); isEditing=false;
+    saveAll();
   };
   r.readAsDataURL(fileInput.files[0]);
 };
@@ -243,9 +236,8 @@ btnDelete.onclick=()=>{
   drawLines(); saveAll();
 };
 
-/* FIREBASE */
+/* SAVE */
 function saveAll(){
-  if(loading) return;
   set(treeRef,{
     nodes:nodes.map(n=>({
       left:n.style.left,
@@ -262,24 +254,17 @@ function saveAll(){
   });
 }
 
-onValue(treeRef,snap=>{
-  if(isEditing) return;
-  loading=true;
-
-  nodes.forEach(n=>n.remove());
-  nodes=[]; connections=[];
-
-  if(snap.exists()){
-    const d=snap.val();
-    d.nodes?.forEach(n=>addBubble(n,true));
-    d.connections?.forEach(([i,j])=>{
-      if(nodes[i]&&nodes[j]) connections.push([nodes[i],nodes[j]]);
-    });
-  }
-
+/* LOAD ONCE */
+get(treeRef).then(snap=>{
+  if(!snap.exists()) return;
+  const d=snap.val();
+  d.nodes?.forEach(n=>addBubble(n,true));
+  d.connections?.forEach(([i,j])=>{
+    if(nodes[i]&&nodes[j]) connections.push([nodes[i],nodes[j]]);
+  });
   drawLines();
-  loading=false;
 });
 </script>
+
 </body>
 </html>
