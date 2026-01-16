@@ -90,7 +90,7 @@ svg{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;}
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
-/* FIREBASE */
+/* ================= FIREBASE ================= */
 const app = initializeApp({
   apiKey: "AIzaSyBCCbxXH6UZEqpItsdVaaG354Nqu28HA44",
   authDomain: "rpg-ficha-online.firebaseapp.com",
@@ -101,10 +101,11 @@ const db = getDatabase(app);
 const TREE_ID = document.body.dataset.tree || "default";
 const treeRef = ref(db, `skillTrees/${TREE_ID}`);
 
-/* ESTADO */
+/* ================= ESTADO ================= */
 const canvas = document.getElementById("canvas");
 const svg = document.getElementById("lines");
 const panel = document.getElementById("panel");
+const toolbar = document.getElementById("toolbar");
 
 const titleInput = document.getElementById("titleInput");
 const descInput  = document.getElementById("descInput");
@@ -114,133 +115,141 @@ const sizeInput  = document.getElementById("sizeInput");
 let nodes = [];
 let connections = [];
 let selected = null;
+
 let loading = true;
 let initialized = false;
 let isEditing = false;
 
-/* CLICK FORA (CORRETO) */
+/* ========== BLOQUEIO CORRETO DE EVENTOS UI ========== */
+["mousedown","click"].forEach(evt=>{
+  panel.addEventListener(evt,e=>e.stopPropagation());
+  toolbar.addEventListener(evt,e=>e.stopPropagation());
+});
+
+/* ========== CLIQUE FORA REAL ========== */
 document.addEventListener("mousedown", e => {
   if (!selected) return;
-  if (
-    e.target.closest(".node") ||
-    e.target.closest("#panel") ||
-    e.target.closest("#toolbar")
-  ) return;
-
+  if (e.target.closest(".node") || e.target.closest("#panel") || e.target.closest("#toolbar")) return;
   selected = null;
   panel.hidden = true;
 });
 
-/* CREATE */
+/* ================= CREATE ================= */
 function addBubble(data={}, silent=false){
-  const node = document.createElement("div");
-  node.className = "node";
-  node.style.left = data.left || "200px";
-  node.style.top  = data.top  || "200px";
-  node.dataset.title = data.title || "";
-  node.dataset.desc  = data.desc  || "";
-  node.dataset.img   = data.img   || "";
-  node.dataset.size  = data.size  || "1";
-  node.style.transform = `scale(${node.dataset.size})`;
+  const node=document.createElement("div");
+  node.className="node";
+  node.style.left=data.left||"200px";
+  node.style.top=data.top||"200px";
+  node.dataset.title=data.title||"";
+  node.dataset.desc=data.desc||"";
+  node.dataset.img=data.img||"";
+  node.dataset.size=data.size||"1";
+  node.style.transform=`scale(${node.dataset.size})`;
 
-  const bubble = document.createElement("div");
-  bubble.className = "bubble";
-  if (node.dataset.img) {
-    const img = document.createElement("img");
-    img.src = node.dataset.img;
+  const bubble=document.createElement("div");
+  bubble.className="bubble";
+  if(node.dataset.img){
+    const img=document.createElement("img");
+    img.src=node.dataset.img;
     bubble.appendChild(img);
   }
 
-  const title = document.createElement("div");
-  title.className = "node-title";
-  title.textContent = node.dataset.title;
+  const title=document.createElement("div");
+  title.className="node-title";
+  title.textContent=node.dataset.title;
 
-  node.append(bubble, title);
-  node.onclick = e => { e.stopPropagation(); selectNode(node); };
+  node.append(bubble,title);
+  node.onclick=e=>{e.stopPropagation();selectNode(node);};
   drag(node);
 
   canvas.appendChild(node);
   nodes.push(node);
-  if (!silent && initialized) saveAll();
+  if(!silent && initialized) saveAll();
 }
 
-/* SELECT */
+/* ================= SELECT ================= */
 function selectNode(node){
-  selected = node;
-  panel.hidden = false;
-  titleInput.value = node.dataset.title;
-  descInput.value  = node.dataset.desc;
-  sizeInput.value  = node.dataset.size || 1;
+  selected=node;
+  panel.hidden=false;
+  titleInput.value=node.dataset.title;
+  descInput.value=node.dataset.desc;
+  sizeInput.value=node.dataset.size||1;
 }
 
-/* DRAG */
+/* ================= DRAG ================= */
 function drag(el){
-  let ox, oy;
-  el.onmousedown = e => {
-    ox = e.offsetX;
-    oy = e.offsetY;
-    document.onmousemove = ev => {
-      el.style.left = ev.pageX - ox + "px";
-      el.style.top  = ev.pageY - oy + "px";
+  let ox,oy;
+  el.onmousedown=e=>{
+    ox=e.offsetX; oy=e.offsetY;
+    document.onmousemove=ev=>{
+      el.style.left=ev.pageX-ox+"px";
+      el.style.top =ev.pageY-oy+"px";
       drawLines();
     };
-    document.onmouseup = () => {
-      document.onmousemove = null;
+    document.onmouseup=()=>{
+      document.onmousemove=null;
       saveAll();
     };
   };
 }
 
-/* LINES */
+/* ================= LINES ================= */
 function connectNearest(){
-  if (!selected) return;
-  let min=Infinity, target=null;
+  if(!selected || nodes.length<2) return;
+  let min=Infinity,target=null;
   nodes.forEach(n=>{
     if(n===selected) return;
     const d=Math.hypot(
       parseInt(n.style.left)-parseInt(selected.style.left),
-      parseInt(n.style.top)-parseInt(selected.style.top)
+      parseInt(n.style.top )-parseInt(selected.style.top )
     );
     if(d<min){min=d;target=n;}
   });
-  if(target){connections.push([selected,target]);drawLines();saveAll();}
+  if(target){
+    connections.push([selected,target]);
+    drawLines(); saveAll();
+  }
 }
+
 function drawLines(){
   svg.innerHTML="";
   connections.forEach(([a,b])=>{
     const l=document.createElementNS("http://www.w3.org/2000/svg","line");
     l.setAttribute("x1",parseInt(a.style.left)+45);
-    l.setAttribute("y1",parseInt(a.style.top)+45);
+    l.setAttribute("y1",parseInt(a.style.top )+45);
     l.setAttribute("x2",parseInt(b.style.left)+45);
-    l.setAttribute("y2",parseInt(b.style.top)+45);
+    l.setAttribute("y2",parseInt(b.style.top )+45);
     l.setAttribute("stroke","#aaa");
     l.setAttribute("stroke-width","2");
     svg.appendChild(l);
   });
 }
 
-/* PANEL */
-titleInput.oninput = () => {
+/* ================= PANEL INPUTS ================= */
+titleInput.oninput=()=>{
   if(!selected) return;
   isEditing=true;
   selected.dataset.title=titleInput.value;
   selected.querySelector(".node-title").textContent=titleInput.value;
   saveAll(); isEditing=false;
 };
-descInput.oninput = () => {
+
+descInput.oninput=()=>{
   if(!selected) return;
   isEditing=true;
   selected.dataset.desc=descInput.value;
   saveAll(); isEditing=false;
 };
-sizeInput.oninput = () => {
+
+sizeInput.oninput=()=>{
   if(!selected) return;
   isEditing=true;
   selected.dataset.size=sizeInput.value;
   selected.style.transform=`scale(${sizeInput.value})`;
   drawLines(); saveAll(); isEditing=false;
 };
-fileInput.onchange = () => {
+
+fileInput.onchange=()=>{
   if(!selected||!fileInput.files[0]) return;
   isEditing=true;
   const r=new FileReader();
@@ -256,7 +265,13 @@ fileInput.onchange = () => {
   r.readAsDataURL(fileInput.files[0]);
 };
 
-/* BUTTONS */
+/* ================= BUTTONS ================= */
+btnConnect.onclick=connectNearest;
+btnClear.onclick=()=>{
+  if(!selected) return;
+  connections=connections.filter(c=>c[0]!==selected&&c[1]!==selected);
+  drawLines(); saveAll();
+};
 btnDelete.onclick=()=>{
   if(!selected) return;
   connections=connections.filter(c=>c[0]!==selected&&c[1]!==selected);
@@ -266,26 +281,27 @@ btnDelete.onclick=()=>{
   panel.hidden=true;
   drawLines(); saveAll();
 };
-btnClear.onclick=()=>{
-  if(!selected) return;
-  connections=connections.filter(c=>c[0]!==selected&&c[1]!==selected);
-  drawLines(); saveAll();
-};
-btnConnect.onclick=connectNearest;
 btnAdd.onclick=()=>addBubble();
 
-/* FIREBASE */
+/* ================= FIREBASE ================= */
 function saveAll(){
   if(loading||!initialized) return;
   set(treeRef,{
     nodes:nodes.map(n=>({
-      left:n.style.left,top:n.style.top,
-      title:n.dataset.title,desc:n.dataset.desc,
-      img:n.dataset.img,size:n.dataset.size
+      left:n.style.left,
+      top:n.style.top,
+      title:n.dataset.title,
+      desc:n.dataset.desc,
+      img:n.dataset.img,
+      size:n.dataset.size
     })),
-    connections:connections.map(c=>[nodes.indexOf(c[0]),nodes.indexOf(c[1])])
+    connections:connections.map(c=>[
+      nodes.indexOf(c[0]),
+      nodes.indexOf(c[1])
+    ])
   });
 }
+
 onValue(treeRef,snap=>{
   if(isEditing) return;
   loading=true;
