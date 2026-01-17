@@ -1,55 +1,58 @@
 /* =========================
-   PALETA — FOGO AZUL ULTRA SATURADO
+   VARIÁVEIS GLOBAIS
 ========================= */
 :root {
-  --void: #000000;
-  --metal-dark: #010712;
-  --metal-mid: #061e40;
-
-  --fire-deep: #002bff;
-  --fire-core: #00a2ff;
-  --fire-hot: #66e6ff;
-  --fire-white: #f8ffff;
-
-  --text-main: #ffffff;
-  --text-soft: #bfe9ff;
+  --bg: #0b0b12;
+  --panel: #1c1c28;
+  --border: #ff1a1a;
+  --text: #e0e0e0;
+  --accent: #ff1a1a;
+  --secondary: #00fff7;
+  --highlight: #ff0055;
+  --input-bg: #0d0d14;
+  --input-border: #444;
+  --bar-bg: #222;
 }
 
 /* =========================
    BASE
 ========================= */
 body {
+  background: radial-gradient(circle at top, #08080d, #0b0b12);
+  color: var(--text);
+  font-family: 'Verdana', Geneva, sans-serif;
   margin: 0;
-  font-family: "Segoe UI", Arial, sans-serif;
-  color: var(--text-main);
-  background: radial-gradient(circle at top, #020a18, #00030a 70%);
 }
 
-/* =========================
-   PAINEL PRINCIPAL — RESPIRAÇÃO
-========================= */
 .sheet {
-  max-width: 1320px;
+  max-width: 1300px;
   margin: 20px auto;
-  padding: 26px;
-
-  background: linear-gradient(180deg, #0b1f3f, #040b18 70%);
-  border-radius: 18px;
-
-  /* Respiração */
-  animation: breathing 3s ease-in-out infinite;
-
-  box-shadow:
-    inset 0 0 40px rgba(0,60,200,0.5),
-    0 0 40px rgba(0,120,255,0.45);
+  padding: 20px;
+  background: var(--panel);
+  border: 2px solid var(--border);
+  border-radius: 12px;
+  box-shadow: 0 0 20px rgba(255, 0, 0, 0.5);
 }
 
 /* =========================
-   GRID
+   HEADINGS
+========================= */
+h2 {
+  text-align: center;
+  font-size: 1.3em;
+  color: var(--accent);
+  border-bottom: 2px solid var(--border);
+  padding-bottom: 6px;
+  margin-bottom: 10px;
+  text-shadow: 0 0 6px var(--highlight);
+}
+
+/* =========================
+   LAYOUT
 ========================= */
 .top, .middle {
   display: grid;
-  gap: 24px;
+  gap: 15px;
 }
 
 .top {
@@ -61,120 +64,111 @@ body {
 }
 
 /* =========================
-   BLOCOS — RESPIRANDO
+   BLOCOS
 ========================= */
 .block, .info {
-  padding: 20px;
-  background: radial-gradient(circle at top left, #0d2b55, #050c18 70%);
-  border-radius: 16px;
-
-  animation: breathing 3s ease-in-out infinite;
-
-  box-shadow:
-    inset 0 0 30px rgba(0,0,0,1),
-    0 0 16px rgba(0,100,220,0.25);
+  background: linear-gradient(145deg, #11111b, #1f1f2f);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 12px;
+  box-shadow: 0 0 8px rgba(255,0,0,0.3);
 }
 
-/* =========================
-   TÍTULOS — ENTALHADOS
-========================= */
-h2 {
-  margin: 0 0 18px;
-  padding-bottom: 6px;
-  font-size: 0.85em;
-  letter-spacing: 5px;
-  text-transform: uppercase;
-  color: var(--fire-white);
-  position: relative;
+.fields-grid {
+  display: flex;
+  gap: 10px;
 }
 
-h2::after {
-  content: "";
-  display: block;
-  margin-top: 8px;
-  height: 3px;
-  border-radius: 6px;
-  background: linear-gradient(90deg, transparent, var(--fire-core), var(--fire-hot), transparent);
+.fields-grid .column {
+  flex: 1;
 }
 
-/* =========================
-   CAMPOS — ESCULPIDOS
-========================= */
 .fields-group {
-  display: grid;
-  gap: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
 
+/* =========================
+   CAMPOS
+========================= */
 .field {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  margin-bottom: 5px;
+  position: relative;
 }
 
 .field label {
-  font-size: 10px;
-  letter-spacing: 3px;
-  text-transform: uppercase;
-  color: var(--text-soft);
-  margin-left: 6px;
+  font-size: 13px;
+  color: var(--secondary);
+  margin-bottom: 2px;
+  font-weight: bold;
+  text-shadow: 0 0 3px var(--accent);
 }
 
-/* INPUT — PULSO AO FOCO */
 .field input {
-  height: 36px;
-  padding: 0 14px;
-  background: radial-gradient(circle at top, #000a18, #00040a);
-  color: var(--text-main);
-  border: none;
-  border-radius: 999px;
+  padding: 6px 8px;
   font-size: 14px;
-
-  box-shadow: inset 0 2px 8px rgba(0,0,0,1), inset 0 -2px 6px rgba(0,0,0,0.8);
-  transition: box-shadow 0.25s ease, transform 0.25s ease;
+  background: var(--input-bg);
+  color: var(--text);
+  border: 1px solid var(--input-border);
+  border-radius: 5px;
+  outline: none;
+  transition: all 0.2s ease;
 }
 
 .field input:focus {
-  outline: none;
-  box-shadow: inset 0 0 12px rgba(0,180,255,0.9), 0 0 20px rgba(0,120,255,0.6);
-  transform: scale(1.02);
+  border-color: var(--highlight);
+  box-shadow: 0 0 6px var(--highlight);
 }
 
 /* =========================
-   STATUS — CANAIS DE ENERGIA VIVOS
+   STATUS BARS
 ========================= */
 .bar {
-  height: 18px;
-  margin: 10px 0;
-  background: radial-gradient(circle at center, #000a18, #00030a);
-  border-radius: 999px;
+  background: #0a0a12;
+  height: 16px;
+  border-radius: 6px;
+  border: 1px solid #000;
   overflow: hidden;
-  box-shadow: inset 0 0 12px rgba(0,0,0,1), 0 0 10px rgba(0,60,140,0.4);
+  margin: 6px 0;
+  box-shadow:
+    inset 0 0 6px rgba(0,0,0,0.9),
+    0 0 6px rgba(255,0,0,0.15);
 }
 
 .bar div {
   height: 100%;
   width: 0%;
-  border-radius: 999px;
-
-  /* Fluxo + respiração */
-  background-size: 300px 100%;
-  animation: charge 2s linear infinite, breathing 3s ease-in-out infinite;
+  transition: width 0.35s ease;
+  border-radius: 6px;
 }
 
-/* VIDA — FLUXO FORTE */
+/* VIDA */
 #vida {
-  background: linear-gradient(90deg, #003bff, #00a2ff, #66e6ff, #00a2ff);
+  background: linear-gradient(90deg, #ff1a1a, #ff5e5e);
+  box-shadow:
+    0 0 6px #ff1a1a,
+    0 0 14px rgba(255, 26, 26, 0.9);
 }
 
-/* SANIDADE — FRIO */
+/* SANIDADE */
 #sanidade {
-  background: linear-gradient(90deg, #001433, #3d6bff, #bcd8ff);
+  background: linear-gradient(90deg, #8a00ff, #d05fff);
+  box-shadow:
+    0 0 6px #8a00ff,
+    0 0 14px rgba(138, 0, 255, 0.9);
 }
 
-/* ENERGIA — SOBRECARGA */
+/* ENERGIA */
 #energia {
-  background: linear-gradient(90deg, #00bfff, #6fffff, #ffffff);
+  background: linear-gradient(90deg, #00fff7, #00c4b7);
+  box-shadow:
+    0 0 6px #00fff7,
+    0 0 14px rgba(0, 255, 247, 0.9);
 }
+
 
 /* =========================
    DICE OVERLAY
@@ -182,10 +176,11 @@ h2::after {
 #dice-overlay {
   position: fixed;
   inset: 0;
-  background: radial-gradient(circle, rgba(0,70,160,0.9), rgba(0,0,0,0.98));
+  background: rgba(0,0,0,0.85);
   display: none;
   justify-content: center;
   align-items: center;
+  z-index: 999;
 }
 
 #dice-overlay.show {
@@ -198,13 +193,20 @@ h2::after {
 #dice-sprite {
   width: 64px;
   height: 64px;
+
   background-image: url("./players/bah.png");
+  background-repeat: no-repeat;
+
+  /* 20 dados em uma linha */
   background-size: 1280px 64px;
-  filter: drop-shadow(0 0 18px rgba(80,200,255,0.9)) drop-shadow(0 0 36px rgba(0,100,220,0.8));
+  background-position: 0 0;
+
+  background-color: transparent;
 }
 
+/* animação correta */
 #dice-sprite.rolling {
-  animation: dice-roll 0.85s steps(20) infinite;
+  animation: dice-roll 1s steps(20) infinite;
 }
 
 @keyframes dice-roll {
@@ -212,36 +214,37 @@ h2::after {
   to   { background-position-x: -1280px; }
 }
 
-/* =========================
-   TEXTO DO RESULTADO
-========================= */
+
+
+/* TEXTO DO RESULTADO */
 .dice-text {
-  margin-top: 14px;
   font-size: 2em;
-  letter-spacing: 5px;
-  text-transform: uppercase;
-  color: var(--fire-white);
-  text-shadow: 0 0 16px var(--fire-hot), 0 0 36px rgba(0,120,255,0.9);
+  font-weight: bold;
+  color: #ffffff;
+  text-shadow: 0 0 8px #ff1a1a;
 }
 
-.dice-text.EXTREMO { color: #ffffff; }
-.dice-text.BOM     { color: #b0ffff; }
-.dice-text.NORMAL  { color: #90caff; }
-.dice-text.FALHA   { color: #ff9a9a; }
-
-/* =========================
-   ANIMAÇÕES
-========================= */
-@keyframes breathing {
-  0%, 100% {
-    box-shadow: inset 0 0 40px rgba(0,60,200,0.5), 0 0 40px rgba(0,120,255,0.45);
-  }
-  50% {
-    box-shadow: inset 0 0 60px rgba(0,90,255,0.7), 0 0 60px rgba(0,180,255,0.6);
-  }
+/* CORES POR RESULTADO */
+.dice-text.EXTREMO {
+  color: gold;
+  text-shadow: 0 0 14px gold;
 }
 
-@keyframes charge {
-  0% { background-position-x: 0; }
-  100% { background-position-x: 300px; }
+.dice-text.BOM {
+  color: #4caf50;
+  text-shadow: 0 0 12px #4caf50;
 }
+
+.dice-text.NORMAL {
+  color: #2196f3;
+  text-shadow: 0 0 12px #2196f3;
+}
+
+.dice-text.FALHA {
+  color: #f44336;
+  text-shadow: 0 0 12px #f44336;
+}
+
+
+
+
