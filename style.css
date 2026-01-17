@@ -246,3 +246,30 @@ span:hover,
     0 0 12px rgba(255,255,255,0.85),
     0 0 36px rgba(255,255,255,0.45);
 }
+/* =========================
+   SPRITE DO DADO (CORREÇÃO)
+========================= */
+#dice-sprite {
+  width: 64px;
+  height: 64px;
+
+  background-image: url("./players/bah.png");
+  background-repeat: no-repeat;
+
+  /* 20 frames horizontais */
+  background-size: 1280px 64px;
+  background-position: 0 0;
+
+  image-rendering: pixelated;
+}
+
+/* animação */
+#dice-sprite.rolling {
+  animation: dice-roll 1s steps(20) infinite;
+}
+
+@keyframes dice-roll {
+  from { background-position-x: 0; }
+  to   { background-position-x: -1280px; }
+}
+
