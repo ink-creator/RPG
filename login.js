@@ -1,5 +1,5 @@
 const contas = {
-  Ravir:   { senha: "furryto", pagina: "players/p1.html" },
+  Matheus:   { senha: "furryto", pagina: "players/p1.html" },
   Ruan:    { senha: "pato", pagina: "players/p2.html" },
   Luma:    { senha: "monitora", pagina: "players/p3.html" },
   Cayo:    { senha: "cabeludo", pagina: "players/p4.html" },
@@ -24,3 +24,4 @@ function login() {
     document.getElementById("erro").innerText = "Usuário ou senha incorretos";
   }
 }
+
