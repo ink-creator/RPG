@@ -2,7 +2,6 @@
 import { PLAYER_ID } from "./players.js";
 import { supabase } from "./supabase.js";
 
-/* ====== TABELA DE ORDEM (IGUAL) ====== */
 const TABELA_ORDEM = {
   1:{extremo:null,bom:null,normal:20},
   2:{extremo:null,bom:20,normal:19},
@@ -23,63 +22,39 @@ const TABELA_ORDEM = {
   17:{extremo:18,bom:13,normal:4},
   18:{extremo:18,bom:12,normal:3},
   19:{extremo:18,bom:12,normal:2},
-  20:{extremo:17,bom:11,normal:1},
+  20:{extremo:17,bom:11,normal:1}
 };
 
-function avaliarResultado(valor, dado) {
-  const regra = TABELA_ORDEM[valor];
-  if (!regra) return "FALHA";
-  if (regra.extremo !== null && dado >= regra.extremo) return "EXTREMO";
-  if (regra.bom !== null && dado >= regra.bom) return "BOM";
-  if (regra.normal !== null && dado >= regra.normal) return "NORMAL";
+function avaliar(valor, dado) {
+  const r = TABELA_ORDEM[valor];
+  if (!r) return "FALHA";
+  if (r.extremo && dado >= r.extremo) return "EXTREMO";
+  if (r.bom && dado >= r.bom) return "BOM";
+  if (dado >= r.normal) return "NORMAL";
   return "FALHA";
 }
 
-async function rolarDado2D(nome, valorSkill) {
-  const overlay = document.getElementById("dice-overlay");
-  const sprite = document.getElementById("dice-sprite");
-  const texto = document.getElementById("dice-text");
+async function rolarDado2D(nome, valor) {
+  const dado = Math.floor(Math.random() * 20) + 1;
+  const resultado = avaliar(valor, dado);
 
-  overlay.classList.add("show");
-  sprite.classList.add("rolling");
-  texto.textContent = "";
+  await supabase.from("historico").insert({
+    player_id: PLAYER_ID,
+    nome,
+    resultado,
+    dado,
+    data: Date.now()
+  });
 
-  setTimeout(async () => {
-    const dado = Math.floor(Math.random() * 20) + 1;
-    const resultado = avaliarResultado(valorSkill, dado);
-
-    sprite.style.backgroundPositionX = `-${(dado - 1) * 64}px`;
-    sprite.classList.remove("rolling");
-
-    texto.textContent = `${nome}: ${resultado} (${dado})`;
-    texto.className = `dice-text ${resultado}`;
-
-    // 🔹 grava no Supabase
-    await supabase.from("historico").insert({
-      player_id: PLAYER_ID,
-      nome,
-      resultado,
-      dado,
-      data: Date.now()
-    });
-
-    setTimeout(() => overlay.classList.remove("show"), 2000);
-  }, 1000);
+  alert(`${nome}: ${resultado} (${dado})`);
 }
 
-document.addEventListener("DOMContentLoaded", () => {
-  document.querySelectorAll(".roll-label").forEach(label => {
-    label.addEventListener("click", e => {
-      e.preventDefault();
-      const input = document.getElementById(label.dataset.input);
-      const valor = parseInt(input.value, 10);
-      if (isNaN(valor) || valor < 1 || valor > 20) {
-        alert("Valor deve ser entre 1 e 20");
-        return;
-      }
-      rolarDado2D(label.textContent.trim(), valor);
-    });
+document.querySelectorAll(".roll-label").forEach(label => {
+  label.addEventListener("click", e => {
+    e.preventDefault();
+    const input = document.getElementById(label.dataset.input);
+    const valor = parseInt(input.value, 10);
+    if (isNaN(valor)) return alert("Valor inválido");
+    rolarDado2D(label.textContent.trim(), valor);
   });
 });
-
-export { rolarDado2D };
