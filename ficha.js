@@ -1,23 +1,33 @@
 // ficha.js
 import { PLAYER_ID } from "./players.js";
-import { db, ref, set, onValue } from "./firebase.js";
+import { supabase } from "./supabase.js";
 
-// ============================
-// INPUTS
-// ============================
 const inputs = document.querySelectorAll("input");
 
 inputs.forEach(input => {
   if (!input.id) return;
 
-  const caminho = `jogadores/${PLAYER_ID}/${input.id}`;
-  const referencia = ref(db, caminho);
+  const tipo = input.id;
 
-  onValue(referencia, snapshot => {
-    if (snapshot.exists()) input.value = snapshot.val();
-  });
+  // 🔹 Carregar valor inicial
+  supabase
+    .from("player_status")
+    .select("valor")
+    .eq("player_id", PLAYER_ID)
+    .eq("tipo", tipo)
+    .single()
+    .then(({ data }) => {
+      if (data) input.value = data.valor;
+    });
 
-  input.addEventListener("input", () => {
-    set(referencia, input.value);
+  // 🔹 Atualizar ao digitar
+  input.addEventListener("input", async () => {
+    await supabase
+      .from("player_status")
+      .upsert({
+        player_id: PLAYER_ID,
+        tipo,
+        valor: input.value
+      });
   });
 });
