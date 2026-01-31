@@ -1,16 +1,17 @@
 // ===============================
-// FIREBASE
+// SUPABASE - CONEXÃO
 // ===============================
-import {
-  getDatabase,
-  ref,
-  set,
-  onValue
-} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+const supabaseUrl = "https://zhfqewgnnfejfyfkmyae.supabase.co"; // <-- Project URL
+const supabaseKey = "sb_publishable_DGpfjOL9IQ4t8DEiz06fhQ_YDnJABI6";             // <-- anon public key
 
-const db = getDatabase();
+const supabase = window.supabase.createClient(
+  supabaseUrl,
+  supabaseKey
+);
 
-// ID DO PLAYER (ex: p1, p2...)
+// ===============================
+// PLAYER
+// ===============================
 // coloque no <body data-player="p1">
 const playerId = document.body.dataset.player;
 
@@ -28,6 +29,9 @@ function ligarBarra(atualId, maxId, barraId, tipo) {
 
   if (!atualInput || !maxInput || !barra) return;
 
+  // -------------------------------
+  // ATUALIZA VISUAL DA BARRA
+  // -------------------------------
   function atualizarBarra() {
     const atual = Number(atualInput.value);
     const max   = Number(maxInput.value);
@@ -43,41 +47,89 @@ function ligarBarra(atualId, maxId, barraId, tipo) {
     barra.style.width = porcentagem + "%";
   }
 
-  function salvarFirebase() {
+  // -------------------------------
+  // SALVAR NO SUPABASE
+  // -------------------------------
+  async function salvarSupabase() {
     if (!playerId) return;
 
-    set(ref(db, `players/${playerId}/status/${tipo}`), {
-      atual: Number(atualInput.value) || 0,
-      max: Number(maxInput.value) || 0
-    });
+    await supabase
+      .from("player_status")
+      .upsert(
+        {
+          player_id: playerId,
+          tipo: tipo,
+          atual: Number(atualInput.value) || 0,
+          max: Number(maxInput.value) || 0
+        },
+        {
+          onConflict: "player_id,tipo"
+        }
+      );
   }
 
-  // eventos
+  // -------------------------------
+  // EVENTOS DE INPUT
+  // -------------------------------
   atualInput.addEventListener("input", () => {
     atualizarBarra();
-    salvarFirebase();
+    salvarSupabase();
   });
 
   maxInput.addEventListener("input", () => {
     atualizarBarra();
-    salvarFirebase();
+    salvarSupabase();
   });
 
-  // carregar do Firebase
-  onValue(ref(db, `players/${playerId}/status/${tipo}`), snapshot => {
-    const dados = snapshot.val();
-    if (!dados) return;
+  // -------------------------------
+  // CARREGAR DADOS AO ABRIR
+  // -------------------------------
+  async function carregarInicial() {
+    const { data } = await supabase
+      .from("player_status")
+      .select("*")
+      .eq("player_id", playerId)
+      .eq("tipo", tipo)
+      .single();
 
-    atualInput.value = dados.atual;
-    maxInput.value   = dados.max;
+    if (!data) return;
+
+    atualInput.value = data.atual;
+    maxInput.value   = data.max;
 
     atualizarBarra();
-  });
+  }
+
+  carregarInicial();
+
+  // -------------------------------
+  // REALTIME (SUBSTITUI onValue)
+  // -------------------------------
+  supabase
+    .channel(`status-${playerId}-${tipo}`)
+    .on(
+      "postgres_changes",
+      {
+        event: "*",
+        schema: "public",
+        table: "player_status",
+        filter: `player_id=eq.${playerId},tipo=eq.${tipo}`
+      },
+      payload => {
+        const dados = payload.new;
+        if (!dados) return;
+
+        atualInput.value = dados.atual;
+        maxInput.value   = dados.max;
+
+        atualizarBarra();
+      }
+    )
+    .subscribe();
 
   // inicializa
   atualizarBarra();
 
-  // expõe globalmente (dano automático, mestre, etc)
   return atualizarBarra;
 }
 
