@@ -1,21 +1,8 @@
-// ===============================
-// SUPABASE - CONEXÃO
-// ===============================
-const supabaseUrl = "https://zhfqewgnnfejfyfkmyae.supabase.co"; // <-- Project URL
-const supabaseKey = "sb_publishable_DGpfjOL9IQ4t8DEiz06fhQ_YDnJABI6";             // <-- anon public key
-// ===============================
-// PLAYER
-// ===============================
-// coloque no <body data-player="p1">
+// barra.js
+import { supabase } from "./supabase.js";
+
 const playerId = document.body.dataset.player;
 
-if (!playerId) {
-  console.warn("Player ID não definido no body");
-}
-
-// ===============================
-// FUNÇÃO GENÉRICA DE BARRA
-// ===============================
 function ligarBarra(atualId, maxId, barraId, tipo) {
   const atualInput = document.getElementById(atualId);
   const maxInput   = document.getElementById(maxId);
@@ -23,62 +10,44 @@ function ligarBarra(atualId, maxId, barraId, tipo) {
 
   if (!atualInput || !maxInput || !barra) return;
 
-  // -------------------------------
-  // ATUALIZA VISUAL DA BARRA
-  // -------------------------------
   function atualizarBarra() {
     const atual = Number(atualInput.value);
     const max   = Number(maxInput.value);
 
-    if (isNaN(atual) || isNaN(max) || max <= 0) {
+    if (!max || max <= 0) {
       barra.style.width = "0%";
       return;
     }
 
-    let porcentagem = (atual / max) * 100;
-    porcentagem = Math.max(0, Math.min(100, porcentagem));
-
-    barra.style.width = porcentagem + "%";
+    const pct = Math.max(0, Math.min(100, (atual / max) * 100));
+    barra.style.width = pct + "%";
   }
 
-  // -------------------------------
-  // SALVAR NO SUPABASE
-  // -------------------------------
-  async function salvarSupabase() {
-    if (!playerId) return;
-
+  async function salvar() {
     await supabase
       .from("player_status")
       .upsert(
         {
           player_id: playerId,
-          tipo: tipo,
+          tipo,
           atual: Number(atualInput.value) || 0,
           max: Number(maxInput.value) || 0
         },
-        {
-          onConflict: "player_id,tipo"
-        }
+        { onConflict: "player_id,tipo" }
       );
   }
 
-  // -------------------------------
-  // EVENTOS DE INPUT
-  // -------------------------------
   atualInput.addEventListener("input", () => {
     atualizarBarra();
-    salvarSupabase();
+    salvar();
   });
 
   maxInput.addEventListener("input", () => {
     atualizarBarra();
-    salvarSupabase();
+    salvar();
   });
 
-  // -------------------------------
-  // CARREGAR DADOS AO ABRIR
-  // -------------------------------
-  async function carregarInicial() {
+  async function carregar() {
     const { data } = await supabase
       .from("player_status")
       .select("*")
@@ -90,15 +59,11 @@ function ligarBarra(atualId, maxId, barraId, tipo) {
 
     atualInput.value = data.atual;
     maxInput.value   = data.max;
-
     atualizarBarra();
   }
 
-  carregarInicial();
+  carregar();
 
-  // -------------------------------
-  // REALTIME (SUBSTITUI onValue)
-  // -------------------------------
   supabase
     .channel(`status-${playerId}-${tipo}`)
     .on(
@@ -110,47 +75,17 @@ function ligarBarra(atualId, maxId, barraId, tipo) {
         filter: `player_id=eq.${playerId},tipo=eq.${tipo}`
       },
       payload => {
-        const dados = payload.new;
-        if (!dados) return;
-
-        atualInput.value = dados.atual;
-        maxInput.value   = dados.max;
-
+        if (!payload.new) return;
+        atualInput.value = payload.new.atual;
+        maxInput.value   = payload.new.max;
         atualizarBarra();
       }
     )
     .subscribe();
-
-  // inicializa
-  atualizarBarra();
-
-  return atualizarBarra;
 }
 
-// ===============================
-// INICIALIZAÇÃO
-// ===============================
 window.addEventListener("DOMContentLoaded", () => {
-
-  window.atualizarVida = ligarBarra(
-    "vida-atual",
-    "vida-max",
-    "vida",
-    "vida"
-  );
-
-  window.atualizarSanidade = ligarBarra(
-    "sanidade-atual",
-    "sanidade-max",
-    "sanidade",
-    "sanidade"
-  );
-
-  window.atualizarEnergia = ligarBarra(
-    "energia-atual",
-    "energia-max",
-    "energia",
-    "energia"
-  );
-
+  ligarBarra("vida-atual", "vida-max", "vida", "vida");
+  ligarBarra("sanidade-atual", "sanidade-max", "sanidade", "sanidade");
+  ligarBarra("energia-atual", "energia-max", "energia", "energia");
 });
