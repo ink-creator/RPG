@@ -3,12 +3,6 @@
 // ===============================
 const supabaseUrl = "https://zhfqewgnnfejfyfkmyae.supabase.co"; // <-- Project URL
 const supabaseKey = "sb_publishable_DGpfjOL9IQ4t8DEiz06fhQ_YDnJABI6";             // <-- anon public key
-
-const supabase = window.supabase.createClient(
-  supabaseUrl,
-  supabaseKey
-);
-
 // ===============================
 // PLAYER
 // ===============================
