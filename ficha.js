@@ -7,27 +7,34 @@ const inputs = document.querySelectorAll("input");
 inputs.forEach(input => {
   if (!input.id) return;
 
-  const tipo = input.id;
+  // ignora campos de barra
+  if (
+    input.id.includes("vida-") ||
+    input.id.includes("sanidade-") ||
+    input.id.includes("energia-")
+  ) return;
 
-  // 🔹 Carregar valor inicial
+  const campo = input.id;
+
+  // carregar valor
   supabase
-    .from("player_status")
+    .from("player_fields")
     .select("valor")
     .eq("player_id", PLAYER_ID)
-    .eq("tipo", tipo)
+    .eq("campo", campo)
     .single()
     .then(({ data }) => {
       if (data) input.value = data.valor;
     });
 
-  // 🔹 Atualizar ao digitar
+  // salvar ao digitar
   input.addEventListener("input", async () => {
     await supabase
-      .from("player_status")
+      .from("player_fields")
       .upsert({
         player_id: PLAYER_ID,
-        tipo,
-        valor: input.value
+        campo,
+        valor: Number(input.value) || 0
       });
   });
 });
