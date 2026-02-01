@@ -7,13 +7,6 @@ const inputs = document.querySelectorAll("input");
 inputs.forEach(input => {
   if (!input.id) return;
 
-  // ignora campos de barra
-  if (
-    input.id.includes("vida-") ||
-    input.id.includes("sanidade-") ||
-    input.id.includes("energia-")
-  ) return;
-
   const campo = input.id;
 
   // 🔹 CARREGAR
@@ -27,15 +20,20 @@ inputs.forEach(input => {
       if (data) input.value = data.valor;
     });
 
-  // 🔹 SALVAR EM TEMPO REAL
+  // 🔹 SALVAR EM TEMPO REAL (texto ou número)
   input.addEventListener("input", async () => {
+    const valor =
+      input.type === "number"
+        ? Number(input.value) || 0
+        : input.value;
+
     await supabase
       .from("player_fields")
       .upsert(
         {
           player_id: PLAYER_ID,
           campo,
-          valor: input.value
+          valor
         },
         {
           onConflict: "player_id,campo"
