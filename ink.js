@@ -3,9 +3,8 @@ import { PLAYER_ID } from "./players.js";
 import { supabase } from "./supabase.js";
 
 /* =========================
-   📊 TABELA DE RESULTADOS
+   🎲 TABELA DE RESULTADOS
 ========================= */
-
 const TABELA_ORDEM = {
   1:{extremo:null,bom:null,normal:20},
   2:{extremo:null,bom:20,normal:19},
@@ -29,10 +28,6 @@ const TABELA_ORDEM = {
   20:{extremo:17,bom:11,normal:1}
 };
 
-/* =========================
-   🎲 AVALIAÇÃO
-========================= */
-
 function avaliar(valor, dado) {
   const r = TABELA_ORDEM[valor];
   if (!r) return "FALHA";
@@ -43,22 +38,21 @@ function avaliar(valor, dado) {
 }
 
 /* =========================
-   🎲 ROLAGEM + HISTÓRICO
+   🧠 ROLAGEM + HISTÓRICO
 ========================= */
-
-async function rolarDadoINK(pericia, valor) {
+async function rolarDado2D(pericia, valor) {
   const dado = Math.floor(Math.random() * 20) + 1;
   const resultado = avaliar(valor, dado);
 
   const { error } = await supabase
     .from("roll_history")
-    .insert([{
+    .insert({
       player_id: PLAYER_ID,
       pericia: pericia,
       dado: dado,
       input_valor: valor,
       resultado: resultado
-    }]);
+    });
 
   if (error) {
     console.error("Erro ao salvar histórico:", error);
@@ -66,18 +60,12 @@ async function rolarDadoINK(pericia, valor) {
     return;
   }
 
-  alert(
-    `${pericia}\n` +
-    `Dado: ${dado}\n` +
-    `Valor: ${valor}\n` +
-    `Resultado: ${resultado}`
-  );
+  alert(`${pericia}: ${resultado} (${dado})`);
 }
 
 /* =========================
    🖱️ EVENTOS
 ========================= */
-
 document.querySelectorAll(".roll-label").forEach(label => {
   label.addEventListener("click", e => {
     e.preventDefault();
@@ -88,7 +76,6 @@ document.querySelectorAll(".roll-label").forEach(label => {
     const valor = parseInt(input.value, 10);
     if (isNaN(valor)) return alert("Valor inválido");
 
-    const pericia = label.textContent.trim();
-    rolarDadoINK(pericia, valor);
+    rolarDado2D(label.textContent.trim(), valor);
   });
 });
