@@ -18,7 +18,7 @@ inputs.forEach(input => {
     .select("valor")
     .eq("player_id", PLAYER_ID)
     .eq("campo", campo)
-    .maybeSingle()
+    .Single()
     .then(({ data }) => {
       if (data) input.value = data.valor;
     });
