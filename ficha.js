@@ -13,17 +13,19 @@ inputs.forEach(input => {
 
   const campo = input.id;
 
-  /* 🔹 CARREGAR */
+  /* 🔹 CARREGAR VALOR */
   supabase
+    .from("player_fields")
     .select("valor")
     .eq("player_id", PLAYER_ID)
     .eq("campo", campo)
-    .Single()
-    .then(({ data }) => {
+    .single()
+    .then(({ data, error }) => {
+      if (error) return;
       if (data) input.value = data.valor;
     });
 
-  /* 🔹 SALVAR */
+  /* 🔹 SALVAR EM TEMPO REAL */
   input.addEventListener("input", async () => {
     const valor =
       input.type === "number"
@@ -38,9 +40,7 @@ inputs.forEach(input => {
           campo,
           valor
         },
-        {
-          onConflict: "player_id,campo"
-        }
+        { onConflict: "player_id,campo" }
       );
   });
 });
@@ -53,9 +53,6 @@ function rolarDado(lados = 20) {
   return Math.floor(Math.random() * lados) + 1;
 }
 
-/**
- * pericia = id do input (ex: "agilidade")
- */
 window.rolarTeste = async function (pericia) {
   const input = document.getElementById(pericia);
   if (!input) {
@@ -67,7 +64,7 @@ window.rolarTeste = async function (pericia) {
   const dado = rolarDado(20);
   const resultado = dado + inputValor;
 
-  /* 📝 salvar histórico */
+  /* 📝 SALVAR HISTÓRICO */
   await supabase
     .from("roll_history")
     .insert([{
@@ -78,7 +75,7 @@ window.rolarTeste = async function (pericia) {
       resultado: resultado
     }]);
 
-  /* 🖥️ feedback */
+  /* 🖥️ FEEDBACK */
   alert(
     `Teste de ${pericia.toUpperCase()}\n` +
     `Dado: ${dado}\n` +
