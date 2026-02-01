@@ -1,38 +1,48 @@
-import { db, ref, onValue, remove } from "../firebase.js";
+import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
+
+const supabaseUrl = "SUA_URL_AQUI";
+const supabaseKey = "SUA_ANON_KEY_AQUI";
+
+const supabase = createClient(supabaseUrl, supabaseKey);
 
 const lista = document.getElementById("historico");
 const btnLimpar = document.getElementById("limpar-historico");
 
-// 🔄 Escuta TODAS as rolagens de TODOS os jogadores
-onValue(ref(db, "historico"), snapshot => {
+/* 🔄 carregar histórico */
+async function carregarHistorico() {
+  const { data, error } = await supabase
+    .from("roll_history")
+    .select("*")
+    .order("created_at", { ascending: false });
+
   lista.innerHTML = "";
 
-  if (!snapshot.exists()) {
+  if (error || !data || data.length === 0) {
     const li = document.createElement("li");
     li.textContent = "Nenhuma rolagem ainda.";
     lista.appendChild(li);
     return;
   }
 
-  const data = snapshot.val();
+  data.forEach(r => {
+    const li = document.createElement("li");
 
-  for (const playerId in data) {
-    const rolls = data[playerId];
+    li.textContent =
+      `[${new Date(r.created_at).toLocaleString()}] ` +
+      `${r.player_id} — ${r.pericia} | ` +
+      `Dado: ${r.dado} + Input: ${r.input_valor} = ${r.resultado}`;
 
-    for (const rollId in rolls) {
-      const r = rolls[rollId];
+    lista.appendChild(li);
+  });
+}
 
-      const li = document.createElement("li");
-      li.textContent =
-        `[${new Date(r.data).toLocaleString()}] ${playerId} — ${r.nome}: ${r.resultado} (${r.dado})`;
-
-      lista.appendChild(li);
-    }
-  }
-});
-
-// 🗑️ Botão para apagar TODO o histórico
-btnLimpar.addEventListener("click", () => {
+/* 🗑️ limpar histórico */
+btnLimpar.addEventListener("click", async () => {
   if (!confirm("Apagar todo o histórico?")) return;
-  remove(ref(db, "historico"));
+
+  await supabase.from("roll_history").delete().neq("id", "000");
+  carregarHistorico();
 });
+
+/* 🚀 iniciar */
+carregarHistorico();
