@@ -1,91 +1,73 @@
-// barra.js
-import { supabase } from "./supabase.js";
+/****************************
+ * 1️⃣ CONEXÃO COM SUPABASE
+ ****************************/
+const SUPABASE_URL = "https://zhfqewgnnfejfyfkmyae.supabase.co";
+const SUPABASE_KEY = "sb_publishable_DGpfjOL9IQ4t8DEiz06fhQ_YDnJABI6";
 
-const playerId = document.body.dataset.player;
+const supabase = window.supabase.createClient(
+  SUPABASE_URL,
+  SUPABASE_KEY
+);
 
-function ligarBarra(atualId, maxId, barraId, tipo) {
-  const atualInput = document.getElementById(atualId);
-  const maxInput   = document.getElementById(maxId);
-  const barra      = document.getElementById(barraId);
+// ===============================
+// 2. IDENTIDADE DO PLAYER
+// ===============================
+const playerId = localStorage.getItem("playerId") || "p1";
 
-  if (!atualInput || !maxInput || !barra) return;
+// ===============================
+// 3. PEGAR TODOS OS INPUTS
+// ===============================
+const inputs = document.querySelectorAll("input");
 
-  function atualizarBarra() {
-    const atual = Number(atualInput.value);
-    const max   = Number(maxInput.value);
+// ===============================
+// 4. CARREGAR DADOS DO BANCO
+// ===============================
+async function carregarDados() {
+  const { data, error } = await supabase
+    .from("player_status")
+    .select("*")
+    .eq("player_id", playerId);
 
-    if (!max || max <= 0) {
-      barra.style.width = "0%";
-      return;
+  if (error) {
+    console.error("Erro ao carregar:", error);
+    return;
+  }
+
+  data.forEach(item => {
+    const input = document.getElementById(item.campo);
+    if (input) {
+      input.value = item.valor;
     }
-
-    const pct = Math.max(0, Math.min(100, (atual / max) * 100));
-    barra.style.width = pct + "%";
-  }
-
-  async function salvar() {
-    await supabase
-      .from("player_status")
-      .upsert(
-        {
-          player_id: playerId,
-          tipo,
-          atual: Number(atualInput.value) || 0,
-          max: Number(maxInput.value) || 0
-        },
-        { onConflict: "player_id,tipo" }
-      );
-  }
-
-  atualInput.addEventListener("input", () => {
-    atualizarBarra();
-    salvar();
   });
-
-  maxInput.addEventListener("input", () => {
-    atualizarBarra();
-    salvar();
-  });
-
-  async function carregar() {
-    const { data } = await supabase
-      .from("player_status")
-      .select("*")
-      .eq("player_id", playerId)
-      .eq("tipo", tipo)
-      .single();
-
-    if (!data) return;
-
-    atualInput.value = data.atual;
-    maxInput.value   = data.max;
-    atualizarBarra();
-  }
-
-  carregar();
-
-  supabase
-    .channel(`status-${playerId}-${tipo}`)
-    .on(
-      "postgres_changes",
-      {
-        event: "*",
-        schema: "public",
-        table: "player_status",
-        filter: `player_id=eq.${playerId},tipo=eq.${tipo}`
-      },
-      payload => {
-        if (!payload.new) return;
-        atualInput.value = payload.new.atual;
-        maxInput.value   = payload.new.max;
-        atualizarBarra();
-      }
-    )
-    .subscribe();
 }
 
-window.addEventListener("DOMContentLoaded", () => {
-  ligarBarra("vida-atual", "vida-max", "vida", "vida");
-  ligarBarra("sanidade-atual", "sanidade-max", "sanidade", "sanidade");
-  ligarBarra("energia-atual", "energia-max", "energia", "energia");
+// ===============================
+// 5. SALVAR DADOS NO BANCO
+// ===============================
+async function salvarCampo(campo, valor) {
+  const { error } = await supabase
+    .from("player_status")
+    .upsert({
+      player_id: playerId,
+      campo: campo,
+      valor: valor
+    });
+
+  if (error) {
+    console.error("Erro ao salvar:", error);
+  }
+}
+
+// ===============================
+// 6. ESCUTAR MUDANÇAS
+// ===============================
+inputs.forEach(input => {
+  input.addEventListener("input", () => {
+    salvarCampo(input.id, input.value);
+  });
 });
+
+// ===============================
+// 7. INICIAR
+// ===============================
+carregarDados();
