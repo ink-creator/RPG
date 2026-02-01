@@ -47,17 +47,21 @@ async function carregarDados() {
 async function salvarCampo(campo, valor) {
   const { error } = await supabase
     .from("player_status")
-    .upsert({
-      player_id: playerId,
-      campo: campo,
-      valor: valor
-    });
+    .upsert(
+      {
+        player_id: playerId,
+        campo: campo,
+        valor: valor
+      },
+      {
+        onConflict: "player_id,campo"
+      }
+    );
 
   if (error) {
     console.error("Erro ao salvar:", error);
   }
 }
-
 // ===============================
 // 6. ESCUTAR MUDANÇAS
 // ===============================
