@@ -2,8 +2,19 @@
 import { supabase } from "./supabase.js";
 import { PLAYER_ID } from "./players.js";
 
-const inputs = document.querySelectorAll("input");
+function atualizarBarra(atualId, maxId, barraId) {
+  const atual = Number(document.getElementById(atualId)?.value) || 0;
+  const max = Number(document.getElementById(maxId)?.value) || 1;
 
+  const percent = Math.min((atual / max) * 100, 100);
+  const barra = document.getElementById(barraId);
+
+  if (barra) barra.style.width = percent + "%";
+}
+
+// ===============================
+// CARREGAR STATUS
+// ===============================
 async function carregarDados() {
   const { data, error } = await supabase
     .from("player_status")
@@ -11,7 +22,7 @@ async function carregarDados() {
     .eq("player_id", PLAYER_ID);
 
   if (error) {
-    console.error("Erro ao carregar:", error);
+    console.error(error);
     return;
   }
 
@@ -19,29 +30,36 @@ async function carregarDados() {
     const input = document.getElementById(item.campo);
     if (input) input.value = item.valor;
   });
+
+  // 🔁 atualizar barras depois de carregar
+  atualizarBarra("vida-atual", "vida-max", "vida");
+  atualizarBarra("sanidade-atual", "sanidade-max", "sanidade");
+  atualizarBarra("energia-atual", "energia-max", "energia");
 }
 
-async function salvarCampo(campo, valor) {
-  await supabase
-    .from("player_status")
-    .upsert(
-      {
-        player_id: PLAYER_ID,
-        campo,
-        valor
-      },
-      {
-        onConflict: "player_id,campo"
-      }
-    );
-}
-
-inputs.forEach(input => {
+// ===============================
+// SALVAR + ATUALIZAR
+// ===============================
+document.querySelectorAll("input").forEach(input => {
   if (!input.id) return;
-  input.addEventListener("input", () => {
-    salvarCampo(input.id, input.value);
+
+  input.addEventListener("input", async () => {
+    await supabase
+      .from("player_status")
+      .upsert(
+        {
+          player_id: PLAYER_ID,
+          campo: input.id,
+          valor: input.value
+        },
+        { onConflict: "player_id,campo" }
+      );
+
+    // atualizar barras em tempo real
+    atualizarBarra("vida-atual", "vida-max", "vida");
+    atualizarBarra("sanidade-atual", "sanidade-max", "sanidade");
+    atualizarBarra("energia-atual", "energia-max", "energia");
   });
 });
 
 carregarDados();
-
