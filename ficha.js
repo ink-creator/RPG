@@ -16,7 +16,7 @@ inputs.forEach(input => {
 
   const campo = input.id;
 
-  // carregar valor
+  // 🔹 CARREGAR
   supabase
     .from("player_fields")
     .select("valor")
@@ -27,14 +27,19 @@ inputs.forEach(input => {
       if (data) input.value = data.valor;
     });
 
-  // salvar ao digitar
+  // 🔹 SALVAR EM TEMPO REAL
   input.addEventListener("input", async () => {
     await supabase
       .from("player_fields")
-      .upsert({
-        player_id: PLAYER_ID,
-        campo,
-        valor: Number(input.value) || 0
-      });
+      .upsert(
+        {
+          player_id: PLAYER_ID,
+          campo,
+          valor: input.value
+        },
+        {
+          onConflict: "player_id,campo"
+        }
+      );
   });
 });
