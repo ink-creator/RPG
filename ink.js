@@ -2,6 +2,10 @@
 import { PLAYER_ID } from "./players.js";
 import { supabase } from "./supabase.js";
 
+/* =========================
+   📊 TABELA DE RESULTADOS
+========================= */
+
 const TABELA_ORDEM = {
   1:{extremo:null,bom:null,normal:20},
   2:{extremo:null,bom:20,normal:19},
@@ -25,6 +29,10 @@ const TABELA_ORDEM = {
   20:{extremo:17,bom:11,normal:1}
 };
 
+/* =========================
+   🎲 AVALIAÇÃO
+========================= */
+
 function avaliar(valor, dado) {
   const r = TABELA_ORDEM[valor];
   if (!r) return "FALHA";
@@ -34,27 +42,53 @@ function avaliar(valor, dado) {
   return "FALHA";
 }
 
-async function rolarDado2D(nome, valor) {
+/* =========================
+   🎲 ROLAGEM + HISTÓRICO
+========================= */
+
+async function rolarDadoINK(pericia, valor) {
   const dado = Math.floor(Math.random() * 20) + 1;
   const resultado = avaliar(valor, dado);
 
-  await supabase.from("historico").insert({
-    player_id: PLAYER_ID,
-    nome,
-    resultado,
-    dado,
-    data: Date.now()
-  });
+  const { error } = await supabase
+    .from("roll_history")
+    .insert([{
+      player_id: PLAYER_ID,
+      pericia: pericia,
+      dado: dado,
+      input_valor: valor,
+      resultado: resultado
+    }]);
 
-  alert(`${nome}: ${resultado} (${dado})`);
+  if (error) {
+    console.error("Erro ao salvar histórico:", error);
+    alert("Erro ao salvar no histórico.");
+    return;
+  }
+
+  alert(
+    `${pericia}\n` +
+    `Dado: ${dado}\n` +
+    `Valor: ${valor}\n` +
+    `Resultado: ${resultado}`
+  );
 }
+
+/* =========================
+   🖱️ EVENTOS
+========================= */
 
 document.querySelectorAll(".roll-label").forEach(label => {
   label.addEventListener("click", e => {
     e.preventDefault();
+
     const input = document.getElementById(label.dataset.input);
+    if (!input) return alert("Input não encontrado");
+
     const valor = parseInt(input.value, 10);
     if (isNaN(valor)) return alert("Valor inválido");
-    rolarDado2D(label.textContent.trim(), valor);
+
+    const pericia = label.textContent.trim();
+    rolarDadoINK(pericia, valor);
   });
 });
