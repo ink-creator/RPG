@@ -15,6 +15,9 @@ inputs.forEach(input => {
 
   /* 🔹 CARREGAR */
   supabase
+    .select("valor")
+    .eq("player_id", PLAYER_ID)
+    .eq("campo", campo)
     .maybeSingle()
     .then(({ data }) => {
       if (data) input.value = data.valor;
