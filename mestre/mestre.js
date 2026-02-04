@@ -47,8 +47,12 @@ btnLimpar.addEventListener("click", async () => {
 
   const { error } = await supabase
     .from("roll_history")
-    .delete()
-    .not("created_at", "is", null);
+    const { data, error } = await supabase
+   .from("roll_history")
+   .delete()
+   .not("id", "is", null)
+   .select(); // ← IMPORTANTE
+
 
   if (error) {
     console.error("Erro ao limpar histórico:", error);
