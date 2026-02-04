@@ -11,7 +11,6 @@ body{
   font-family:Arial,sans-serif;
   overflow:auto;
 }
-
 #toolbar{
   position:fixed;
   top:10px;
@@ -26,27 +25,23 @@ body{
   border-radius:8px;
   cursor:pointer;
 }
-
 #canvas{
   position:relative;
   min-width:100vw;
   min-height:100vh;
 }
-
 svg{
   position:absolute;
   top:0;
   left:0;
   pointer-events:none;
 }
-
 .node{
   position:absolute;
   display:flex;
   flex-direction:column;
   align-items:center;
   cursor:grab;
-  transform-origin:center;
 }
 .bubble{
   width:90px;
@@ -67,7 +62,6 @@ svg{
   color:#fff;
   text-align:center;
 }
-
 #panel{
   position:fixed;
   right:20px;
@@ -119,7 +113,6 @@ svg{
   <textarea id="descInput" placeholder="Descrição"></textarea>
   <input id="fileInput" type="file" accept="image/*">
   <input id="sizeInput" type="range" min="0.5" max="2" step="0.05">
-
   <button class="panel-btn" id="btnConnect">🔗 Conectar próxima</button>
   <button class="panel-btn warn" id="btnClear">❌ Remover ligações</button>
   <button class="panel-btn danger" id="btnDelete">🗑️ Excluir bolha</button>
@@ -156,20 +149,9 @@ const btnDelete  = document.getElementById("btnDelete");
 let nodes = [];
 let connections = [];
 let selected = null;
+let saveTimeout;
 
-/* PROTEÇÃO DE UI */
-["mousedown","click"].forEach(evt=>{
-  panel.addEventListener(evt,e=>e.stopPropagation());
-  document.getElementById("toolbar").addEventListener(evt,e=>e.stopPropagation());
-});
-
-document.addEventListener("mousedown", e=>{
-  if(e.target.closest(".node")||e.target.closest("#panel")||e.target.closest("#toolbar")) return;
-  selected=null;
-  panel.hidden=true;
-});
-
-/* CANVAS AUTO SIZE */
+/* CANVAS SIZE */
 function updateCanvasSize(){
   let maxX = window.innerWidth;
   let maxY = window.innerHeight;
@@ -177,21 +159,24 @@ function updateCanvasSize(){
   nodes.forEach(n=>{
     const x = parseInt(n.style.left);
     const y = parseInt(n.style.top);
-    const size = 90 * (parseFloat(n.dataset.size) || 1);
-    maxX = Math.max(maxX, x + size + 100);
-    maxY = Math.max(maxY, y + size + 100);
+    const s = 90 * (parseFloat(n.dataset.size)||1);
+    maxX = Math.max(maxX, x + s + 200);
+    maxY = Math.max(maxY, y + s + 200);
   });
 
-  canvas.style.width = maxX + "px";
-  canvas.style.height = maxY + "px";
+  canvas.style.width = maxX+"px";
+  canvas.style.height = maxY+"px";
   svg.setAttribute("width", maxX);
   svg.setAttribute("height", maxY);
+  svg.setAttribute("viewBox", `0 0 ${maxX} ${maxY}`);
 }
 
 /* CREATE */
 function addBubble(data={}, silent=false){
   const node=document.createElement("div");
   node.className="node";
+  node.dataset.id = data.id || crypto.randomUUID();
+
   node.style.left=data.left||"200px";
   node.style.top=data.top||"200px";
   node.dataset.title=data.title||"";
@@ -264,7 +249,6 @@ function connectNearest(){
   if(target){
     connections.push([selected,target]);
     drawLines();
-    updateCanvasSize();
     saveAll();
   }
 }
@@ -284,27 +268,9 @@ function drawLines(){
 }
 
 /* PANEL */
-titleInput.oninput=()=>{
-  if(!selected) return;
-  selected.dataset.title=titleInput.value;
-  selected.querySelector(".node-title").textContent=titleInput.value;
-  saveAll();
-};
-
-descInput.oninput=()=>{
-  if(!selected) return;
-  selected.dataset.desc=descInput.value;
-  saveAll();
-};
-
-sizeInput.oninput=()=>{
-  if(!selected) return;
-  selected.dataset.size=sizeInput.value;
-  selected.style.transform=`scale(${sizeInput.value})`;
-  drawLines();
-  updateCanvasSize();
-  saveAll();
-};
+titleInput.oninput=()=>{ if(selected){ selected.dataset.title=titleInput.value; selected.querySelector(".node-title").textContent=titleInput.value; saveAll(); }};
+descInput.oninput =()=>{ if(selected){ selected.dataset.desc =descInput.value; saveAll(); }};
+sizeInput.oninput =()=>{ if(selected){ selected.dataset.size=sizeInput.value; selected.style.transform=`scale(${sizeInput.value})`; drawLines(); updateCanvasSize(); saveAll(); }};
 
 fileInput.onchange=()=>{
   if(!selected||!fileInput.files[0]) return;
@@ -324,14 +290,12 @@ fileInput.onchange=()=>{
 /* BUTTONS */
 btnAdd.onclick=()=>addBubble();
 btnConnect.onclick=connectNearest;
-
 btnClear.onclick=()=>{
   if(!selected) return;
   connections=connections.filter(c=>c[0]!==selected&&c[1]!==selected);
   drawLines();
   saveAll();
 };
-
 btnDelete.onclick=()=>{
   if(!selected) return;
   connections=connections.filter(c=>c[0]!==selected&&c[1]!==selected);
@@ -346,29 +310,35 @@ btnDelete.onclick=()=>{
 
 /* SAVE */
 function saveAll(){
-  set(treeRef,{
-    nodes:nodes.map(n=>({
-      left:n.style.left,
-      top:n.style.top,
-      title:n.dataset.title,
-      desc:n.dataset.desc,
-      img:n.dataset.img,
-      size:n.dataset.size
-    })),
-    connections:connections.map(c=>[
-      nodes.indexOf(c[0]),
-      nodes.indexOf(c[1])
-    ])
-  });
+  clearTimeout(saveTimeout);
+  saveTimeout=setTimeout(()=>{
+    set(treeRef,{
+      nodes:nodes.map(n=>({
+        id:n.dataset.id,
+        left:n.style.left,
+        top:n.style.top,
+        title:n.dataset.title,
+        desc:n.dataset.desc,
+        img:n.dataset.img,
+        size:n.dataset.size
+      })),
+      connections:connections.map(c=>[
+        c[0].dataset.id,
+        c[1].dataset.id
+      ])
+    });
+  },300);
 }
 
-/* LOAD ONCE */
+/* LOAD */
 get(treeRef).then(snap=>{
   if(!snap.exists()) return;
   const d=snap.val();
   d.nodes?.forEach(n=>addBubble(n,true));
-  d.connections?.forEach(([i,j])=>{
-    if(nodes[i]&&nodes[j]) connections.push([nodes[i],nodes[j]]);
+  d.connections?.forEach(([a,b])=>{
+    const na=nodes.find(n=>n.dataset.id===a);
+    const nb=nodes.find(n=>n.dataset.id===b);
+    if(na&&nb) connections.push([na,nb]);
   });
   drawLines();
   updateCanvasSize();
@@ -377,3 +347,4 @@ get(treeRef).then(snap=>{
 
 </body>
 </html>
+
