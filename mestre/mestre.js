@@ -4,6 +4,30 @@ const lista = document.getElementById("historico");
 const btnLimpar = document.getElementById("limpar-historico");
 
 /* =========================
+   🕒 FORMATAR DATA
+========================= */
+function formatarData(data) {
+  if (!data) return "sem data";
+  return new Date(data).toLocaleString("pt-BR", {
+    dateStyle: "short",
+    timeStyle: "medium"
+  });
+}
+
+/* =========================
+   🧾 RENDER ITEM
+========================= */
+function renderItem(r, topo = false) {
+  const li = document.createElement("li");
+  li.textContent =
+    `[${formatarData(r.created_at)}] ` +
+    `${r.player_id} — ${r.pericia} | ` +
+    `Dado: ${r.dado} + Input: ${r.input_valor} = ${r.resultado}`;
+
+  topo ? lista.prepend(li) : lista.appendChild(li);
+}
+
+/* =========================
    🔄 CARREGAR HISTÓRICO
 ========================= */
 async function carregarHistorico() {
@@ -15,7 +39,7 @@ async function carregarHistorico() {
   lista.innerHTML = "";
 
   if (error) {
-    console.error("Erro ao carregar histórico:", error);
+    console.error(error);
     lista.innerHTML = "<li>Erro ao carregar histórico.</li>";
     return;
   }
@@ -25,26 +49,14 @@ async function carregarHistorico() {
     return;
   }
 
-  data.forEach(renderItem);
-}
-
-/* =========================
-   🧾 RENDER ITEM
-========================= */
-function renderItem(r) {
-  const li = document.createElement("li");
-  li.textContent =
-    `[${new Date(r.created_at).toLocaleString()}] ` +
-    `${r.player_id} — ${r.pericia} | ` +
-    `Dado: ${r.dado} + Input: ${r.input_valor} = ${r.resultado}`;
-  lista.appendChild(li);
+  data.forEach(r => renderItem(r));
 }
 
 /* =========================
    🧹 LIMPAR HISTÓRICO
 ========================= */
 btnLimpar.addEventListener("click", async () => {
-  if (!confirm("Apagar TODO o histórico de rolagens?")) return;
+  if (!confirm("Apagar TODO o histórico?")) return;
 
   const { error: deleteError } = await supabase
     .from("roll_history")
@@ -52,7 +64,7 @@ btnLimpar.addEventListener("click", async () => {
     .not("id", "is", null);
 
   if (deleteError) {
-    console.error("Erro ao limpar histórico:", deleteError);
+    console.error(deleteError);
     alert("Erro ao limpar histórico.");
     return;
   }
@@ -61,7 +73,7 @@ btnLimpar.addEventListener("click", async () => {
 });
 
 /* =========================
-   📡 REALTIME (AUTO UPDATE)
+   📡 REALTIME
 ========================= */
 supabase
   .channel("roll-history-realtime")
@@ -69,7 +81,7 @@ supabase
     "postgres_changes",
     { event: "INSERT", schema: "public", table: "roll_history" },
     payload => {
-      renderItem(payload.new);
+      renderItem(payload.new, true); // 👈 entra no topo
     }
   )
   .subscribe();
