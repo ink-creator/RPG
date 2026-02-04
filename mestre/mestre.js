@@ -3,7 +3,9 @@ import { supabase } from "../supabase.js";
 const lista = document.getElementById("historico");
 const btnLimpar = document.getElementById("limpar-historico");
 
-/* 🔄 carregar histórico */
+/* =========================
+   🔄 CARREGAR HISTÓRICO
+========================= */
 async function carregarHistorico() {
   const { data, error } = await supabase
     .from("roll_history")
@@ -12,7 +14,15 @@ async function carregarHistorico() {
 
   lista.innerHTML = "";
 
-  if (error || !data || data.length === 0) {
+  if (error) {
+    console.error("Erro ao carregar histórico:", error);
+    const li = document.createElement("li");
+    li.textContent = "Erro ao carregar histórico.";
+    lista.appendChild(li);
+    return;
+  }
+
+  if (!data || data.length === 0) {
     const li = document.createElement("li");
     li.textContent = "Nenhuma rolagem ainda.";
     lista.appendChild(li);
@@ -29,10 +39,28 @@ async function carregarHistorico() {
   });
 }
 
+/* =========================
+   🧹 LIMPAR HISTÓRICO
+========================= */
 btnLimpar.addEventListener("click", async () => {
-  if (!confirm("Apagar todo o histórico?")) return;
-  await supabase.from("roll_history").delete().neq("id", "000");
+  const confirmar = confirm("Apagar TODO o histórico de rolagens?");
+  if (!confirmar) return;
+
+  const { error } = await supabase
+    .from("roll_history")
+    .delete()
+    .gt("id", 0); // apaga todos os registros
+
+  if (error) {
+    console.error("Erro ao limpar histórico:", error);
+    alert("Erro ao limpar histórico. Veja o console.");
+    return;
+  }
+
   carregarHistorico();
 });
 
+/* =========================
+   🚀 INIT
+========================= */
 carregarHistorico();
