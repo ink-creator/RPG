@@ -41,9 +41,38 @@ function avaliar(valor, dado) {
    🧠 ROLAGEM + HISTÓRICO
 ========================= */
 async function rolarDado2D(pericia, valor) {
+  const overlay = document.getElementById("dice-overlay");
+  const dice = document.getElementById("dice-sprite");
+  const text = document.getElementById("dice-text");
+
+  // reset visual
+  text.textContent = "";
+  text.className = "dice-text";
+  dice.style.backgroundPositionX = "0px";
+
+  // mostra overlay e anima
+  overlay.classList.add("show");
+  dice.classList.add("rolling");
+
+  // tempo da animação girando
+  await new Promise(r => setTimeout(r, 1200));
+
+  // sorteio real
   const dado = Math.floor(Math.random() * 20) + 1;
   const resultado = avaliar(valor, dado);
 
+  // para animação
+  dice.classList.remove("rolling");
+
+  // posiciona sprite no número correto
+  const posX = -((dado - 1) * 64);
+  dice.style.backgroundPositionX = `${posX}px`;
+
+  // texto + cor
+  text.textContent = `${resultado} (${dado})`;
+  text.classList.add(resultado);
+
+  // salva no supabase
   const { error } = await supabase
     .from("roll_history")
     .insert({
@@ -56,11 +85,12 @@ async function rolarDado2D(pericia, valor) {
 
   if (error) {
     console.error("Erro ao salvar histórico:", error);
-    alert("Erro ao salvar no histórico.");
-    return;
   }
 
-  alert(`${pericia}: ${resultado} (${dado})`);
+  // fecha overlay
+  setTimeout(() => {
+    overlay.classList.remove("show");
+  }, 2200);
 }
 
 /* =========================
@@ -79,3 +109,4 @@ document.querySelectorAll(".roll-label").forEach(label => {
     rolarDado2D(label.textContent.trim(), valor);
   });
 });
+
