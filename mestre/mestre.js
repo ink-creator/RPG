@@ -43,13 +43,12 @@ async function carregarHistorico() {
    🧹 LIMPAR HISTÓRICO
 ========================= */
 btnLimpar.addEventListener("click", async () => {
-  const confirmar = confirm("Apagar TODO o histórico de rolagens?");
-  if (!confirmar) return;
+  if (!confirm("Apagar TODO o histórico de rolagens?")) return;
 
   const { error } = await supabase
     .from("roll_history")
     .delete()
-    .gt("id", 0); // apaga todos os registros
+    .not("created_at", "is", null);
 
   if (error) {
     console.error("Erro ao limpar histórico:", error);
