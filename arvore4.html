@@ -11,7 +11,6 @@ body{
   font-family:Arial,sans-serif;
   overflow:auto;
 }
-
 #toolbar{
   position:fixed;
   top:10px;
@@ -26,27 +25,27 @@ body{
   border-radius:8px;
   cursor:pointer;
 }
-
 #canvas{
   position:relative;
   min-width:100vw;
   min-height:100vh;
 }
-
 svg{
   position:absolute;
   top:0;
   left:0;
   pointer-events:none;
 }
-
 .node{
   position:absolute;
   display:flex;
   flex-direction:column;
   align-items:center;
   cursor:grab;
-  transform-origin:center;
+}
+.node.selected .bubble{
+  border-color:#6a5acd;
+  box-shadow:0 0 10px #6a5acd;
 }
 .bubble{
   width:90px;
@@ -67,7 +66,6 @@ svg{
   color:#fff;
   text-align:center;
 }
-
 #panel{
   position:fixed;
   right:20px;
@@ -119,25 +117,25 @@ svg{
   <textarea id="descInput" placeholder="Descrição"></textarea>
   <input id="fileInput" type="file" accept="image/*">
   <input id="sizeInput" type="range" min="0.5" max="2" step="0.05">
-
   <button class="panel-btn" id="btnConnect">🔗 Conectar próxima</button>
   <button class="panel-btn warn" id="btnClear">❌ Remover ligações</button>
   <button class="panel-btn danger" id="btnDelete">🗑️ Excluir bolha</button>
 </div>
 
 <script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getDatabase, ref, set, get } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
 
-/* FIREBASE */
-const app = initializeApp({
-  apiKey: "AIzaSyBCCbxXH6UZEqpItsdVaaG354Nqu28HA44",
-  databaseURL: "https://rpg-ficha-online-default-rtdb.firebaseio.com"
-});
-const db = getDatabase(app);
-const treeRef = ref(db, `skillTrees/${document.body.dataset.tree}`);
+/* ======================
+   SUPABASE
+====================== */
+const supabase = createClient(
+  "https://zhfqewgnnfejfyfkmyae.supabase.co",
+  "sb_publishable_DGpfjOL9IQ4t8DEiz06fhQ_YDnJABI6"
+);
 
-/* DOM */
+/* ======================
+   DOM
+====================== */
 const canvas = document.getElementById("canvas");
 const svg = document.getElementById("lines");
 const panel = document.getElementById("panel");
@@ -152,227 +150,286 @@ const btnConnect = document.getElementById("btnConnect");
 const btnClear   = document.getElementById("btnClear");
 const btnDelete  = document.getElementById("btnDelete");
 
-/* ESTADO */
+/* ======================
+   ESTADO
+====================== */
 let nodes = [];
 let connections = [];
 let selected = null;
+let saveTimer = null;
 
-/* PROTEÇÃO DE UI */
-["mousedown","click"].forEach(evt=>{
-  panel.addEventListener(evt,e=>e.stopPropagation());
-  document.getElementById("toolbar").addEventListener(evt,e=>e.stopPropagation());
-});
-
-document.addEventListener("mousedown", e=>{
-  if(e.target.closest(".node")||e.target.closest("#panel")||e.target.closest("#toolbar")) return;
-  selected=null;
-  panel.hidden=true;
-});
-
-/* CANVAS AUTO SIZE */
+/* ======================
+   UTIL
+====================== */
 function updateCanvasSize(){
   let maxX = window.innerWidth;
   let maxY = window.innerHeight;
 
   nodes.forEach(n=>{
-    const x = parseInt(n.style.left);
-    const y = parseInt(n.style.top);
-    const size = 90 * (parseFloat(n.dataset.size) || 1);
-    maxX = Math.max(maxX, x + size + 100);
-    maxY = Math.max(maxY, y + size + 100);
+    maxX = Math.max(maxX, parseInt(n.style.left) + 300);
+    maxY = Math.max(maxY, parseInt(n.style.top) + 300);
   });
 
-  canvas.style.width = maxX + "px";
-  canvas.style.height = maxY + "px";
+  canvas.style.width = maxX+"px";
+  canvas.style.height = maxY+"px";
   svg.setAttribute("width", maxX);
   svg.setAttribute("height", maxY);
 }
 
-/* CREATE */
+/* ======================
+   CREATE
+====================== */
 function addBubble(data={}, silent=false){
-  const node=document.createElement("div");
-  node.className="node";
-  node.style.left=data.left||"200px";
-  node.style.top=data.top||"200px";
-  node.dataset.title=data.title||"";
-  node.dataset.desc=data.desc||"";
-  node.dataset.img=data.img||"";
-  node.dataset.size=data.size||"1";
-  node.style.transform=`scale(${node.dataset.size})`;
+  const node = document.createElement("div");
+  node.className = "node";
+  node.dataset.id = data.id || crypto.randomUUID();
 
-  const bubble=document.createElement("div");
-  bubble.className="bubble";
+  node.style.left = data.left || "200px";
+  node.style.top  = data.top  || "200px";
+  node.dataset.title = data.title || "";
+  node.dataset.desc  = data.desc  || "";
+  node.dataset.img   = data.img   || "";
+  node.dataset.size  = data.size  || "1";
+
+  node.style.transform = `scale(${node.dataset.size})`;
+
+  const bubble = document.createElement("div");
+  bubble.className = "bubble";
+
   if(node.dataset.img){
-    const img=document.createElement("img");
-    img.src=node.dataset.img;
+    const img = document.createElement("img");
+    img.src = node.dataset.img;
     bubble.appendChild(img);
   }
 
-  const title=document.createElement("div");
-  title.className="node-title";
-  title.textContent=node.dataset.title;
+  const title = document.createElement("div");
+  title.className = "node-title";
+  title.textContent = node.dataset.title;
 
-  node.append(bubble,title);
-  node.onclick=e=>{e.stopPropagation();selectNode(node);};
+  node.append(bubble, title);
   drag(node);
 
   canvas.appendChild(node);
   nodes.push(node);
+
   updateCanvasSize();
   if(!silent) saveAll();
 }
 
-/* SELECT */
+/* ======================
+   SELECT
+====================== */
 function selectNode(node){
-  selected=node;
-  panel.hidden=false;
-  titleInput.value=node.dataset.title;
-  descInput.value=node.dataset.desc;
-  sizeInput.value=node.dataset.size;
+  nodes.forEach(n=>n.classList.remove("selected"));
+  selected = node;
+  node.classList.add("selected");
+  panel.hidden = false;
+  titleInput.value = node.dataset.title;
+  descInput.value  = node.dataset.desc;
+  sizeInput.value  = node.dataset.size;
 }
 
-/* DRAG */
+/* ======================
+   DRAG + CLICK
+====================== */
 function drag(el){
-  let ox,oy;
-  el.onmousedown=e=>{
-    ox=e.offsetX; oy=e.offsetY;
-    document.onmousemove=ev=>{
-      el.style.left=ev.pageX-ox+"px";
-      el.style.top =ev.pageY-oy+"px";
+  let ox, oy, moved = false;
+
+  el.onmousedown = e => {
+    moved = false;
+    ox = e.offsetX;
+    oy = e.offsetY;
+
+    document.onmousemove = ev => {
+      moved = true;
+      el.style.left = ev.pageX - ox + "px";
+      el.style.top  = ev.pageY - oy + "px";
       drawLines();
-      updateCanvasSize();
     };
-    document.onmouseup=()=>{
-      document.onmousemove=null;
-      saveAll();
+
+    document.onmouseup = () => {
+      document.onmousemove = null;
+      if(moved){
+        saveAll();
+      }else{
+        selectNode(el);
+      }
     };
   };
 }
 
-/* CONNECTIONS */
-function connectNearest(){
-  if(!selected) return;
-  let min=Infinity,target=null;
-  nodes.forEach(n=>{
-    if(n===selected) return;
-    const d=Math.hypot(
-      parseInt(n.style.left)-parseInt(selected.style.left),
-      parseInt(n.style.top)-parseInt(selected.style.top)
-    );
-    if(d<min){min=d;target=n;}
-  });
-  if(target){
-    connections.push([selected,target]);
-    drawLines();
-    updateCanvasSize();
-    saveAll();
-  }
-}
-
+/* ======================
+   CONNECTIONS
+====================== */
 function drawLines(){
-  svg.innerHTML="";
+  svg.innerHTML = "";
   connections.forEach(([a,b])=>{
-    const l=document.createElementNS("http://www.w3.org/2000/svg","line");
-    l.setAttribute("x1",parseInt(a.style.left)+45);
-    l.setAttribute("y1",parseInt(a.style.top)+45);
-    l.setAttribute("x2",parseInt(b.style.left)+45);
-    l.setAttribute("y2",parseInt(b.style.top)+45);
+    const l = document.createElementNS("http://www.w3.org/2000/svg","line");
+    l.setAttribute("x1", parseInt(a.style.left)+45);
+    l.setAttribute("y1", parseInt(a.style.top)+45);
+    l.setAttribute("x2", parseInt(b.style.left)+45);
+    l.setAttribute("y2", parseInt(b.style.top)+45);
     l.setAttribute("stroke","#aaa");
     l.setAttribute("stroke-width","2");
     svg.appendChild(l);
   });
 }
 
-/* PANEL */
-titleInput.oninput=()=>{
+function connectNearest(){
   if(!selected) return;
-  selected.dataset.title=titleInput.value;
-  selected.querySelector(".node-title").textContent=titleInput.value;
+  let min = Infinity, target = null;
+
+  nodes.forEach(n=>{
+    if(n === selected) return;
+    const d = Math.hypot(
+      parseInt(n.style.left)-parseInt(selected.style.left),
+      parseInt(n.style.top)-parseInt(selected.style.top)
+    );
+    if(d < min){ min = d; target = n; }
+  });
+
+  if(target){
+    connections.push([selected, target]);
+    drawLines();
+    saveAll();
+  }
+}
+
+/* ======================
+   PANEL INPUTS
+====================== */
+titleInput.oninput = ()=>{
+  if(!selected) return;
+  selected.dataset.title = titleInput.value;
+  selected.querySelector(".node-title").textContent = titleInput.value;
   saveAll();
 };
 
-descInput.oninput=()=>{
+descInput.oninput = ()=>{
   if(!selected) return;
-  selected.dataset.desc=descInput.value;
+  selected.dataset.desc = descInput.value;
   saveAll();
 };
 
-sizeInput.oninput=()=>{
+sizeInput.oninput = ()=>{
   if(!selected) return;
-  selected.dataset.size=sizeInput.value;
-  selected.style.transform=`scale(${sizeInput.value})`;
+  selected.dataset.size = sizeInput.value;
+  selected.style.transform = `scale(${sizeInput.value})`;
   drawLines();
-  updateCanvasSize();
   saveAll();
 };
 
-fileInput.onchange=()=>{
-  if(!selected||!fileInput.files[0]) return;
-  const r=new FileReader();
-  r.onload=e=>{
-    selected.dataset.img=e.target.result;
-    const b=selected.querySelector(".bubble");
-    b.innerHTML="";
-    const img=document.createElement("img");
-    img.src=e.target.result;
+fileInput.onchange = ()=>{
+  if(!selected || !fileInput.files[0]) return;
+  const r = new FileReader();
+  r.onload = e=>{
+    selected.dataset.img = e.target.result;
+    const b = selected.querySelector(".bubble");
+    b.innerHTML = "";
+    const img = document.createElement("img");
+    img.src = e.target.result;
     b.appendChild(img);
     saveAll();
   };
   r.readAsDataURL(fileInput.files[0]);
 };
 
-/* BUTTONS */
-btnAdd.onclick=()=>addBubble();
-btnConnect.onclick=connectNearest;
+/* ======================
+   BUTTONS
+====================== */
+btnAdd.onclick = ()=> addBubble();
+btnConnect.onclick = connectNearest;
 
-btnClear.onclick=()=>{
+btnClear.onclick = ()=>{
   if(!selected) return;
-  connections=connections.filter(c=>c[0]!==selected&&c[1]!==selected);
+  connections = connections.filter(c=>c[0]!==selected && c[1]!==selected);
   drawLines();
   saveAll();
 };
 
-btnDelete.onclick=()=>{
+btnDelete.onclick = ()=>{
   if(!selected) return;
-  connections=connections.filter(c=>c[0]!==selected&&c[1]!==selected);
-  nodes=nodes.filter(n=>n!==selected);
+  connections = connections.filter(c=>c[0]!==selected && c[1]!==selected);
+  nodes = nodes.filter(n=>n!==selected);
   selected.remove();
-  selected=null;
-  panel.hidden=true;
+  selected = null;
+  panel.hidden = true;
   drawLines();
-  updateCanvasSize();
   saveAll();
 };
 
-/* SAVE */
+/* ======================
+   SAVE / LOAD
+====================== */
 function saveAll(){
-  set(treeRef,{
-    nodes:nodes.map(n=>({
-      left:n.style.left,
-      top:n.style.top,
-      title:n.dataset.title,
-      desc:n.dataset.desc,
-      img:n.dataset.img,
-      size:n.dataset.size
-    })),
-    connections:connections.map(c=>[
-      nodes.indexOf(c[0]),
-      nodes.indexOf(c[1])
-    ])
-  });
+  clearTimeout(saveTimer);
+
+  saveTimer = setTimeout(async ()=>{
+    const treeId = document.body.dataset.tree;
+
+    await supabase.from("skill_nodes").upsert(
+      nodes.map(n=>({
+        id:n.dataset.id,
+        tree_id:treeId,
+        left_pos:n.style.left,
+        top_pos:n.style.top,
+        title:n.dataset.title,
+        description:n.dataset.desc,
+        image:n.dataset.img,
+        size:n.dataset.size
+      }))
+    );
+
+    await supabase
+      .from("skill_connections")
+      .delete()
+      .eq("tree_id", treeId);
+
+    if(connections.length){
+      await supabase.from("skill_connections").insert(
+        connections.map(c=>({
+          tree_id:treeId,
+          from_node:c[0].dataset.id,
+          to_node:c[1].dataset.id
+        }))
+      );
+    }
+  }, 300);
 }
 
-/* LOAD ONCE */
-get(treeRef).then(snap=>{
-  if(!snap.exists()) return;
-  const d=snap.val();
-  d.nodes?.forEach(n=>addBubble(n,true));
-  d.connections?.forEach(([i,j])=>{
-    if(nodes[i]&&nodes[j]) connections.push([nodes[i],nodes[j]]);
+async function loadTree(){
+  const treeId = document.body.dataset.tree;
+
+  const { data:nodesData } = await supabase
+    .from("skill_nodes")
+    .select("*")
+    .eq("tree_id", treeId);
+
+  nodesData?.forEach(n=>addBubble({
+    id:n.id,
+    left:n.left_pos,
+    top:n.top_pos,
+    title:n.title,
+    desc:n.description,
+    img:n.image,
+    size:n.size
+  }, true));
+
+  const { data:connData } = await supabase
+    .from("skill_connections")
+    .select("*")
+    .eq("tree_id", treeId);
+
+  connData?.forEach(c=>{
+    const a = nodes.find(n=>n.dataset.id===c.from_node);
+    const b = nodes.find(n=>n.dataset.id===c.to_node);
+    if(a && b) connections.push([a,b]);
   });
+
   drawLines();
-  updateCanvasSize();
-});
+}
+
+loadTree();
 </script>
 
 </body>
