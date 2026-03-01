@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RPG Dice Roller</title>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<style>
+body {
+    font-family: 'Segoe UI', sans-serif;
+    background: linear-gradient(135deg, #141E30, #243B55);
+    color: white;
+    text-align: center;
+    padding: 30px;
+}
+
+h1 {
+    margin-bottom: 20px;
+}
+
+.container {
+    max-width: 700px;
+    margin: auto;
+}
+
+input {
+    padding: 10px;
+    width: 80%;
+    margin: 10px 0;
+    border-radius: 8px;
+    border: none;
+    font-size: 16px;
+}
+
+button {
+    padding: 10px 15px;
+    margin: 5px;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    background: #00c6ff;
+    color: black;
+    font-weight: bold;
+    transition: 0.2s;
+}
+
+button:hover {
+    transform: scale(1.1);
+    background: #00ffcc;
+}
+
+.dice-buttons button {
+    background: #ff9800;
+    color: white;
+}
+
+.result {
+    margin-top: 20px;
+    font-size: 20px;
+    font-weight: bold;
+}
+
+.saved-rolls {
+    margin-top: 30px;
+    text-align: left;
+}
+
+.roll-card {
+    background: rgba(255,255,255,0.1);
+    padding: 10px;
+    margin: 8px 0;
+    border-radius: 8px;
+}
+</style>
+</head>
+<body>
+
+<h1>🎲 RPG Dice Roller</h1>
+
+<div class="container">
+
+<input type="text" id="rollName" placeholder="Nome da rolagem (ex: Dano do Bastão)">
+<input type="text" id="formula" placeholder="Fórmula (ex: 1d4 + 3d6 + 3)">
+
+<div class="dice-buttons">
+<button onclick="addDice('d4')">d4</button>
+<button onclick="addDice('d6')">d6</button>
+<button onclick="addDice('d8')">d8</button>
+<button onclick="addDice('d10')">d10</button>
+<button onclick="addDice('d12')">d12</button>
+<button onclick="addDice('d20')">d20</button>
+</div>
+
+<br>
+<button onclick="saveRoll()">💾 Salvar</button>
+<button onclick="rollDice()">🎲 Rolar</button>
+
+<div class="result" id="result"></div>
+
+<div class="saved-rolls">
+<h2>Rolagens Salvas</h2>
+<div id="rollList"></div>
+</div>
+
+</div>
+
+<script>
+// 🔥 COLOQUE SEUS DADOS DO SUPABASE AQUI
+const SUPABASE_URL = "COLE_SUA_URL_AQUI";
+const SUPABASE_KEY = "COLE_SUA_ANON_KEY_AQUI";
+
+const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+// Adiciona dado no input
+function addDice(dice) {
+    const formulaInput = document.getElementById("formula");
+    formulaInput.value += (formulaInput.value ? " + 1" : "1") + dice;
+}
+
+// Calcula rolagem
+function rollDice(formulaText = null) {
+    const formula = formulaText || document.getElementById("formula").value;
+    let total = 0;
+
+    const parts = formula.split("+");
+
+    parts.forEach(part => {
+        part = part.trim();
+
+        if (part.includes("d")) {
+            const [qty, dice] = part.split("d");
+            const quantity = parseInt(qty);
+            const sides = parseInt(dice);
+
+            for (let i = 0; i < quantity; i++) {
+                total += Math.floor(Math.random() * sides) + 1;
+            }
+        } else {
+            total += parseInt(part);
+        }
+    });
+
+    document.getElementById("result").innerText =
+        `Resultado (${formula}) = ${total}`;
+
+    return total;
+}
+
+// Salvar no Supabase
+async function saveRoll() {
+    const name = document.getElementById("rollName").value;
+    const formula = document.getElementById("formula").value;
+
+    if (!name || !formula) {
+        alert("Preencha nome e fórmula!");
+        return;
+    }
+
+    const { error } = await supabase
+        .from("rolls")
+        .insert([{ name, formula }]);
+
+    if (!error) {
+        alert("Salvo com sucesso!");
+        loadRolls();
+    } else {
+        alert("Erro ao salvar.");
+    }
+}
+
+// Carregar rolagens
+async function loadRolls() {
+    const { data, error } = await supabase
+        .from("rolls")
+        .select("*")
+        .order("created_at", { ascending: false });
+
+    const rollList = document.getElementById("rollList");
+    rollList.innerHTML = "";
+
+    data.forEach(roll => {
+        const div = document.createElement("div");
+        div.classList.add("roll-card");
+
+        div.innerHTML = `
+            <strong>${roll.name}</strong><br>
+            ${roll.formula}
+            <br>
+            <button onclick="rollDice('${roll.formula}')">Rolar</button>
+        `;
+
+        rollList.appendChild(div);
+    });
+}
+
+// Carrega ao abrir o site
+loadRolls();
+</script>
+
+</body>
+</html>
