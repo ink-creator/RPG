@@ -1,432 +1,188 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="UTF-8">
-<title>Árvore de Habilidades</title>
-
-<style>
-body{
-  margin:0;
-  background:#0b0b12;
-  font-family:Arial,sans-serif;
-  overflow:auto;
-}
-#toolbar{
-  position:fixed;
-  top:10px;
-  left:10px;
-  z-index:10;
-}
-#toolbar button{
-  padding:10px 14px;
-  background:#6a5acd;
-  border:none;
-  color:#fff;
-  border-radius:8px;
-  cursor:pointer;
-}
-#canvas{
-  position:relative;
-  min-width:100vw;
-  min-height:100vh;
-}
-svg{
-  position:absolute;
-  top:0;
-  left:0;
-  pointer-events:none;
-}
-.node{
-  position:absolute;
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  cursor:grab;
-}
-.node.selected .bubble{
-  border-color:#6a5acd;
-  box-shadow:0 0 10px #6a5acd;
-}
-.bubble{
-  width:90px;
-  height:90px;
-  border-radius:50%;
-  background:#222;
-  border:2px solid #aaa;
-  overflow:hidden;
-}
-.bubble img{
-  width:100%;
-  height:100%;
-  object-fit:cover;
-}
-.node-title{
-  margin-top:6px;
-  font-size:12px;
-  color:#fff;
-  text-align:center;
-}
-#panel{
-  position:fixed;
-  right:20px;
-  top:20px;
-  width:260px;
-  background:#151520;
-  border-radius:12px;
-  padding:14px;
-  color:#fff;
-  z-index:20;
-}
-#panel input,
-#panel textarea{
-  width:100%;
-  background:#0f0f18;
-  color:#fff;
-  border:1px solid #444;
-  border-radius:6px;
-  padding:6px;
-  margin-bottom:8px;
-}
-.panel-btn{
-  width:100%;
-  padding:8px;
-  margin-top:6px;
-  background:#6a5acd;
-  border:none;
-  color:#fff;
-  border-radius:6px;
-  cursor:pointer;
-}
-.warn{background:#e67e22;}
-.danger{background:#c0392b;}
-
-#resultBox{
-  position:fixed;
-  bottom:20px;
-  left:50%;
-  transform:translateX(-50%);
-  background:#6a5acd;
-  padding:12px 20px;
-  border-radius:10px;
-  font-weight:bold;
-  display:none;
-}
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ficha</title>
+  <link rel="stylesheet" href="../style.css">
 </head>
+<body data-player="p1">
 
-<body data-tree="p1">
+<div class="sheet">
 
-<div id="toolbar">
-  <button id="btnAdd">➕ Adicionar Bolha</button>
-</div>
+  <!-- TOPO -->
+  <div class="top">
 
-<div id="canvas">
-  <svg id="lines"></svg>
-</div>
+    <!-- INFO ESQUERDA -->
+    <div class="info left">
+      <div class="fields-group">
+        <div class="field"><label>Nome</label><input id="nome"></div>
+        <div class="field"><label>Raça</label><input id="raca"></div>
+        <div class="field"><label>Semi Raça</label><input id="sraca"></div>
+        <div class="field"><label>Altura</label><input id="altura"></div>
+        <div class="field"><label>Idade</label><input id="idade"></div>
+        <div class="field"><label>Peso</label><input id="peso"></div>
+        <div class="field"><label>Dinheiro</label><input id="dinheiro"></div>
+        <div class="field"><label class="roll-label" data-input="generico">Genérico</label><input id="generico" type="number"></div>
+      </div>
+    </div>
 
-<div id="panel" hidden>
-  <input id="titleInput" placeholder="Nome">
-  <textarea id="descInput" placeholder="Descrição"></textarea>
-  <input id="diceInput" placeholder="Fórmula de Dado (ex: 2d6 + 3)">
-  <button class="panel-btn" id="btnRoll">🎲 Rolar Skill</button>
-  <input id="fileInput" type="file" accept="image/*">
-  <input id="sizeInput" type="range" min="0.5" max="2" step="0.05">
-  <button class="panel-btn" id="btnConnect">🔗 Conectar próxima</button>
-  <button class="panel-btn warn" id="btnClear">❌ Remover ligações</button>
-  <button class="panel-btn danger" id="btnDelete">🗑️ Excluir bolha</button>
-</div>
+    <!-- GERAIS -->
+    <div class="info center">
+      <h2>GERAIS</h2>
+      <div class="fields-group">
+        <div class="field"><label class="roll-label" data-input="agilidade">Agilidade</label><input id="agilidade" type="number"></div>
+        <div class="field"><label class="roll-label" data-input="briga">Briga</label><input id="briga" type="number"></div>
+        <div class="field"><label class="roll-label" data-input="constituicao">Constituição</label><input id="constituicao" type="number"></div>
+        <div class="field"><label class="roll-label" data-input="destreza">Destreza</label><input id="destreza" type="number"></div>
+        <div class="field"><label class="roll-label" data-input="forca">Força</label><input id="forca" type="number"></div>
+        <div class="field"><label class="roll-label" data-input="furtar">Furtar</label><input id="furtar" type="number"></div>
+        <div class="field"><label class="roll-label" data-input="furtividade">Furtividade</label><input id="furtividade" type="number"></div>
+        <div class="field"><label class="roll-label" data-input="intelecto">Intelecto</label><input id="intelecto" type="number"></div>
+        <div class="field"><label class="roll-label" data-input="sorte">Sorte</label><input id="sorte" type="number"></div>
+        <div class="field"><label class="roll-label" data-input="vigilancia">Vigilância</label><input id="vigilancia" type="number"></div>
+        <div class="field"><label class="roll-label" data-input="vontade">Vontade</label><input id="vontade" type="number"></div>
+        <div class="field"><label class="roll-label" data-input="voar">Voar</label><input id="voar" type="number"></div>
+      </div>
+    </div>
 
-<div id="resultBox"></div>
+    <!-- STATUS -->
+    <div class="info right">
+      <div class="status-container">
+        <!-- VIDA -->
+        <div class="bar-group">
+          <label>VIDA</label>
+          <div class="bar-inputs">
+            <div class="field"><label>Atual</label><input id="vida-atual" type="number"></div>
+            <span>/</span>
+            <div class="field"><label>Máx</label><input id="vida-max" type="number"></div>
+          </div>
+          <div class="bar"><div id="vida"></div></div>
+          <div class="field"><label>Resistência</label><input id="vida-resistencia"></div>
+        </div>
 
-<script type="module">
-import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
+        <!-- SANIDADE -->
+        <div class="bar-group">
+          <label>SANIDADE</label>
+          <div class="bar-inputs">
+            <div class="field"><label>Atual</label><input id="sanidade-atual" type="number"></div>
+            <span>/</span>
+            <div class="field"><label>Máx</label><input id="sanidade-max" type="number"></div>
+          </div>
+          <div class="bar"><div id="sanidade"></div></div>
+          <div class="field"><label>Resistência</label><input id="sanidade-resistencia"></div>
+        </div>
 
-const supabase = createClient(
-  "https://zhfqewgnnfejfyfkmyae.supabase.co",
-  "sb_publishable_DGpfjOL9IQ4t8DEiz06fhQ_YDnJABI6"
-);
+        <!-- ENERGIA -->
+        <div class="bar-group">
+          <label>ENERGIA</label>
+          <div class="bar-inputs">
+            <div class="field"><label>Atual</label><input id="energia-atual" type="number"></div>
+            <span>/</span>
+            <div class="field"><label>Máx</label><input id="energia-max" type="number"></div>
+          </div>
+          <div class="bar"><div id="energia"></div></div>
+          <div class="field"><label>Resistência</label><input id="energia-resistencia"></div>
+        </div>
+      </div>
+    </div>
 
-const canvas = document.getElementById("canvas");
-const svg = document.getElementById("lines");
-const panel = document.getElementById("panel");
-const resultBox = document.getElementById("resultBox");
+  </div>
 
-const titleInput = document.getElementById("titleInput");
-const descInput  = document.getElementById("descInput");
-const diceInput  = document.getElementById("diceInput");
-const fileInput  = document.getElementById("fileInput");
-const sizeInput  = document.getElementById("sizeInput");
+  <!-- MEIO -->
+  <div class="middle">
 
-const btnAdd     = document.getElementById("btnAdd");
-const btnConnect = document.getElementById("btnConnect");
-const btnClear   = document.getElementById("btnClear");
-const btnDelete  = document.getElementById("btnDelete");
-const btnRoll    = document.getElementById("btnRoll");
+    <div class="block">
+      <h2>INTERPESSOAL</h2>
+      <div class="fields-group">
+        <div class="field"><label class="roll-label" data-input="charme">Charme</label><input id="charme" type="number"></div>
+        <div class="field"><label class="roll-label" data-input="disfarce">Disfarce</label><input id="disfarce" type="number"></div>
+        <div class="field"><label class="roll-label" data-input="elogiar">Elogiar</label><input id="elogiar" type="number"></div>
+        <div class="field"><label class="roll-label" data-input="flertar">Flertar</label><input id="flertar" type="number"></div>
+        <div class="field"><label class="roll-label" data-input="interrogar">Interrogar</label><input id="interrogar" type="number"></div>
+        <div class="field"><label class="roll-label" data-input="intimidar">Intimidar</label><input id="intimidar" type="number"></div>
+        <div class="field"><label class="roll-label" data-input="manipulacao">Manipulação</label><input id="manipulacao" type="number"></div>
+        <div class="field"><label class="roll-label" data-input="negociar">Negociar</label><input id="negociar" type="number"></div>
+        <div class="field"><label class="roll-label" data-input="provocar">Provocar</label><input id="provocar" type="number"></div>
+        <div class="field"><label class="roll-label" data-input="psicologia">Psicologia</label><input id="psicologia" type="number"></div>
+        <div class="field"><label class="roll-label" data-input="terapia">Terapia</label><input id="terapia" type="number"></div>
+      </div>
+    </div>
 
-let nodes = [];
-let connections = [];
-let selected = null;
-let saveTimer = null;
+    <div class="block">
+      <h2>TÉCNICO</h2>
+      <div class="fields-group">
+        <div class="field"><label class="roll-label" data-input="analise-documentos">Análise de Documentos</label><input id="analise-documentos" type="number"></div>
+        <div class="field"><label class="roll-label" data-input="aviacao">Aviação</label><input id="aviacao" type="number"></div>
+        <div class="field"><label class="roll-label" data-input="balistica">Balística</label><input id="balistica" type="number"></div>
+        <div class="field"><label class="roll-label" data-input="cartografia">Cartografia</label><input id="cartografia" type="number"></div>
+        <div class="field"><label class="roll-label" data-input="explosivos">Explosivos</label><input id="explosivos" type="number"></div>
+        <div class="field"><label class="roll-label" data-input="falsificacao">Falsificação</label><input id="falsificacao" type="number"></div>
+        <div class="field"><label class="roll-label" data-input="forense">Perícia Forense</label><input id="forense" type="number"></div>
+        <div class="field"><label class="roll-label" data-input="mecanica">Mecânica</label><input id="mecanica" type="number"></div>
+        <div class="field"><label class="roll-label" data-input="pesquisa">Pesquisa</label><input id="pesquisa" type="number"></div>
+        <div class="field"><label class="roll-label" data-input="pilotagem">Pilotagem</label><input id="pilotagem" type="number"></div>
+        <div class="field"><label class="roll-label" data-input="tecnologia">Tecnologia</label><input id="tecnologia" type="number"></div>
+      </div>
+    </div>
 
-function updateCanvasSize(){
-  let maxX = window.innerWidth;
-  let maxY = window.innerHeight;
+    <div class="block">
+      <h2>ACADÊMICO</h2>
+      <div class="fields-group">
+        <div class="field"><label class="roll-label" data-input="curiosidades">Conhecimento Geral</label><input id="curiosidades" type="number"></div>
+        <div class="field"><label class="roll-label" data-input="fisica">Física</label><input id="fisica" type="number"></div>
+        <div class="field"><label class="roll-label" data-input="geografia">Geografia</label><input id="geografia" type="number"></div>
+        <div class="field"><label class="roll-label" data-input="historia">História</label><input id="historia" type="number"></div>
+        <div class="field"><label class="roll-label" data-input="historia-artistica">História Artística</label><input id="historia-artistica" type="number"></div>
+        <div class="field"><label class="roll-label" data-input="historia-natural">História Natural</label><input id="historia-natural" type="number"></div>
+        <div class="field"><label class="roll-label" data-input="linguagem">Linguagem</label><input id="linguagem" type="number"></div>
+        <div class="field"><label class="roll-label" data-input="matematica">Matemática</label><input id="matematica" type="number"></div>
+        <div class="field"><label class="roll-label" data-input="poderes">Poderes</label><input id="poderes" type="number"></div>
+        <div class="field"><label class="roll-label" data-input="quimica">Química</label><input id="quimica" type="number"></div>
+        <div class="field"><label class="roll-label" data-input="religiao">Religião</label><input id="religiao" type="number"></div>
+      </div>
+    </div>
 
-  nodes.forEach(n=>{
-    maxX = Math.max(maxX, parseInt(n.style.left) + 300);
-    maxY = Math.max(maxY, parseInt(n.style.top) + 300);
-  });
+  </div>
 
-  canvas.style.width = maxX+"px";
-  canvas.style.height = maxY+"px";
-  svg.setAttribute("width", maxX);
-  svg.setAttribute("height", maxY);
-}
-
-function addBubble(data={}, silent=false){
-  const node = document.createElement("div");
-  node.className = "node";
-  node.dataset.id = data.id || crypto.randomUUID();
-
-  node.style.left = data.left || "200px";
-  node.style.top  = data.top  || "200px";
-  node.dataset.title = data.title || "";
-  node.dataset.desc  = data.desc  || "";
-  node.dataset.img   = data.img   || "";
-  node.dataset.size  = data.size  || "1";
-  node.dataset.dice  = data.dice  || "";
-
-  node.style.transform = `scale(${node.dataset.size})`;
-
-  const bubble = document.createElement("div");
-  bubble.className = "bubble";
-
-  if(node.dataset.img){
-    const img = document.createElement("img");
-    img.src = node.dataset.img;
-    bubble.appendChild(img);
-  }
-
-  const title = document.createElement("div");
-  title.className = "node-title";
-  title.textContent = node.dataset.title;
-
-  node.append(bubble, title);
-  drag(node);
-  canvas.appendChild(node);
-  nodes.push(node);
-
-  updateCanvasSize();
-  if(!silent) saveAll();
-}
-
-function selectNode(node){
-  nodes.forEach(n=>n.classList.remove("selected"));
-  selected = node;
-  node.classList.add("selected");
-  panel.hidden = false;
-
-  titleInput.value = node.dataset.title;
-  descInput.value  = node.dataset.desc;
-  diceInput.value  = node.dataset.dice;
-  sizeInput.value  = node.dataset.size;
-}
-
-function drag(el){
-  let ox, oy, moved=false;
-  el.onmousedown = e=>{
-    moved=false;
-    ox=e.offsetX; oy=e.offsetY;
-
-    document.onmousemove=ev=>{
-      moved=true;
-      el.style.left=ev.pageX-ox+"px";
-      el.style.top=ev.pageY-oy+"px";
-      drawLines();
-    };
-
-    document.onmouseup=()=>{
-      document.onmousemove=null;
-      if(moved) saveAll();
-      else selectNode(el);
-    };
-  };
-}
-
-function drawLines(){
-  svg.innerHTML="";
-  connections.forEach(([a,b])=>{
-    const l=document.createElementNS("http://www.w3.org/2000/svg","line");
-    l.setAttribute("x1",parseInt(a.style.left)+45);
-    l.setAttribute("y1",parseInt(a.style.top)+45);
-    l.setAttribute("x2",parseInt(b.style.left)+45);
-    l.setAttribute("y2",parseInt(b.style.top)+45);
-    l.setAttribute("stroke","#aaa");
-    l.setAttribute("stroke-width","2");
-    svg.appendChild(l);
-  });
-}
-
-function connectNearest(){
-  if(!selected) return;
-  let min=Infinity,target=null;
-  nodes.forEach(n=>{
-    if(n===selected) return;
-    const d=Math.hypot(
-      parseInt(n.style.left)-parseInt(selected.style.left),
-      parseInt(n.style.top)-parseInt(selected.style.top)
-    );
-    if(d<min){min=d;target=n;}
-  });
-  if(target){
-    connections.push([selected,target]);
-    drawLines();
-    saveAll();
-  }
-}
-
-function rollDiceFormula(formula){
-  if(!formula) return alert("Sem fórmula definida!");
-  let total=0;
-  formula.split("+").forEach(part=>{
-    part=part.trim();
-    if(part.includes("d")){
-      const [qty,sides]=part.split("d");
-      for(let i=0;i<parseInt(qty);i++){
-        total+=Math.floor(Math.random()*parseInt(sides))+1;
-      }
-    }else{
-      total+=parseInt(part);
-    }
-  });
-  resultBox.textContent="🎲 Resultado: "+total;
-  resultBox.style.display="block";
-  setTimeout(()=>resultBox.style.display="none",3000);
-}
-
-titleInput.oninput=()=>{
-  if(!selected) return;
-  selected.dataset.title=titleInput.value;
-  selected.querySelector(".node-title").textContent=titleInput.value;
-  saveAll();
-};
-
-descInput.oninput=()=>{
-  if(!selected) return;
-  selected.dataset.desc=descInput.value;
-  saveAll();
-};
-
-diceInput.oninput=()=>{
-  if(!selected) return;
-  selected.dataset.dice=diceInput.value;
-  saveAll();
-};
-
-sizeInput.oninput=()=>{
-  if(!selected) return;
-  selected.dataset.size=sizeInput.value;
-  selected.style.transform=`scale(${sizeInput.value})`;
-  drawLines();
-  saveAll();
-};
-
-btnRoll.onclick=()=>{
-  if(!selected) return;
-  rollDiceFormula(selected.dataset.dice);
-};
-
-btnAdd.onclick=()=>addBubble();
-btnConnect.onclick=connectNearest;
-
-btnClear.onclick=()=>{
-  if(!selected) return;
-  connections=connections.filter(c=>c[0]!==selected&&c[1]!==selected);
-  drawLines();
-  saveAll();
-};
-
-btnDelete.onclick=()=>{
-  if(!selected) return;
-  connections=connections.filter(c=>c[0]!==selected&&c[1]!==selected);
-  nodes=nodes.filter(n=>n!==selected);
-  selected.remove();
-  selected=null;
-  panel.hidden=true;
-  drawLines();
-  saveAll();
-};
-
-function saveAll(){
-  clearTimeout(saveTimer);
-  saveTimer=setTimeout(async()=>{
-    const treeId=document.body.dataset.tree;
-
-    await supabase.from("skill_nodes").upsert(
-      nodes.map(n=>({
-        id:n.dataset.id,
-        tree_id:treeId,
-        left_pos:n.style.left,
-        top_pos:n.style.top,
-        title:n.dataset.title,
-        description:n.dataset.desc,
-        image:n.dataset.img,
-        size:n.dataset.size,
-        dice_formula:n.dataset.dice
-      }))
-    );
-
-    await supabase.from("skill_connections")
-      .delete()
-      .eq("tree_id",treeId);
-
-    if(connections.length){
-      await supabase.from("skill_connections").insert(
-        connections.map(c=>({
-          tree_id:treeId,
-          from_node:c[0].dataset.id,
-          to_node:c[1].dataset.id
-        }))
-      );
-    }
-  },300);
-}
-
-async function loadTree(){
-  const treeId=document.body.dataset.tree;
-
-  const { data:nodesData }=await supabase
-    .from("skill_nodes")
-    .select("*")
-    .eq("tree_id",treeId);
-
-  nodesData?.forEach(n=>addBubble({
-    id:n.id,
-    left:n.left_pos,
-    top:n.top_pos,
-    title:n.title,
-    desc:n.description,
-    img:n.image,
-    size:n.size,
-    dice:n.dice_formula
-  },true));
-
-  const { data:connData }=await supabase
-    .from("skill_connections")
-    .select("*")
-    .eq("tree_id",treeId);
-
-  connData?.forEach(c=>{
-    const a=nodes.find(n=>n.dataset.id===c.from_node);
-    const b=nodes.find(n=>n.dataset.id===c.to_node);
-    if(a&&b) connections.push([a,b]);
-  });
-
-  drawLines();
-}
-
-loadTree();
+<script>
+  localStorage.setItem("playerId", "p1");
 </script>
 
+<div id="dice-overlay">
+  <div style="display:flex; flex-direction:column; align-items:center; gap:16px;">
+    <div id="dice-sprite"></div>
+    <div id="dice-text" class="dice-text"></div>
+  </div>
+</div>
+
+
+<a href="../arvore1.html"
+   style="
+     display:inline-block;
+     margin-top:12px;
+     padding:6px 14px;
+     font-family:'Times New Roman', serif;
+     font-size:16px;
+     letter-spacing:1px;
+     color:#ff1a1a;
+     text-decoration:none;
+     border:1px solid #ff1a1a;
+     background:linear-gradient(180deg,#1a1a1a,#050505);
+     box-shadow: inset 0 0 6px rgba(255,0,0,0.4), 0 0 10px rgba(255,0,0,0.2);
+     transition:all 0.25s ease;
+   "
+   onmouseover="
+     this.style.color='#ffffff';
+     this.style.boxShadow='inset 0 0 10px rgba(255,0,0,0.8), 0 0 18px rgba(255,0,0,0.6)';
+   "
+   onmouseout="
+     this.style.color='#ff1a1a';
+     this.style.boxShadow='inset 0 0 6px rgba(255,0,0,0.4), 0 0 10px rgba(255,0,0,0.2)';
+   ">
+⛧ Skill Tree ⛧
+</a>
+
+<script type="module" src="../main.js"></script>
 </body>
 </html>
