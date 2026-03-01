@@ -99,6 +99,18 @@ svg{
 }
 .warn{background:#e67e22;}
 .danger{background:#c0392b;}
+
+#resultBox{
+  position:fixed;
+  bottom:20px;
+  left:50%;
+  transform:translateX(-50%);
+  background:#6a5acd;
+  padding:12px 20px;
+  border-radius:10px;
+  font-weight:bold;
+  display:none;
+}
 </style>
 </head>
 
@@ -115,6 +127,8 @@ svg{
 <div id="panel" hidden>
   <input id="titleInput" placeholder="Nome">
   <textarea id="descInput" placeholder="Descrição"></textarea>
+  <input id="diceInput" placeholder="Fórmula de Dado (ex: 2d6 + 3)">
+  <button class="panel-btn" id="btnRoll">🎲 Rolar Skill</button>
   <input id="fileInput" type="file" accept="image/*">
   <input id="sizeInput" type="range" min="0.5" max="2" step="0.05">
   <button class="panel-btn" id="btnConnect">🔗 Conectar próxima</button>
@@ -122,26 +136,24 @@ svg{
   <button class="panel-btn danger" id="btnDelete">🗑️ Excluir bolha</button>
 </div>
 
+<div id="resultBox"></div>
+
 <script type="module">
 import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
 
-/* ======================
-   SUPABASE
-====================== */
 const supabase = createClient(
   "https://zhfqewgnnfejfyfkmyae.supabase.co",
   "sb_publishable_DGpfjOL9IQ4t8DEiz06fhQ_YDnJABI6"
 );
 
-/* ======================
-   DOM
-====================== */
 const canvas = document.getElementById("canvas");
 const svg = document.getElementById("lines");
 const panel = document.getElementById("panel");
+const resultBox = document.getElementById("resultBox");
 
 const titleInput = document.getElementById("titleInput");
 const descInput  = document.getElementById("descInput");
+const diceInput  = document.getElementById("diceInput");
 const fileInput  = document.getElementById("fileInput");
 const sizeInput  = document.getElementById("sizeInput");
 
@@ -149,18 +161,13 @@ const btnAdd     = document.getElementById("btnAdd");
 const btnConnect = document.getElementById("btnConnect");
 const btnClear   = document.getElementById("btnClear");
 const btnDelete  = document.getElementById("btnDelete");
+const btnRoll    = document.getElementById("btnRoll");
 
-/* ======================
-   ESTADO
-====================== */
 let nodes = [];
 let connections = [];
 let selected = null;
 let saveTimer = null;
 
-/* ======================
-   UTIL
-====================== */
 function updateCanvasSize(){
   let maxX = window.innerWidth;
   let maxY = window.innerHeight;
@@ -176,9 +183,6 @@ function updateCanvasSize(){
   svg.setAttribute("height", maxY);
 }
 
-/* ======================
-   CREATE
-====================== */
 function addBubble(data={}, silent=false){
   const node = document.createElement("div");
   node.className = "node";
@@ -190,6 +194,7 @@ function addBubble(data={}, silent=false){
   node.dataset.desc  = data.desc  || "";
   node.dataset.img   = data.img   || "";
   node.dataset.size  = data.size  || "1";
+  node.dataset.dice  = data.dice  || "";
 
   node.style.transform = `scale(${node.dataset.size})`;
 
@@ -208,7 +213,6 @@ function addBubble(data={}, silent=false){
 
   node.append(bubble, title);
   drag(node);
-
   canvas.appendChild(node);
   nodes.push(node);
 
@@ -216,59 +220,47 @@ function addBubble(data={}, silent=false){
   if(!silent) saveAll();
 }
 
-/* ======================
-   SELECT
-====================== */
 function selectNode(node){
   nodes.forEach(n=>n.classList.remove("selected"));
   selected = node;
   node.classList.add("selected");
   panel.hidden = false;
+
   titleInput.value = node.dataset.title;
   descInput.value  = node.dataset.desc;
+  diceInput.value  = node.dataset.dice;
   sizeInput.value  = node.dataset.size;
 }
 
-/* ======================
-   DRAG + CLICK
-====================== */
 function drag(el){
-  let ox, oy, moved = false;
+  let ox, oy, moved=false;
+  el.onmousedown = e=>{
+    moved=false;
+    ox=e.offsetX; oy=e.offsetY;
 
-  el.onmousedown = e => {
-    moved = false;
-    ox = e.offsetX;
-    oy = e.offsetY;
-
-    document.onmousemove = ev => {
-      moved = true;
-      el.style.left = ev.pageX - ox + "px";
-      el.style.top  = ev.pageY - oy + "px";
+    document.onmousemove=ev=>{
+      moved=true;
+      el.style.left=ev.pageX-ox+"px";
+      el.style.top=ev.pageY-oy+"px";
       drawLines();
     };
 
-    document.onmouseup = () => {
-      document.onmousemove = null;
-      if(moved){
-        saveAll();
-      }else{
-        selectNode(el);
-      }
+    document.onmouseup=()=>{
+      document.onmousemove=null;
+      if(moved) saveAll();
+      else selectNode(el);
     };
   };
 }
 
-/* ======================
-   CONNECTIONS
-====================== */
 function drawLines(){
-  svg.innerHTML = "";
+  svg.innerHTML="";
   connections.forEach(([a,b])=>{
-    const l = document.createElementNS("http://www.w3.org/2000/svg","line");
-    l.setAttribute("x1", parseInt(a.style.left)+45);
-    l.setAttribute("y1", parseInt(a.style.top)+45);
-    l.setAttribute("x2", parseInt(b.style.left)+45);
-    l.setAttribute("y2", parseInt(b.style.top)+45);
+    const l=document.createElementNS("http://www.w3.org/2000/svg","line");
+    l.setAttribute("x1",parseInt(a.style.left)+45);
+    l.setAttribute("y1",parseInt(a.style.top)+45);
+    l.setAttribute("x2",parseInt(b.style.left)+45);
+    l.setAttribute("y2",parseInt(b.style.top)+45);
     l.setAttribute("stroke","#aaa");
     l.setAttribute("stroke-width","2");
     svg.appendChild(l);
@@ -277,95 +269,98 @@ function drawLines(){
 
 function connectNearest(){
   if(!selected) return;
-  let min = Infinity, target = null;
-
+  let min=Infinity,target=null;
   nodes.forEach(n=>{
-    if(n === selected) return;
-    const d = Math.hypot(
+    if(n===selected) return;
+    const d=Math.hypot(
       parseInt(n.style.left)-parseInt(selected.style.left),
       parseInt(n.style.top)-parseInt(selected.style.top)
     );
-    if(d < min){ min = d; target = n; }
+    if(d<min){min=d;target=n;}
   });
-
   if(target){
-    connections.push([selected, target]);
+    connections.push([selected,target]);
     drawLines();
     saveAll();
   }
 }
 
-/* ======================
-   PANEL INPUTS
-====================== */
-titleInput.oninput = ()=>{
+function rollDiceFormula(formula){
+  if(!formula) return alert("Sem fórmula definida!");
+  let total=0;
+  formula.split("+").forEach(part=>{
+    part=part.trim();
+    if(part.includes("d")){
+      const [qty,sides]=part.split("d");
+      for(let i=0;i<parseInt(qty);i++){
+        total+=Math.floor(Math.random()*parseInt(sides))+1;
+      }
+    }else{
+      total+=parseInt(part);
+    }
+  });
+  resultBox.textContent="🎲 Resultado: "+total;
+  resultBox.style.display="block";
+  setTimeout(()=>resultBox.style.display="none",3000);
+}
+
+titleInput.oninput=()=>{
   if(!selected) return;
-  selected.dataset.title = titleInput.value;
-  selected.querySelector(".node-title").textContent = titleInput.value;
+  selected.dataset.title=titleInput.value;
+  selected.querySelector(".node-title").textContent=titleInput.value;
   saveAll();
 };
 
-descInput.oninput = ()=>{
+descInput.oninput=()=>{
   if(!selected) return;
-  selected.dataset.desc = descInput.value;
+  selected.dataset.desc=descInput.value;
   saveAll();
 };
 
-sizeInput.oninput = ()=>{
+diceInput.oninput=()=>{
   if(!selected) return;
-  selected.dataset.size = sizeInput.value;
-  selected.style.transform = `scale(${sizeInput.value})`;
+  selected.dataset.dice=diceInput.value;
+  saveAll();
+};
+
+sizeInput.oninput=()=>{
+  if(!selected) return;
+  selected.dataset.size=sizeInput.value;
+  selected.style.transform=`scale(${sizeInput.value})`;
   drawLines();
   saveAll();
 };
 
-fileInput.onchange = ()=>{
-  if(!selected || !fileInput.files[0]) return;
-  const r = new FileReader();
-  r.onload = e=>{
-    selected.dataset.img = e.target.result;
-    const b = selected.querySelector(".bubble");
-    b.innerHTML = "";
-    const img = document.createElement("img");
-    img.src = e.target.result;
-    b.appendChild(img);
-    saveAll();
-  };
-  r.readAsDataURL(fileInput.files[0]);
+btnRoll.onclick=()=>{
+  if(!selected) return;
+  rollDiceFormula(selected.dataset.dice);
 };
 
-/* ======================
-   BUTTONS
-====================== */
-btnAdd.onclick = ()=> addBubble();
-btnConnect.onclick = connectNearest;
+btnAdd.onclick=()=>addBubble();
+btnConnect.onclick=connectNearest;
 
-btnClear.onclick = ()=>{
+btnClear.onclick=()=>{
   if(!selected) return;
-  connections = connections.filter(c=>c[0]!==selected && c[1]!==selected);
+  connections=connections.filter(c=>c[0]!==selected&&c[1]!==selected);
   drawLines();
   saveAll();
 };
 
-btnDelete.onclick = ()=>{
+btnDelete.onclick=()=>{
   if(!selected) return;
-  connections = connections.filter(c=>c[0]!==selected && c[1]!==selected);
-  nodes = nodes.filter(n=>n!==selected);
+  connections=connections.filter(c=>c[0]!==selected&&c[1]!==selected);
+  nodes=nodes.filter(n=>n!==selected);
   selected.remove();
-  selected = null;
-  panel.hidden = true;
+  selected=null;
+  panel.hidden=true;
   drawLines();
   saveAll();
 };
 
-/* ======================
-   SAVE / LOAD
-====================== */
 function saveAll(){
   clearTimeout(saveTimer);
-
-  saveTimer = setTimeout(async ()=>{
-    const treeId = document.body.dataset.tree;
+  saveTimer=setTimeout(async()=>{
+    const treeId=document.body.dataset.tree;
 
     await supabase.from("skill_nodes").upsert(
       nodes.map(n=>({
@@ -376,14 +371,14 @@ function saveAll(){
         title:n.dataset.title,
         description:n.dataset.desc,
         image:n.dataset.img,
-        size:n.dataset.size
+        size:n.dataset.size,
+        dice_formula:n.dataset.dice
       }))
     );
 
-    await supabase
-      .from("skill_connections")
+    await supabase.from("skill_connections")
       .delete()
-      .eq("tree_id", treeId);
+      .eq("tree_id",treeId);
 
     if(connections.length){
       await supabase.from("skill_connections").insert(
@@ -394,16 +389,16 @@ function saveAll(){
         }))
       );
     }
-  }, 300);
+  },300);
 }
 
 async function loadTree(){
-  const treeId = document.body.dataset.tree;
+  const treeId=document.body.dataset.tree;
 
-  const { data:nodesData } = await supabase
+  const { data:nodesData }=await supabase
     .from("skill_nodes")
     .select("*")
-    .eq("tree_id", treeId);
+    .eq("tree_id",treeId);
 
   nodesData?.forEach(n=>addBubble({
     id:n.id,
@@ -412,18 +407,19 @@ async function loadTree(){
     title:n.title,
     desc:n.description,
     img:n.image,
-    size:n.size
-  }, true));
+    size:n.size,
+    dice:n.dice_formula
+  },true));
 
-  const { data:connData } = await supabase
+  const { data:connData }=await supabase
     .from("skill_connections")
     .select("*")
-    .eq("tree_id", treeId);
+    .eq("tree_id",treeId);
 
   connData?.forEach(c=>{
-    const a = nodes.find(n=>n.dataset.id===c.from_node);
-    const b = nodes.find(n=>n.dataset.id===c.to_node);
-    if(a && b) connections.push([a,b]);
+    const a=nodes.find(n=>n.dataset.id===c.from_node);
+    const b=nodes.find(n=>n.dataset.id===c.to_node);
+    if(a&&b) connections.push([a,b]);
   });
 
   drawLines();
