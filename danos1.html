@@ -1,202 +1,570 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>RPG Dice Roller</title>
+<title>Dice Manager</title>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <style>
 body {
-    font-family: 'Segoe UI', sans-serif;
-    background: linear-gradient(135deg, #141E30, #243B55);
-    color: white;
-    text-align: center;
-    padding: 30px;
-}
-
-h1 {
-    margin-bottom: 20px;
+  font-family: Arial, sans-serif;
+  background: linear-gradient(135deg,#0f2027,#203a43,#2c5364);
+  color: white;
+  text-align: center;
+  padding: 30px;
 }
 
 .container {
-    max-width: 700px;
-    margin: auto;
+  max-width: 600px;
+  margin: auto;
 }
 
 input {
-    padding: 10px;
-    width: 80%;
-    margin: 10px 0;
-    border-radius: 8px;
-    border: none;
-    font-size: 16px;
+  padding: 10px;
+  width: 90%;
+  margin: 8px 0;
+  border-radius: 8px;
+  border: none;
 }
 
 button {
-    padding: 10px 15px;
-    margin: 5px;
-    border-radius: 8px;
-    border: none;
-    cursor: pointer;
-    background: #00c6ff;
-    color: black;
-    font-weight: bold;
-    transition: 0.2s;
+  padding: 10px 15px;
+  margin: 5px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  font-weight: bold;
+  transition: 0.2s;
 }
 
 button:hover {
-    transform: scale(1.1);
-    background: #00ffcc;
+  transform: scale(1.05);
 }
 
-.dice-buttons button {
-    background: #ff9800;
-    color: white;
+.dice button {
+  background: #ff9800;
+  color: white;
 }
 
-.result {
-    margin-top: 20px;
-    font-size: 20px;
-    font-weight: bold;
-}
-
-.saved-rolls {
-    margin-top: 30px;
-    text-align: left;
+.action {
+  background: #00e676;
+  color: black;
 }
 
 .roll-card {
-    background: rgba(255,255,255,0.1);
-    padding: 10px;
-    margin: 8px 0;
-    border-radius: 8px;
+  background: rgba(255,255,255,0.1);
+  padding: 10px;
+  margin: 10px 0;
+  border-radius: 8px;
+}
+
+.result {
+  margin-top: 20px;
+  font-size: 20px;
+  font-weight: bold;
 }
 </style>
 </head>
 <body>
 
-<h1>🎲 RPG Dice Roller</h1>
+<h1>🎲 Gerenciador de Rolagens</h1>
 
 <div class="container">
 
-<input type="text" id="rollName" placeholder="Nome da rolagem (ex: Dano do Bastão)">
-<input type="text" id="formula" placeholder="Fórmula (ex: 1d4 + 3d6 + 3)">
+<input id="rollName" placeholder="Nome (ex: Dano do Bastão)">
+<input id="formula" placeholder="Fórmula (ex: 1d4 + 3d6 + 3)">
 
-<div class="dice-buttons">
-<button onclick="addDice('d4')">d4</button>
-<button onclick="addDice('d6')">d6</button>
-<button onclick="addDice('d8')">d8</button>
-<button onclick="addDice('d10')">d10</button>
-<button onclick="addDice('d12')">d12</button>
-<button onclick="addDice('d20')">d20</button>
+<div class="dice">
+<button onclick="addDice(4)">d4</button>
+<button onclick="addDice(6)">d6</button>
+<button onclick="addDice(8)">d8</button>
+<button onclick="addDice(10)">d10</button>
+<button onclick="addDice(12)">d12</button>
+<button onclick="addDice(20)">d20</button>
 </div>
 
 <br>
-<button onclick="saveRoll()">💾 Salvar</button>
-<button onclick="rollDice()">🎲 Rolar</button>
+<button class="action" onclick="saveFormula()">💾 Salvar Fórmula</button>
 
 <div class="result" id="result"></div>
 
-<div class="saved-rolls">
-<h2>Rolagens Salvas</h2>
-<div id="rollList"></div>
-</div>
+<h2>📜 Fórmulas Salvas</h2>
+<div id="list"></div>
 
 </div>
 
 <script>
-// 🔥 COLOQUE SEUS DADOS DO SUPABASE AQUI
-const supabaseUrl = "https://zhfqewgnnfejfyfkmyae.supabase.co";
-const supabaseKey = "sb_publishable_DGpfjOL9IQ4t8DEiz06fhQ_YDnJABI6";
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dice Manager</title>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<style>
+body {
+  font-family: Arial, sans-serif;
+  background: linear-gradient(135deg,#0f2027,#203a43,#2c5364);
+  color: white;
+  text-align: center;
+  padding: 30px;
+}
+
+.container {
+  max-width: 600px;
+  margin: auto;
+}
+
+input {
+  padding: 10px;
+  width: 90%;
+  margin: 8px 0;
+  border-radius: 8px;
+  border: none;
+}
+
+button {
+  padding: 10px 15px;
+  margin: 5px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  font-weight: bold;
+  transition: 0.2s;
+}
+
+button:hover {
+  transform: scale(1.05);
+}
+
+.dice button {
+  background: #ff9800;
+  color: white;
+}
+
+.action {
+  background: #00e676;
+  color: black;
+}
+
+.roll-card {
+  background: rgba(255,255,255,0.1);
+  padding: 10px;
+  margin: 10px 0;
+  border-radius: 8px;
+}
+
+.result {
+  margin-top: 20px;
+  font-size: 20px;
+  font-weight: bold;
+}
+</style>
+</head>
+<body>
+
+<h1>🎲 Gerenciador de Rolagens</h1>
+
+<div class="container">
+
+<input id="rollName" placeholder="Nome (ex: Dano do Bastão)">
+<input id="formula" placeholder="Fórmula (ex: 1d4 + 3d6 + 3)">
+
+<div class="dice">
+<button onclick="addDice(4)">d4</button>
+<button onclick="addDice(6)">d6</button>
+<button onclick="addDice(8)">d8</button>
+<button onclick="addDice(10)">d10</button>
+<button onclick="addDice(12)">d12</button>
+<button onclick="addDice(20)">d20</button>
+</div>
+
+<br>
+<button class="action" onclick="saveFormula()">💾 Salvar Fórmula</button>
+
+<div class="result" id="result"></div>
+
+<h2>📜 Fórmulas Salvas</h2>
+<div id="list"></div>
+
+</div>
+
+<script>
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dice Manager</title>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<style>
+body {
+  font-family: Arial, sans-serif;
+  background: linear-gradient(135deg,#0f2027,#203a43,#2c5364);
+  color: white;
+  text-align: center;
+  padding: 30px;
+}
+
+.container {
+  max-width: 600px;
+  margin: auto;
+}
+
+input {
+  padding: 10px;
+  width: 90%;
+  margin: 8px 0;
+  border-radius: 8px;
+  border: none;
+}
+
+button {
+  padding: 10px 15px;
+  margin: 5px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  font-weight: bold;
+  transition: 0.2s;
+}
+
+button:hover {
+  transform: scale(1.05);
+}
+
+.dice button {
+  background: #ff9800;
+  color: white;
+}
+
+.action {
+  background: #00e676;
+  color: black;
+}
+
+.roll-card {
+  background: rgba(255,255,255,0.1);
+  padding: 10px;
+  margin: 10px 0;
+  border-radius: 8px;
+}
+
+.result {
+  margin-top: 20px;
+  font-size: 20px;
+  font-weight: bold;
+}
+</style>
+</head>
+<body>
+
+<h1>🎲 Gerenciador de Rolagens</h1>
+
+<div class="container">
+
+<input id="rollName" placeholder="Nome (ex: Dano do Bastão)">
+<input id="formula" placeholder="Fórmula (ex: 1d4 + 3d6 + 3)">
+
+<div class="dice">
+<button onclick="addDice(4)">d4</button>
+<button onclick="addDice(6)">d6</button>
+<button onclick="addDice(8)">d8</button>
+<button onclick="addDice(10)">d10</button>
+<button onclick="addDice(12)">d12</button>
+<button onclick="addDice(20)">d20</button>
+</div>
+
+<br>
+<button class="action" onclick="saveFormula()">💾 Salvar Fórmula</button>
+
+<div class="result" id="result"></div>
+
+<h2>📜 Fórmulas Salvas</h2>
+<div id="list"></div>
+
+</div>
+
+<script>
+// 🔴 COLOQUE SUAS CHAVES AQUI
+const SUPABASE_URL = "SUA_URL_AQUI";
+const SUPABASE_KEY = "SUA_ANON_KEY_AQUI";
 
 const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-// Adiciona dado no input
-function addDice(dice) {
-    const formulaInput = document.getElementById("formula");
-    formulaInput.value += (formulaInput.value ? " + 1" : "1") + dice;
+// adiciona dado
+function addDice(sides) {
+  const input = document.getElementById("formula");
+  input.value += (input.value ? " + 1d" : "1d") + sides;
 }
 
-// Calcula rolagem
-function rollDice(formulaText = null) {
-    const formula = formulaText || document.getElementById("formula").value;
-    let total = 0;
+// salva fórmula
+async function saveFormula() {
+  const name = document.getElementById("rollName").value.trim();
+  const formula = document.getElementById("formula").value.trim();
 
-    const parts = formula.split("+");
+  if (!name || !formula) {
+    alert("Preencha tudo!");
+    return;
+  }
 
-    parts.forEach(part => {
-        part = part.trim();
+  const { error } = await supabase
+    .from("rolls")
+    .insert([{ name, formula }]);
 
-        if (part.includes("d")) {
-            const [qty, dice] = part.split("d");
-            const quantity = parseInt(qty);
-            const sides = parseInt(dice);
+  if (error) {
+    console.error(error);
+    alert("Erro ao salvar. Veja o console.");
+    return;
+  }
 
-            for (let i = 0; i < quantity; i++) {
-                total += Math.floor(Math.random() * sides) + 1;
-            }
-        } else {
-            total += parseInt(part);
-        }
-    });
+  document.getElementById("rollName").value = "";
+  document.getElementById("formula").value = "";
 
-    document.getElementById("result").innerText =
-        `Resultado (${formula}) = ${total}`;
-
-    return total;
+  loadFormulas();
 }
 
-// Salvar no Supabase
-async function saveRoll() {
-    const name = document.getElementById("rollName").value;
-    const formula = document.getElementById("formula").value;
+// carrega fórmulas
+async function loadFormulas() {
+  const { data, error } = await supabase
+    .from("rolls")
+    .select("*")
+    .order("created_at", { ascending: false });
 
-    if (!name || !formula) {
-        alert("Preencha nome e fórmula!");
-        return;
-    }
+  if (error) {
+    console.error(error);
+    return;
+  }
 
-    const { error } = await supabase
-        .from("rolls")
-        .insert([{ name, formula }]);
+  const list = document.getElementById("list");
+  list.innerHTML = "";
 
-    if (!error) {
-        alert("Salvo com sucesso!");
-        loadRolls();
+  data.forEach(item => {
+    const div = document.createElement("div");
+    div.className = "roll-card";
+
+    div.innerHTML = `
+      <strong>${item.name}</strong><br>
+      ${item.formula}
+      <br>
+      <button onclick="roll('${item.formula}')">🎲 Rolar</button>
+    `;
+
+    list.appendChild(div);
+  });
+}
+
+// rolar (NÃO SALVA resultado)
+function roll(formula) {
+  let total = 0;
+
+  formula.split("+").forEach(part => {
+    part = part.trim();
+
+    if (part.includes("d")) {
+      const [qty, sides] = part.split("d");
+      for (let i = 0; i < parseInt(qty); i++) {
+        total += Math.floor(Math.random() * parseInt(sides)) + 1;
+      }
     } else {
-        alert("Erro ao salvar.");
+      total += parseInt(part);
     }
+  });
+
+  document.getElementById("result").innerText =
+    `Resultado: ${total}`;
 }
 
-// Carregar rolagens
-async function loadRolls() {
-    const { data, error } = await supabase
-        .from("rolls")
-        .select("*")
-        .order("created_at", { ascending: false });
+// carrega ao abrir
+loadFormulas();
+</script>
 
-    const rollList = document.getElementById("rollList");
-    rollList.innerHTML = "";
+</body>
+</html>
+const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-    data.forEach(roll => {
-        const div = document.createElement("div");
-        div.classList.add("roll-card");
-
-        div.innerHTML = `
-            <strong>${roll.name}</strong><br>
-            ${roll.formula}
-            <br>
-            <button onclick="rollDice('${roll.formula}')">Rolar</button>
-        `;
-
-        rollList.appendChild(div);
-    });
+// adiciona dado
+function addDice(sides) {
+  const input = document.getElementById("formula");
+  input.value += (input.value ? " + 1d" : "1d") + sides;
 }
 
-// Carrega ao abrir o site
-loadRolls();
+// salva fórmula
+async function saveFormula() {
+  const name = document.getElementById("rollName").value.trim();
+  const formula = document.getElementById("formula").value.trim();
+
+  if (!name || !formula) {
+    alert("Preencha tudo!");
+    return;
+  }
+
+  const { error } = await supabase
+    .from("rolls")
+    .insert([{ name, formula }]);
+
+  if (error) {
+    console.error(error);
+    alert("Erro ao salvar. Veja o console.");
+    return;
+  }
+
+  document.getElementById("rollName").value = "";
+  document.getElementById("formula").value = "";
+
+  loadFormulas();
+}
+
+// carrega fórmulas
+async function loadFormulas() {
+  const { data, error } = await supabase
+    .from("rolls")
+    .select("*")
+    .order("created_at", { ascending: false });
+
+  if (error) {
+    console.error(error);
+    return;
+  }
+
+  const list = document.getElementById("list");
+  list.innerHTML = "";
+
+  data.forEach(item => {
+    const div = document.createElement("div");
+    div.className = "roll-card";
+
+    div.innerHTML = `
+      <strong>${item.name}</strong><br>
+      ${item.formula}
+      <br>
+      <button onclick="roll('${item.formula}')">🎲 Rolar</button>
+    `;
+
+    list.appendChild(div);
+  });
+}
+
+// rolar (NÃO SALVA resultado)
+function roll(formula) {
+  let total = 0;
+
+  formula.split("+").forEach(part => {
+    part = part.trim();
+
+    if (part.includes("d")) {
+      const [qty, sides] = part.split("d");
+      for (let i = 0; i < parseInt(qty); i++) {
+        total += Math.floor(Math.random() * parseInt(sides)) + 1;
+      }
+    } else {
+      total += parseInt(part);
+    }
+  });
+
+  document.getElementById("result").innerText =
+    `Resultado: ${total}`;
+}
+
+// carrega ao abrir
+loadFormulas();
+</script>
+
+</body>
+</html>
+const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+// adiciona dado
+function addDice(sides) {
+  const input = document.getElementById("formula");
+  input.value += (input.value ? " + 1d" : "1d") + sides;
+}
+
+// salva fórmula
+async function saveFormula() {
+  const name = document.getElementById("rollName").value.trim();
+  const formula = document.getElementById("formula").value.trim();
+
+  if (!name || !formula) {
+    alert("Preencha tudo!");
+    return;
+  }
+
+  const { error } = await supabase
+    .from("rolls")
+    .insert([{ name, formula }]);
+
+  if (error) {
+    console.error(error);
+    alert("Erro ao salvar. Veja o console.");
+    return;
+  }
+
+  document.getElementById("rollName").value = "";
+  document.getElementById("formula").value = "";
+
+  loadFormulas();
+}
+
+// carrega fórmulas
+async function loadFormulas() {
+  const { data, error } = await supabase
+    .from("rolls")
+    .select("*")
+    .order("created_at", { ascending: false });
+
+  if (error) {
+    console.error(error);
+    return;
+  }
+
+  const list = document.getElementById("list");
+  list.innerHTML = "";
+
+  data.forEach(item => {
+    const div = document.createElement("div");
+    div.className = "roll-card";
+
+    div.innerHTML = `
+      <strong>${item.name}</strong><br>
+      ${item.formula}
+      <br>
+      <button onclick="roll('${item.formula}')">🎲 Rolar</button>
+    `;
+
+    list.appendChild(div);
+  });
+}
+
+// rolar (NÃO SALVA resultado)
+function roll(formula) {
+  let total = 0;
+
+  formula.split("+").forEach(part => {
+    part = part.trim();
+
+    if (part.includes("d")) {
+      const [qty, sides] = part.split("d");
+      for (let i = 0; i < parseInt(qty); i++) {
+        total += Math.floor(Math.random() * parseInt(sides)) + 1;
+      }
+    } else {
+      total += parseInt(part);
+    }
+  });
+
+  document.getElementById("result").innerText =
+    `Resultado: ${total}`;
+}
+
+// carrega ao abrir
+loadFormulas();
 </script>
 
 </body>
