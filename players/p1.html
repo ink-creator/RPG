@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Ficha RPG</title>
-  <link rel="stylesheet" href="../style.css">
+  <link rel="stylesheet" href="style.css">
 </head>
 <body data-player="p1">
 
@@ -14,70 +14,69 @@
   <div class="top">
 
     <!-- INFO -->
-    <div class="info left">
+    <div class="info">
       <div class="fields-group">
         <div class="field"><label>Nome</label><input id="nome"></div>
         <div class="field"><label>Raça</label><input id="raca"></div>
-        <div class="field"><label>Semi-Raça</label><input id="sraca"></div>
         <div class="field"><label>Classe</label><input id="classe"></div>
         <div class="field"><label>Origem</label><input id="origem"></div>
         <div class="field"><label>Idade</label><input id="idade"></div>
-        <div class="field"><label>Altura</label><input id="altura"></div>
-        <div class="field"><label>Peso</label><input id="peso"></div>
         <div class="field"><label>Dinheiro</label><input id="dinheiro"></div>
       </div>
     </div>
 
     <!-- ATRIBUTOS -->
-    <div class="info center">
+    <div class="info">
       <h2>ATRIBUTOS</h2>
       <div class="fields-group">
-        <div class="field"><label>Força</label><input id="forca" type="number"></div>
-        <div class="field"><label>Agilidade</label><input id="agilidade" type="number"></div>
-        <div class="field"><label>Intelecto</label><input id="intelecto" type="number"></div>
-        <div class="field"><label>Presença</label><input id="presenca" type="number"></div>
-        <div class="field"><label>Vigor</label><input id="vigor" type="number"></div>
+
+        <div class="field">
+          <label class="roll-label" data-input="forca">Força</label>
+          <input id="forca" type="number">
+        </div>
+
+        <div class="field">
+          <label class="roll-label" data-input="agilidade">Agilidade</label>
+          <input id="agilidade" type="number">
+        </div>
+
+        <div class="field">
+          <label class="roll-label" data-input="intelecto">Intelecto</label>
+          <input id="intelecto" type="number">
+        </div>
+
+        <div class="field">
+          <label class="roll-label" data-input="presenca">Presença</label>
+          <input id="presenca" type="number">
+        </div>
+
+        <div class="field">
+          <label class="roll-label" data-input="vigor">Vigor</label>
+          <input id="vigor" type="number">
+        </div>
+
       </div>
     </div>
 
     <!-- STATUS -->
-    <div class="info right">
-      <div class="status-container">
+    <div class="info">
+      <h2>STATUS</h2>
 
-        <!-- VIDA -->
-        <div class="bar-group">
-          <label>VIDA</label>
-          <div class="bar-inputs">
-            <input id="vida-atual" type="number"> /
-            <input id="vida-max" type="number">
-          </div>
-          <div class="bar"><div id="vida"></div></div>
-          <input id="vida-resistencia" placeholder="Resistência">
-        </div>
+      <label>VIDA</label>
+      <input id="vida-atual" type="number"> /
+      <input id="vida-max" type="number">
+      <div class="bar"><div id="vida"></div></div>
 
-        <!-- SANIDADE -->
-        <div class="bar-group">
-          <label>SANIDADE</label>
-          <div class="bar-inputs">
-            <input id="sanidade-atual" type="number"> /
-            <input id="sanidade-max" type="number">
-          </div>
-          <div class="bar"><div id="sanidade"></div></div>
-          <input id="sanidade-resistencia" placeholder="Resistência">
-        </div>
+      <label>SANIDADE</label>
+      <input id="sanidade-atual" type="number"> /
+      <input id="sanidade-max" type="number">
+      <div class="bar"><div id="sanidade"></div></div>
 
-        <!-- ENERGIA -->
-        <div class="bar-group">
-          <label>ENERGIA</label>
-          <div class="bar-inputs">
-            <input id="energia-atual" type="number"> /
-            <input id="energia-max" type="number">
-          </div>
-          <div class="bar"><div id="energia"></div></div>
-          <input id="energia-resistencia" placeholder="Resistência">
-        </div>
+      <label>ENERGIA</label>
+      <input id="energia-atual" type="number"> /
+      <input id="energia-max" type="number">
+      <div class="bar"><div id="energia"></div></div>
 
-      </div>
     </div>
 
   </div>
@@ -85,51 +84,54 @@
   <!-- MEIO -->
   <div class="middle">
 
-    <!-- PERÍCIAS GERAIS -->
+    <!-- PERÍCIAS -->
     <div class="block">
-      <h2>PERÍCIAS GERAIS</h2>
+      <h2>PERÍCIAS</h2>
       <div class="fields-group">
-        <input id="luta" placeholder="Luta">
-        <input id="destreza" placeholder="Destreza">
-        <input id="furtividade" placeholder="Furtividade">
-        <input id="vigilancia" placeholder="Vigilância">
-        <input id="sorte" placeholder="Sorte">
+
+        <div class="field">
+          <label class="roll-label" data-input="luta">Luta</label>
+          <input id="luta" type="number">
+        </div>
+
+        <div class="field">
+          <label class="roll-label" data-input="furtividade">Furtividade</label>
+          <input id="furtividade" type="number">
+        </div>
+
+        <div class="field">
+          <label class="roll-label" data-input="vigilancia">Vigilância</label>
+          <input id="vigilancia" type="number">
+        </div>
+
+        <div class="field">
+          <label class="roll-label" data-input="sorte">Sorte</label>
+          <input id="sorte" type="number">
+        </div>
+
       </div>
     </div>
 
-    <!-- INTERPESSOAL -->
+    <!-- SOCIAL -->
     <div class="block">
       <h2>INTERPESSOAL</h2>
       <div class="fields-group">
-        <input id="charme" placeholder="Charme">
-        <input id="intimidar" placeholder="Intimidar">
-        <input id="manipulacao" placeholder="Manipulação">
-        <input id="negociar" placeholder="Negociar">
-        <input id="psicologia" placeholder="Psicologia">
-      </div>
-    </div>
 
-    <!-- TÉCNICO -->
-    <div class="block">
-      <h2>TÉCNICO</h2>
-      <div class="fields-group">
-        <input id="tecnologia" placeholder="Tecnologia">
-        <input id="mecanica" placeholder="Mecânica">
-        <input id="balistica" placeholder="Balística">
-        <input id="investigacao" placeholder="Investigação">
-        <input id="medicina" placeholder="Medicina">
-      </div>
-    </div>
+        <div class="field">
+          <label class="roll-label" data-input="charme">Charme</label>
+          <input id="charme" type="number">
+        </div>
 
-    <!-- ACADÊMICO -->
-    <div class="block">
-      <h2>ACADÊMICO</h2>
-      <div class="fields-group">
-        <input id="historia" placeholder="História">
-        <input id="geografia" placeholder="Geografia">
-        <input id="fisica" placeholder="Física">
-        <input id="quimica" placeholder="Química">
-        <input id="linguagem" placeholder="Linguagem">
+        <div class="field">
+          <label class="roll-label" data-input="intimidar">Intimidar</label>
+          <input id="intimidar" type="number">
+        </div>
+
+        <div class="field">
+          <label class="roll-label" data-input="negociar">Negociar</label>
+          <input id="negociar" type="number">
+        </div>
+
       </div>
     </div>
 
@@ -137,13 +139,6 @@
     <div class="block">
       <h2>PODERES</h2>
       <textarea id="poderes" rows="5"></textarea>
-    </div>
-
-    <!-- SANIDADE EXTRA -->
-    <div class="block">
-      <h2>MENTAL</h2>
-      <input id="exposicao" placeholder="Exposição Paranormal">
-      <textarea id="traumas" placeholder="Traumas" rows="3"></textarea>
     </div>
 
     <!-- INVENTÁRIO -->
@@ -156,23 +151,14 @@
 
 </div>
 
-<script>
-  localStorage.setItem("playerId", "p1");
-
-  // AUTO SAVE
-  const inputs = document.querySelectorAll("input, textarea");
-
-  inputs.forEach(input => {
-    input.addEventListener("input", () => {
-      localStorage.setItem(input.id, input.value);
-    });
-
-    const saved = localStorage.getItem(input.id);
-    if (saved) input.value = saved;
-  });
-</script>
+<!-- 🎲 OVERLAY -->
+<div id="dice-overlay">
+  <div class="dice-box">
+    <div id="dice-sprite"></div>
+    <div id="dice-text" class="dice-text"></div>
+  </div>
+</div>
 
 <script type="module" src="../main.js"></script>
-
 </body>
 </html>
