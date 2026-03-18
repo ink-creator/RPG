@@ -20,10 +20,14 @@
 body {
   background: radial-gradient(circle at top, #08080d, #0b0b12);
   color: var(--text);
-  font-family: 'Verdana', Geneva, sans-serif;
+  font-family: 'Georgia', 'Times New Roman', serif;
   margin: 0;
+  letter-spacing: 0.5px;
 }
 
+/* =========================
+   CONTAINER PRINCIPAL
+========================= */
 .sheet {
   max-width: 1300px;
   margin: 20px auto;
@@ -31,7 +35,14 @@ body {
   background: var(--panel);
   border: 2px solid var(--border);
   border-radius: 12px;
-  box-shadow: 0 0 20px rgba(255, 0, 0, 0.5);
+  animation: pulse 6s infinite;
+}
+
+/* EFEITO RESPIRAÇÃO */
+@keyframes pulse {
+  0% { box-shadow: 0 0 20px rgba(255, 0, 0, 0.4); }
+  50% { box-shadow: 0 0 35px rgba(255, 0, 0, 0.8); }
+  100% { box-shadow: 0 0 20px rgba(255, 0, 0, 0.4); }
 }
 
 /* =========================
@@ -63,6 +74,17 @@ h2 {
   grid-template-columns: repeat(3, 1fr);
 }
 
+/* RESPONSIVO */
+@media (max-width: 900px) {
+  .top {
+    grid-template-columns: 1fr;
+  }
+
+  .middle {
+    grid-template-columns: 1fr;
+  }
+}
+
 /* =========================
    BLOCOS
 ========================= */
@@ -72,17 +94,28 @@ h2 {
   border-radius: 8px;
   padding: 12px;
   box-shadow: 0 0 8px rgba(255,0,0,0.3);
+  transition: all 0.3s ease;
 }
 
-.fields-grid {
-  display: flex;
-  gap: 10px;
+/* LINHA DECORATIVA */
+.block::before {
+  content: "";
+  display: block;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--accent), transparent);
+  margin-bottom: 6px;
+  opacity: 0.7;
 }
 
-.fields-grid .column {
-  flex: 1;
+/* HOVER */
+.block:hover, .info:hover {
+  transform: translateY(-3px) scale(1.01);
+  box-shadow: 0 0 18px rgba(255,0,0,0.6);
 }
 
+/* =========================
+   GRUPOS
+========================= */
 .fields-group {
   display: flex;
   flex-direction: column;
@@ -90,37 +123,43 @@ h2 {
 }
 
 /* =========================
-   CAMPOS
+   INPUTS
 ========================= */
-.field {
-  display: flex;
-  flex-direction: column;
-  margin-bottom: 5px;
-  position: relative;
+input, textarea {
+  width: 100%;
+  padding: 6px 8px;
+  background: linear-gradient(145deg, #0d0d14, #12121c);
+  border: 1px solid var(--input-border);
+  border-radius: 6px;
+  color: var(--text);
+  transition: all 0.25s ease;
+  font-size: 14px;
 }
 
+textarea {
+  resize: none;
+}
+
+/* HOVER */
+input:hover, textarea:hover {
+  border-color: var(--accent);
+}
+
+/* FOCUS */
+input:focus, textarea:focus {
+  border-color: var(--highlight);
+  box-shadow: 0 0 10px var(--highlight);
+  transform: scale(1.02);
+  outline: none;
+}
+
+/* LABEL */
 .field label {
   font-size: 13px;
   color: var(--secondary);
   margin-bottom: 2px;
   font-weight: bold;
   text-shadow: 0 0 3px var(--accent);
-}
-
-.field input {
-  padding: 6px 8px;
-  font-size: 14px;
-  background: var(--input-bg);
-  color: var(--text);
-  border: 1px solid var(--input-border);
-  border-radius: 5px;
-  outline: none;
-  transition: all 0.2s ease;
-}
-
-.field input:focus {
-  border-color: var(--highlight);
-  box-shadow: 0 0 6px var(--highlight);
 }
 
 /* =========================
@@ -141,8 +180,12 @@ h2 {
 .bar div {
   height: 100%;
   width: 0%;
-  transition: width 0.35s ease;
+  transition: width 0.35s ease, box-shadow 0.3s;
   border-radius: 6px;
+}
+
+.bar div:hover {
+  filter: brightness(1.2);
 }
 
 /* VIDA */
@@ -169,6 +212,33 @@ h2 {
     0 0 14px rgba(0, 255, 247, 0.9);
 }
 
+/* =========================
+   EFEITOS ESPECIAIS
+========================= */
+
+/* VIDA BAIXA */
+.low-life {
+  animation: danger 1s infinite;
+}
+
+@keyframes danger {
+  0% { box-shadow: 0 0 5px red; }
+  50% { box-shadow: 0 0 20px red; }
+  100% { box-shadow: 0 0 5px red; }
+}
+
+/* SANIDADE INSANA */
+.insano {
+  animation: glitch 0.2s infinite;
+}
+
+@keyframes glitch {
+  0% { transform: translate(0); }
+  25% { transform: translate(2px, -2px); }
+  50% { transform: translate(-2px, 2px); }
+  75% { transform: translate(2px, 2px); }
+  100% { transform: translate(0); }
+}
 
 /* =========================
    DICE OVERLAY
@@ -193,18 +263,13 @@ h2 {
 #dice-sprite {
   width: 64px;
   height: 64px;
-
   background-image: url("./players/bah.png");
   background-repeat: no-repeat;
-
-  /* 20 dados em uma linha */
   background-size: 1280px 64px;
   background-position: 0 0;
-
-  background-color: transparent;
 }
 
-/* animação correta */
+/* ANIMAÇÃO */
 #dice-sprite.rolling {
   animation: dice-roll 1s steps(20) infinite;
 }
@@ -214,9 +279,7 @@ h2 {
   to   { background-position-x: -1280px; }
 }
 
-
-
-/* TEXTO DO RESULTADO */
+/* TEXTO */
 .dice-text {
   font-size: 2em;
   font-weight: bold;
@@ -224,7 +287,7 @@ h2 {
   text-shadow: 0 0 8px #ff1a1a;
 }
 
-/* CORES POR RESULTADO */
+/* RESULTADOS */
 .dice-text.EXTREMO {
   color: gold;
   text-shadow: 0 0 14px gold;
@@ -244,7 +307,3 @@ h2 {
   color: #f44336;
   text-shadow: 0 0 12px #f44336;
 }
-
-
-
-
