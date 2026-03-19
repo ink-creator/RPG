@@ -28,6 +28,7 @@
         <div class="field"><label>Altura</label><input id="altura"></div>
         <div class="field"><label>Peso</label><input id="peso"></div>
         <div class="field"><label>Dinheiro</label><input id="dinheiro"></div>
+        <div class="field"><label>Tamanho</label><input id="tamanho" placeholder="Pequeno / Médio / Grande"></div>
       </div>
     </div>
 
@@ -73,12 +74,22 @@
 
     <!-- COMBATE -->
     <div class="block">
-      <h2>COMBATE</h2>
-      <div class="fields-group">
-        <div class="field"><label class="roll-label" data-input="luta">Luta</label><input id="luta"></div>
-        <div class="field"><label class="roll-label" data-input="pontaria">Pontaria</label><input id="pontaria"></div>
-        <div class="field"><label class="roll-label" data-input="tatica">Tática</label><input id="tatica"></div>
-      </div>
+      <div class="block">
+  <h2>COMBATE</h2>
+  <div class="fields-group">
+
+    <div class="field"><label class="roll-label" data-input="luta">Luta</label><input id="luta"></div>
+    <div class="field"><label class="roll-label" data-input="pontaria">Pontaria</label><input id="pontaria"></div>
+    <div class="field"><label class="roll-label" data-input="tatica">Tática</label><input id="tatica"></div>
+
+    <hr>
+
+    <div class="field"><label>Ataque Base</label><input id="ataque-base"></div>
+    <div class="field"><label>Dano Corpo a Corpo</label><input id="dano-corpo"></div>
+    <div class="field"><label>Dano à Distância</label><input id="dano-distancia"></div>
+
+  </div>
+</div>
     </div>
 
     <!-- PERÍCIAS -->
@@ -96,16 +107,28 @@
       </div>
     </div>
 
-    <!-- ARMADURA -->
-    <div class="block">
-      <h2>ARMADURA</h2>
-      <div class="fields-group">
-        <div class="field"><label>Nome</label><input id="armadura-nome"></div>
-        <div class="field"><label>Proteção</label><input id="armadura-def"></div>
-        <div class="field"><label>Penalidade</label><input id="armadura-pen"></div>
-        <div class="field"><label>Durabilidade</label><input id="armadura-dur"></div>
-      </div>
-    </div>
+   <div class="block">
+    <h2>ARMADURA & EQUIPADO</h2>
+    <div class="fields-group">
+
+    <div class="field"><label>Armadura</label><input id="armadura-nome"></div>
+    <div class="field"><label>Proteção</label><input id="armadura-def"></div>
+    <div class="field"><label>Penalidade</label><input id="armadura-pen"></div>
+    <div class="field"><label>Durabilidade</label><input id="armadura-dur"></div>
+
+    <hr>
+
+    <div class="field"><label>Cabeça</label><input id="slot-cabeca"></div>
+    <div class="field"><label>Peito</label><input id="slot-peito"></div>
+    <div class="field"><label>Mãos</label><input id="slot-maos"></div>
+    <div class="field"><label>Acessório</label><input id="slot-acessorio"></div>
+
+    <hr>
+
+    <textarea id="armadura-notas" placeholder="Detalhes, efeitos, modificações..."></textarea>
+
+  </div>
+</div>
 
     <!-- ARMAS -->
     <div class="block">
