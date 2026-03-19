@@ -1,3 +1,4 @@
+```html
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -9,17 +10,25 @@
 
 <div class="sheet">
 
+  <!-- 🔥 HEADER RPG -->
+  <div class="header">
+    <h1 id="char-nome">Personagem</h1>
+    <p id="char-info">Classe • Origem</p>
+    <div id="save-status">✔ Salvo</div>
+  </div>
+
   <div class="top">
 
+    <!-- INFO -->
     <div class="info">
       <div class="fields-group">
-        <div class="field"><label>Nome</label><input id="nome"></div>
-        <div class="field"><label>Classe</label><input id="classe"></div>
-        <div class="field"><label>Origem</label><input id="origem"></div>
-        <div class="field"><label>Idade</label><input id="idade"></div>
-        <div class="field"><label>Altura</label><input id="altura"></div>
-        <div class="field"><label>Peso</label><input id="peso"></div>
-        <div class="field"><label>Dinheiro</label><input id="dinheiro"></div>
+        <div class="field"><label>Nome</label><input id="nome" placeholder="Nome do personagem"></div>
+        <div class="field"><label>Classe</label><input id="classe" placeholder="Classe"></div>
+        <div class="field"><label>Origem</label><input id="origem" placeholder="Origem"></div>
+        <div class="field"><label>Idade</label><input id="idade" placeholder="Idade"></div>
+        <div class="field"><label>Altura</label><input id="altura" placeholder="Altura"></div>
+        <div class="field"><label>Peso</label><input id="peso" placeholder="Peso"></div>
+        <div class="field"><label>Dinheiro</label><input id="dinheiro" placeholder="Dinheiro"></div>
       </div>
     </div>
 
@@ -53,7 +62,6 @@
       <input id="energia-atual" type="number"> /
       <input id="energia-max" type="number">
       <div class="bar"><div id="energia"></div></div>
-
     </div>
 
   </div>
@@ -158,11 +166,20 @@
 
   </div>
 
+  <!-- 🎲 BOTÕES DE TESTE -->
+  <div class="dice-global">
+    <button onclick="rolarTeste('forca')">🎲 Força</button>
+    <button onclick="rolarTeste('agilidade')">🎲 Agilidade</button>
+    <button onclick="rolarTeste('intelecto')">🎲 Intelecto</button>
+  </div>
+
 </div>
+
 <script>
   localStorage.setItem("playerId", "p1");
 </script>
 
+<!-- 🎲 OVERLAY -->
 <div id="dice-overlay">
   <div style="display:flex; flex-direction:column; align-items:center; gap:16px;">
     <div id="dice-sprite"></div>
@@ -170,32 +187,10 @@
   </div>
 </div>
 
-<a href="../arvore1.html"
-   style="
-     display:inline-block;
-     margin-top:12px;
-     padding:6px 14px;
-     font-family:'Times New Roman', serif;
-     font-size:16px;
-     letter-spacing:1px;
-     color:#ff1a1a;
-     text-decoration:none;
-     border:1px solid #ff1a1a;
-     background:linear-gradient(180deg,#1a1a1a,#050505);
-     box-shadow: inset 0 0 6px rgba(255,0,0,0.4), 0 0 10px rgba(255,0,0,0.2);
-     transition:all 0.25s ease;
-   "
-   onmouseover="
-     this.style.color='#ffffff';
-     this.style.boxShadow='inset 0 0 10px rgba(255,0,0,0.8), 0 0 18px rgba(255,0,0,0.6)';
-   "
-   onmouseout="
-     this.style.color='#ff1a1a';
-     this.style.boxShadow='inset 0 0 6px rgba(255,0,0,0.4), 0 0 10px rgba(255,0,0,0.2)';
-   ">
-⛧ Skill Tree ⛧
-</a>
+<!-- 🔗 SKILL TREE -->
+<a href="../arvore1.html" class="skill-btn">⛧ Skill Tree ⛧</a>
 
 <script type="module" src="../main.js"></script>
 </body>
 </html>
+```
