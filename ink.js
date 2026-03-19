@@ -38,48 +38,80 @@ function avaliar(valor, dado) {
 }
 
 /* =========================
-   🧠 ROLAGEM + HISTÓRICO
+   🧠 MAPA DE ATRIBUTOS
 ========================= */
-async function rolarDado2D(pericia, valor) {
+const mapaAtributos = {
+  luta: "forca",
+  atletismo: "forca",
+
+  pontaria: "agilidade",
+  furtividade: "agilidade",
+
+  investigacao: "intelecto",
+  tecnologia: "intelecto",
+  medicina: "intelecto",
+  tatica: "intelecto",
+
+  percepcao: "vigor",
+
+  intimidacao: "presenca",
+  persuasao: "presenca"
+};
+
+function getValor(id) {
+  const el = document.getElementById(id);
+  return el ? parseInt(el.value) || 0 : 0;
+}
+
+/* =========================
+   🎲 ROLAGEM + HISTÓRICO
+========================= */
+async function rolarDado2D(periciaId, labelTexto) {
   const overlay = document.getElementById("dice-overlay");
   const dice = document.getElementById("dice-sprite");
   const text = document.getElementById("dice-text");
+
+  // valores
+  const valorPericia = getValor(periciaId);
+  const atributoId = mapaAtributos[periciaId];
+  const valorAtributo = getValor(atributoId);
+
+  const valorTotal = valorPericia + valorAtributo;
 
   // reset visual
   text.textContent = "";
   text.className = "dice-text";
   dice.style.backgroundPositionX = "0px";
 
-  // mostra overlay e anima
   overlay.classList.add("show");
   dice.classList.add("rolling");
 
-  // tempo da animação girando
   await new Promise(r => setTimeout(r, 1200));
 
-  // sorteio real
   const dado = Math.floor(Math.random() * 20) + 1;
-  const resultado = avaliar(valor, dado);
+  const resultado = avaliar(valorTotal, dado);
 
-  // para animação
   dice.classList.remove("rolling");
 
-  // posiciona sprite no número correto
   const posX = -((dado - 1) * 64);
   dice.style.backgroundPositionX = `${posX}px`;
 
-  // texto + cor
-  text.textContent = `${resultado} (${dado})`;
+  // TEXTO MELHORADO 🔥
+  text.textContent =
+    `${labelTexto}\n` +
+    `🎲 ${dado} | Perícia: ${valorPericia} | Atributo: ${valorAtributo}\n` +
+    `Total: ${valorTotal} → ${resultado}`;
+
   text.classList.add(resultado);
 
-  // salva no supabase
+  // salva no supabase (mantido)
   const { error } = await supabase
     .from("roll_history")
     .insert({
       player_id: PLAYER_ID,
-      pericia: pericia,
+      pericia: periciaId,
       dado: dado,
-      input_valor: valor,
+      input_valor: valorTotal,
       resultado: resultado
     });
 
@@ -87,7 +119,6 @@ async function rolarDado2D(pericia, valor) {
     console.error("Erro ao salvar histórico:", error);
   }
 
-  // fecha overlay
   setTimeout(() => {
     overlay.classList.remove("show");
   }, 2200);
@@ -100,13 +131,11 @@ document.querySelectorAll(".roll-label").forEach(label => {
   label.addEventListener("click", e => {
     e.preventDefault();
 
-    const input = document.getElementById(label.dataset.input);
-    if (!input) return alert("Input não encontrado");
+    const periciaId = label.dataset.input;
+    const labelTexto = label.textContent.trim();
 
-    const valor = parseInt(input.value, 10);
-    if (isNaN(valor)) return alert("Valor inválido");
+    if (!periciaId) return;
 
-    rolarDado2D(label.textContent.trim(), valor);
+    rolarDado2D(periciaId, labelTexto);
   });
 });
-
