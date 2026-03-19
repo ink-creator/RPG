@@ -1,9 +1,8 @@
-```html
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <title>Ficha - Ordem Paranormal</title>
+  <title>Ficha RPG</title>
   <link rel="stylesheet" href="../style.css">
 </head>
 <body data-player="p1">
@@ -25,8 +24,9 @@
         <div class="field"><label>Nome</label><input id="nome"></div>
         <div class="field"><label>Classe</label><input id="classe"></div>
         <div class="field"><label>Origem</label><input id="origem"></div>
-        <div class="field"><label>NEX</label><input id="nex" type="number"></div>
         <div class="field"><label>Idade</label><input id="idade"></div>
+        <div class="field"><label>Altura</label><input id="altura"></div>
+        <div class="field"><label>Peso</label><input id="peso"></div>
         <div class="field"><label>Dinheiro</label><input id="dinheiro"></div>
       </div>
     </div>
@@ -47,20 +47,24 @@
     <div class="info">
       <h2>STATUS</h2>
 
-      <label>VIDA</label>
+      <label>❤️ VIDA</label>
       <input id="vida-atual" type="number"> /
       <input id="vida-max" type="number">
       <div class="bar"><div id="vida"></div></div>
 
-      <label>SANIDADE</label>
+      <label>🧠 SANIDADE</label>
       <input id="sanidade-atual" type="number"> /
       <input id="sanidade-max" type="number">
       <div class="bar"><div id="sanidade"></div></div>
 
-      <label>ENERGIA</label>
+      <label>⚡ ENERGIA</label>
       <input id="energia-atual" type="number"> /
       <input id="energia-max" type="number">
       <div class="bar"><div id="energia"></div></div>
+
+      <div class="field"><label>Defesa</label><input id="defesa"></div>
+      <div class="field"><label>Iniciativa</label><input id="iniciativa"></div>
+      <div class="field"><label>Deslocamento</label><input id="deslocamento"></div>
     </div>
 
   </div>
@@ -74,17 +78,6 @@
         <div class="field"><label class="roll-label" data-input="luta">Luta</label><input id="luta"></div>
         <div class="field"><label class="roll-label" data-input="pontaria">Pontaria</label><input id="pontaria"></div>
         <div class="field"><label class="roll-label" data-input="tatica">Tática</label><input id="tatica"></div>
-        <div class="field"><label>Iniciativa</label><input id="iniciativa"></div>
-      </div>
-    </div>
-
-    <!-- DEFESA -->
-    <div class="block">
-      <h2>DEFESA</h2>
-      <div class="fields-group">
-        <div class="field"><label>Defesa</label><input id="defesa"></div>
-        <div class="field"><label>Esquiva</label><input id="esquiva"></div>
-        <div class="field"><label>Bloqueio</label><input id="bloqueio"></div>
       </div>
     </div>
 
@@ -98,22 +91,62 @@
         <div class="field"><label class="roll-label" data-input="atletismo">Atletismo</label><input id="atletismo"></div>
         <div class="field"><label class="roll-label" data-input="tecnologia">Tecnologia</label><input id="tecnologia"></div>
         <div class="field"><label class="roll-label" data-input="medicina">Medicina</label><input id="medicina"></div>
+        <div class="field"><label class="roll-label" data-input="intimidacao">Intimidação</label><input id="intimidacao"></div>
+        <div class="field"><label class="roll-label" data-input="persuasao">Persuasão</label><input id="persuasao"></div>
       </div>
     </div>
 
-    <!-- RESISTÊNCIAS -->
+    <!-- ARMADURA -->
     <div class="block">
-      <h2>RESISTÊNCIAS</h2>
+      <h2>ARMADURA</h2>
       <div class="fields-group">
-        <div class="field"><label>Física</label><input id="res-fisica"></div>
-        <div class="field"><label>Mental</label><input id="res-mental"></div>
+        <div class="field"><label>Nome</label><input id="armadura-nome"></div>
+        <div class="field"><label>Proteção</label><input id="armadura-def"></div>
+        <div class="field"><label>Penalidade</label><input id="armadura-pen"></div>
+        <div class="field"><label>Durabilidade</label><input id="armadura-dur"></div>
+      </div>
+    </div>
+
+    <!-- ARMAS DETALHADAS -->
+    <div class="block">
+      <h2>ARMAS</h2>
+      <div class="fields-group">
+        <div class="field"><label>Arma</label><input id="arma1"></div>
+        <div class="field"><label>Dano</label><input id="arma1-dano"></div>
+        <div class="field"><label>Crítico</label><input id="arma1-crit"></div>
+        <div class="field"><label>Munição</label><input id="arma1-muni"></div>
       </div>
     </div>
 
     <!-- INVENTÁRIO -->
-    <div class="block"><h2>EQUIPAMENTOS</h2><textarea id="equipamentos"></textarea></div>
-    <div class="block"><h2>ARMAS</h2><textarea id="armas"></textarea></div>
-    <div class="block"><h2>ANOTAÇÕES</h2><textarea id="anotacoes"></textarea></div>
+    <div class="block">
+      <h2>INVENTÁRIO</h2>
+      <textarea id="inventario"></textarea>
+    </div>
+
+    <!-- HABILIDADES -->
+    <div class="block">
+      <h2>HABILIDADES</h2>
+      <textarea id="habilidades"></textarea>
+    </div>
+
+    <!-- CONDIÇÕES -->
+    <div class="block">
+      <h2>CONDIÇÕES</h2>
+      <textarea id="condicoes"></textarea>
+    </div>
+
+    <!-- BUFFS -->
+    <div class="block">
+      <h2>BUFFS / DEBUFFS</h2>
+      <textarea id="buffs"></textarea>
+    </div>
+
+    <!-- ANOTAÇÕES -->
+    <div class="block">
+      <h2>ANOTAÇÕES</h2>
+      <textarea id="anotacoes"></textarea>
+    </div>
 
   </div>
 
