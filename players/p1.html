@@ -5,7 +5,7 @@
   <title>Ficha</title>
   <link rel="stylesheet" href="../style.css">
 </head>
-<body>
+<body data-player="p1">
 
 <div class="sheet">
 
@@ -159,8 +159,18 @@
   </div>
 
 </div>
+<script>
+  localStorage.setItem("playerId", "p1");
+</script>
 
-<a href="../arvore2.html"
+<div id="dice-overlay">
+  <div style="display:flex; flex-direction:column; align-items:center; gap:16px;">
+    <div id="dice-sprite"></div>
+    <div id="dice-text" class="dice-text"></div>
+  </div>
+</div>
+
+<a href="../arvore1.html"
    style="
      display:inline-block;
      margin-top:12px;
