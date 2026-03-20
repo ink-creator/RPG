@@ -1,11 +1,9 @@
 // ink.js
-import { PLAYER_ID } from "./players.js";
-import { supabase } from "./supabase.js";
 
 /* =========================
-   🎲 TABELA DE RESULTADOS
+   🎲 TABELA ORDEM
 ========================= */
-const TABELA_ORDEM = {
+const TABELA = {
   1:{extremo:null,bom:null,normal:20},
   2:{extremo:null,bom:20,normal:19},
   3:{extremo:null,bom:20,normal:18},
@@ -28,8 +26,33 @@ const TABELA_ORDEM = {
   20:{extremo:17,bom:11,normal:1}
 };
 
+/* =========================
+   🧠 ATRIBUTOS
+========================= */
+const mapa = {
+  luta: "forca",
+  atletismo: "forca",
+  pontaria: "agilidade",
+  furtividade: "agilidade",
+  investigacao: "intelecto",
+  tecnologia: "intelecto",
+  medicina: "intelecto",
+  tatica: "intelecto",
+  percepcao: "vigor",
+  intimidacao: "presenca",
+  persuasao: "presenca"
+};
+
+/* =========================
+   🛠 UTILS
+========================= */
+function get(id) {
+  const el = document.getElementById(id);
+  return el ? parseInt(el.value) || 0 : 0;
+}
+
 function avaliar(valor, dado) {
-  const r = TABELA_ORDEM[valor];
+  const r = TABELA[valor];
   if (!r) return "FALHA";
   if (r.extremo && dado >= r.extremo) return "EXTREMO";
   if (r.bom && dado >= r.bom) return "BOM";
@@ -38,147 +61,107 @@ function avaliar(valor, dado) {
 }
 
 /* =========================
-   🧠 MAPA DE ATRIBUTOS
+   🎲 ROLAGEM
 ========================= */
-const mapaAtributos = {
-  luta: "forca",
-  atletismo: "forca",
-
-  pontaria: "agilidade",
-  furtividade: "agilidade",
-
-  investigacao: "intelecto",
-  tecnologia: "intelecto",
-  medicina: "intelecto",
-  tatica: "intelecto",
-
-  percepcao: "vigor",
-
-  intimidacao: "presenca",
-  persuasao: "presenca"
-};
-
-function getValor(id) {
-  const el = document.getElementById(id);
-  if (!el) return 0;
-  return parseInt(el.value) || 0;
-}
-
-/* =========================
-   ⚔️ ROLAGEM COMPLETA
-========================= */
-async function rolarDado2D(periciaId, labelTexto) {
+async function rolar(periciaId, nome) {
 
   const overlay = document.getElementById("dice-overlay");
   const dice = document.getElementById("dice-sprite");
   const text = document.getElementById("dice-text");
 
-  if (!overlay || !dice || !text) {
-    console.error("Overlay não encontrado");
-    return;
-  }
+  const pericia = get(periciaId);
+  const atributo = get(mapa[periciaId]);
+  const total = pericia + atributo;
 
-  const valorPericia = getValor(periciaId);
-  const atributoId = mapaAtributos[periciaId];
-  const valorAtributo = getValor(atributoId);
-
-  const valorTotal = valorPericia + valorAtributo;
-
-  const defesa = getValor("defesa");
+  const defesa = get("defesa");
   const DT = 10;
 
-  // reset visual
-  text.textContent = "";
-  text.className = "dice-text";
-  dice.style.backgroundPositionX = "0px";
-
   overlay.classList.add("show");
-  dice.classList.add("rolling");
+  text.textContent = "";
 
-  await new Promise(r => setTimeout(r, 1200));
+  await new Promise(r => setTimeout(r, 800));
 
   const dado = Math.floor(Math.random() * 20) + 1;
 
-  dice.classList.remove("rolling");
-
-  const posX = -((dado - 1) * 64);
-  dice.style.backgroundPositionX = `${posX}px`;
-
-  let resultado = avaliar(valorTotal, dado);
+  let resultado = avaliar(total, dado);
   let extra = "";
 
-  // crítico
   if (dado === 20) {
     resultado = "CRÍTICO";
-    extra = "🔥 SUCESSO CRÍTICO!";
-  } else if (dado === 1) {
-    resultado = "DESASTRE";
-    extra = "💀 FALHA CRÍTICA!";
+    extra = "🔥 SUCESSO CRÍTICO";
   }
 
-  // combate
+  if (dado === 1) {
+    resultado = "DESASTRE";
+    extra = "💀 FALHA CRÍTICA";
+  }
+
   let combate = "";
   if (["luta", "pontaria"].includes(periciaId)) {
-    combate = (dado + valorTotal >= defesa)
-      ? "✅ ACERTOU"
-      : "❌ ERROU";
+    combate = (dado + total >= defesa) ? "✅ ACERTOU" : "❌ ERROU";
   }
 
-  // DT
-  let testeDT = "";
+  let teste = "";
   if (!["luta", "pontaria"].includes(periciaId)) {
-    testeDT = (dado + valorTotal >= DT)
-      ? "✔ SUCESSO"
-      : "✖ FALHA";
+    teste = (dado + total >= DT) ? "✔ SUCESSO" : "✖ FALHA";
   }
 
   text.textContent =
-    `${labelTexto}\n` +
-    `🎲 ${dado}\n` +
-    `Perícia: ${valorPericia} | Atributo: ${valorAtributo}\n` +
-    `Total: ${valorTotal}\n` +
-    `${resultado} ${extra}\n` +
-    `${combate || testeDT}`;
+    `${nome}
+🎲 ${dado}
+Perícia: ${pericia}
+Atributo: ${atributo}
+Total: ${total}
 
-  text.classList.add(resultado);
+${resultado} ${extra}
+${combate || teste}`;
 
-  // salvar no banco
-  try {
-    await supabase.from("roll_history").insert({
-      player_id: PLAYER_ID,
-      pericia: periciaId,
-      dado: dado,
-      input_valor: valorTotal,
-      resultado: resultado
-    });
-  } catch (err) {
-    console.error("Erro ao salvar:", err);
-  }
+  text.className = "dice-text " + resultado;
 
   setTimeout(() => {
     overlay.classList.remove("show");
-  }, 2600);
+  }, 2500);
 }
 
 /* =========================
-   🖱️ EVENTOS (CORRIGIDO)
+   ❤️ BARRAS
+========================= */
+function atualizarBarra(atualId, maxId, barraId) {
+  const atual = get(atualId);
+  const max = get(maxId);
+
+  const barra = document.getElementById(barraId);
+  if (!barra) return;
+
+  const porcentagem = max > 0 ? (atual / max) * 100 : 0;
+  barra.style.width = porcentagem + "%";
+}
+
+function atualizarTudo() {
+  atualizarBarra("vida-atual", "vida-max", "vida");
+  atualizarBarra("sanidade-atual", "sanidade-max", "sanidade");
+  atualizarBarra("energia-atual", "energia-max", "energia");
+}
+
+/* =========================
+   🖱 EVENTOS
 ========================= */
 document.addEventListener("DOMContentLoaded", () => {
 
+  // clique nas perícias
   document.querySelectorAll(".roll-label").forEach(label => {
-    label.addEventListener("click", e => {
-      e.preventDefault();
-
-      const periciaId = label.dataset.input;
-      const labelTexto = label.textContent.trim();
-
-      if (!periciaId) {
-        console.warn("Sem data-input");
-        return;
-      }
-
-      rolarDado2D(periciaId, labelTexto);
+    label.addEventListener("click", () => {
+      const id = label.dataset.input;
+      const nome = label.textContent;
+      rolar(id, nome);
     });
   });
+
+  // atualizar barras automaticamente
+  document.querySelectorAll("input").forEach(input => {
+    input.addEventListener("input", atualizarTudo);
+  });
+
+  atualizarTudo();
 
 });
