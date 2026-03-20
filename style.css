@@ -236,7 +236,7 @@ textarea {
 #dice-sprite {
   width: 64px;
   height: 64px;
-  background: url("../img/dice.png");
+  background: url("../players/bah.png");
   background-size: cover;
   margin-bottom: 10px;
 }
